@@ -1,0 +1,122 @@
+<svg width="1080" height="1920" viewBox="0 0 1080 1920" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="outroGold" x1="85" y1="1091" x2="951" y2="1414" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5F3400"/>
+      <stop offset="0.15" stop-color="#BD7100"/>
+      <stop offset="0.38" stop-color="#FFD04F"/>
+      <stop offset="0.61" stop-color="#F4A611"/>
+      <stop offset="0.82" stop-color="#F7C95D"/>
+      <stop offset="1" stop-color="#7A4300"/>
+    </linearGradient>
+    <linearGradient id="outroBrandGold" x1="208" y1="90" x2="844" y2="565" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF6CF"/>
+      <stop offset="0.15" stop-color="#FFE28A"/>
+      <stop offset="0.38" stop-color="#FFC93A"/>
+      <stop offset="0.65" stop-color="#E69A06"/>
+      <stop offset="0.84" stop-color="#B96E00"/>
+      <stop offset="1" stop-color="#6E3F00"/>
+    </linearGradient>
+    <radialGradient id="heroGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(540 796) rotate(90) scale(578 332)">
+      <stop stop-color="#FFD35D" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#FFD35D" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="outroGlow" x="-160" y="1030" width="1400" height="540" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+      <feGaussianBlur stdDeviation="9" result="effect1_foregroundBlur"/>
+    </filter>
+    <filter id="textGlow2" x="146" y="136" width="792" height="280" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+      <feGaussianBlur stdDeviation="5" result="effect1_foregroundBlur"/>
+    </filter>
+  </defs>
+  <rect width="1080" height="1920" fill="#040404"/>
+  <g opacity="0.14">
+    <path d="M0 64H1080" stroke="#151515" stroke-width="2"/>
+    <path d="M0 144H1080" stroke="#151515" stroke-width="2"/>
+    <path d="M0 224H1080" stroke="#151515" stroke-width="2"/>
+    <path d="M0 304H1080" stroke="#151515" stroke-width="2"/>
+    <path d="M0 384H1080" stroke="#151515" stroke-width="2"/>
+    <path d="M0 464H1080" stroke="#151515" stroke-width="2"/>
+    <path d="M0 544H1080" stroke="#151515" stroke-width="2"/>
+    <path d="M0 624H1080" stroke="#151515" stroke-width="2"/>
+    <path d="M0 704H1080" stroke="#151515" stroke-width="2"/>
+    <path d="M0 784H1080" stroke="#151515" stroke-width="2"/>
+    <path d="M0 864H1080" stroke="#151515" stroke-width="2"/>
+    <path d="M0 944H1080" stroke="#151515" stroke-width="2"/>
+    <path d="M0 1024H1080" stroke="#151515" stroke-width="2"/>
+    <path d="M0 1104H1080" stroke="#151515" stroke-width="2"/>
+    <path d="M0 1184H1080" stroke="#151515" stroke-width="2"/>
+    <path d="M0 1264H1080" stroke="#151515" stroke-width="2"/>
+    <path d="M0 1344H1080" stroke="#151515" stroke-width="2"/>
+    <path d="M0 1424H1080" stroke="#151515" stroke-width="2"/>
+    <path d="M0 1504H1080" stroke="#151515" stroke-width="2"/>
+    <path d="M0 1584H1080" stroke="#151515" stroke-width="2"/>
+    <path d="M0 1664H1080" stroke="#151515" stroke-width="2"/>
+    <path d="M0 1744H1080" stroke="#151515" stroke-width="2"/>
+    <path d="M0 1824H1080" stroke="#151515" stroke-width="2"/>
+    <path d="M80 0V1920" stroke="#151515" stroke-width="2"/>
+    <path d="M160 0V1920" stroke="#151515" stroke-width="2"/>
+    <path d="M240 0V1920" stroke="#151515" stroke-width="2"/>
+    <path d="M320 0V1920" stroke="#151515" stroke-width="2"/>
+    <path d="M400 0V1920" stroke="#151515" stroke-width="2"/>
+    <path d="M480 0V1920" stroke="#151515" stroke-width="2"/>
+    <path d="M560 0V1920" stroke="#151515" stroke-width="2"/>
+    <path d="M640 0V1920" stroke="#151515" stroke-width="2"/>
+    <path d="M720 0V1920" stroke="#151515" stroke-width="2"/>
+    <path d="M800 0V1920" stroke="#151515" stroke-width="2"/>
+    <path d="M880 0V1920" stroke="#151515" stroke-width="2"/>
+    <path d="M960 0V1920" stroke="#151515" stroke-width="2"/>
+    <path d="M1040 0V1920" stroke="#151515" stroke-width="2"/>
+  </g>
+  <ellipse cx="540" cy="830" rx="360" ry="560" fill="url(#heroGlow)"/>
+  <g transform="translate(133 86) scale(0.24)">
+    <path d="M250 293L476 186V390L374 442V594L476 543V747L250 854V293Z" fill="url(#outroBrandGold)"/>
+    <path d="M541 189L660 189V1011L541 950V189Z" fill="url(#outroBrandGold)"/>
+    <path d="M722 187L956 309V430L842 369V466L947 521V639L842 584V1010L722 948V187Z" fill="url(#outroBrandGold)"/>
+    <path d="M319 382L407 339V429L319 472V382Z" fill="#090909" fill-opacity="0.34"/>
+    <path d="M668 160L675 184L699 191L675 198L668 222L661 198L637 191L661 184L668 160Z" fill="#FFF5C6"/>
+  </g>
+  <g filter="url(#textGlow2)">
+    <text x="356" y="222" fill="url(#outroBrandGold)" font-family="Montserrat, Poppins, Arial, sans-serif" font-size="84" font-weight="800" letter-spacing="2">ARTEFORMA</text>
+    <text x="431" y="286" fill="#F6F1E9" font-family="Montserrat, Poppins, Arial, sans-serif" font-size="30" font-weight="600" letter-spacing="12">MADE DIFFERENT</text>
+  </g>
+  <text x="231" y="712" fill="#FFFDF8" font-family="Montserrat, Poppins, Arial, sans-serif" font-size="114" font-weight="800" letter-spacing="1">FOLLOW</text>
+  <text x="205" y="838" fill="#FFFDF8" font-family="Montserrat, Poppins, Arial, sans-serif" font-size="114" font-weight="800" letter-spacing="1">FOR MORE</text>
+  <g filter="url(#outroGlow)">
+    <path d="M-115 1316C66 1261 179 1371 296 1411C425 1456 556 1455 684 1416C804 1379 897 1281 1005 1263C1091 1249 1181 1268 1236 1294" stroke="url(#outroGold)" stroke-width="14" stroke-linecap="round"/>
+    <path d="M-65 1364C91 1337 194 1412 313 1461C442 1513 568 1508 690 1469C820 1428 904 1344 1007 1329C1088 1317 1162 1337 1227 1368" stroke="url(#outroGold)" stroke-width="8" stroke-linecap="round" opacity="0.82"/>
+    <path d="M-32 1275C136 1237 255 1338 370 1393C479 1445 596 1442 715 1407C835 1372 912 1298 1008 1274C1078 1258 1143 1268 1195 1285" stroke="url(#outroGold)" stroke-width="5" stroke-linecap="round" opacity="0.74"/>
+    <path d="M-92 1435C85 1410 197 1488 313 1523C443 1562 568 1554 692 1520C816 1487 916 1408 1019 1389C1093 1375 1167 1388 1231 1415" stroke="url(#outroGold)" stroke-width="6" stroke-linecap="round" opacity="0.58"/>
+  </g>
+  <g opacity="0.95">
+    <circle cx="118" cy="1342" r="2" fill="#FFC93A"/>
+    <circle cx="173" cy="1301" r="3" fill="#FFE59A"/>
+    <circle cx="228" cy="1361" r="2.5" fill="#FFD564"/>
+    <circle cx="295" cy="1410" r="3" fill="#FFF0BB"/>
+    <circle cx="360" cy="1464" r="3.5" fill="#FFC93A"/>
+    <circle cx="444" cy="1443" r="2.5" fill="#FFE59A"/>
+    <circle cx="531" cy="1473" r="4" fill="#FFD564"/>
+    <circle cx="621" cy="1451" r="3" fill="#FFF0BB"/>
+    <circle cx="706" cy="1417" r="2.5" fill="#FFC93A"/>
+    <circle cx="790" cy="1382" r="3.5" fill="#FFE59A"/>
+    <circle cx="866" cy="1327" r="3" fill="#FFD564"/>
+    <circle cx="941" cy="1289" r="4" fill="#FFF0BB"/>
+    <circle cx="1007" cy="1314" r="3" fill="#FFC93A"/>
+    <circle cx="221" cy="1683" r="2.5" fill="#FFC93A" opacity="0.65"/>
+    <circle cx="326" cy="1739" r="2" fill="#FFE59A" opacity="0.55"/>
+    <circle cx="808" cy="1704" r="2.5" fill="#FFD564" opacity="0.62"/>
+    <circle cx="916" cy="1760" r="3" fill="#FFF0BB" opacity="0.5"/>
+    <circle cx="281" cy="610" r="2.5" fill="#FFC93A" opacity="0.54"/>
+    <circle cx="386" cy="575" r="2" fill="#FFE59A" opacity="0.62"/>
+    <circle cx="691" cy="596" r="2.5" fill="#FFD564" opacity="0.58"/>
+  </g>
+  <g>
+    <rect x="301" y="1610" width="112" height="112" rx="24" fill="#0E0E10" stroke="#313131" stroke-width="2"/>
+    <path d="M355.741 1640.21C368.352 1640.21 378.575 1650.26 378.575 1662.66V1663.79C385.067 1668.51 393.431 1671.31 402.456 1671.31V1697.4C393.13 1697.4 384.752 1695.41 377.364 1691.44C372.555 1699.84 363.264 1705.79 352.522 1705.79C337.053 1705.79 324.515 1693.44 324.515 1678.2C324.515 1663 337.053 1650.65 352.522 1650.65C354.163 1650.65 355.775 1650.79 357.341 1651.07V1665.26C355.95 1664.74 354.435 1664.45 352.849 1664.45C345.865 1664.45 340.204 1670.03 340.204 1676.91C340.204 1683.79 345.865 1689.37 352.849 1689.37C359.833 1689.37 365.494 1683.79 365.494 1676.91V1640.21H355.741Z" fill="#F4F8FF"/>
+    <path d="M366.867 1646.28C371.479 1652.41 378.934 1656.49 387.349 1656.93V1667.06C378.108 1666.69 370.041 1662.86 364.236 1657.02V1646.28H366.867Z" fill="#25F4EE"/>
+    <path d="M363.087 1654.46V1664.75C361.39 1664.11 359.564 1663.77 357.66 1663.77C349.531 1663.77 342.941 1670.26 342.941 1678.27C342.941 1684.01 346.322 1688.98 351.243 1691.33C344.806 1690.72 339.787 1685.42 339.787 1679C339.787 1672.16 345.414 1666.61 352.354 1666.61C355.328 1666.61 358.054 1667.62 360.216 1669.31V1654.46H363.087Z" fill="#FE2C55"/>
+  </g>
+  <text x="448" y="1686" fill="url(#outroBrandGold)" font-family="Montserrat, Poppins, Arial, sans-serif" font-size="68" font-weight="700">@arteforma1</text>
+</svg>

@@ -1,0 +1,62 @@
+<svg width="1400" height="1400" viewBox="0 0 1400 1400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="egoldMain" x1="310" y1="260" x2="998" y2="1080" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FCE7A1"/>
+      <stop offset="0.28" stop-color="#E2B84D"/>
+      <stop offset="0.62" stop-color="#BA7E17"/>
+      <stop offset="1" stop-color="#6F4300"/>
+    </linearGradient>
+    <linearGradient id="egoldSide" x1="432" y1="320" x2="842" y2="1044" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A66B0F"/>
+      <stop offset="1" stop-color="#4B2B00"/>
+    </linearGradient>
+    <linearGradient id="egoldTop" x1="404" y1="216" x2="810" y2="368" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF4CA"/>
+      <stop offset="1" stop-color="#CC9124"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="197" y1="189" x2="1185" y2="466" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#787878"/>
+      <stop offset="0.5" stop-color="#232323"/>
+      <stop offset="1" stop-color="#8B8B8B"/>
+    </linearGradient>
+  </defs>
+  <g>
+    <path d="M326 1098V526L566 356H698V487L530 603V747L638 671V804L530 881V1098H326Z" fill="url(#egoldMain)"/>
+    <path d="M698 356H1016V482H818V632H981V751H818V1098H698V356Z" fill="url(#egoldMain)"/>
+    <path d="M566 356L642 300H774L698 356H566Z" fill="url(#egoldTop)"/>
+    <path d="M698 356L774 300H1093L1016 356H698Z" fill="url(#egoldTop)"/>
+    <path d="M638 671L714 614V747L638 804V671Z" fill="url(#egoldSide)"/>
+    <path d="M698 356L774 300V1042L698 1098V356Z" fill="url(#egoldSide)"/>
+    <path d="M1016 356L1093 300V425L1016 482V356Z" fill="url(#egoldSide)"/>
+    <path d="M981 632L1057 575V694L981 751V632Z" fill="url(#egoldSide)"/>
+    <path d="M326 526L402 469V1042L326 1098V526Z" fill="url(#egoldSide)"/>
+    <path d="M530 603L606 547V691L530 747V603Z" fill="#111111" fill-opacity="0.26"/>
+  </g>
+  <g>
+    <rect x="168" y="260" width="1064" height="34" rx="10" fill="url(#metal)"/>
+    <rect x="226" y="244" width="54" height="66" rx="10" fill="#171717" stroke="#C7962D" stroke-width="6"/>
+    <rect x="1120" y="244" width="54" height="66" rx="10" fill="#171717" stroke="#C7962D" stroke-width="6"/>
+    <rect x="602" y="146" width="196" height="230" rx="22" fill="#191919" stroke="#6A6A6A" stroke-width="8"/>
+    <circle cx="700" cy="258" r="60" fill="#101010" stroke="#505050" stroke-width="8"/>
+    <circle cx="700" cy="258" r="18" fill="#202020"/>
+    <path d="M700 198V237" stroke="#5A5A5A" stroke-width="8" stroke-linecap="round"/>
+    <path d="M700 279V318" stroke="#5A5A5A" stroke-width="8" stroke-linecap="round"/>
+    <path d="M640 258H679" stroke="#5A5A5A" stroke-width="8" stroke-linecap="round"/>
+    <path d="M721 258H760" stroke="#5A5A5A" stroke-width="8" stroke-linecap="round"/>
+    <path d="M658 216L684 242" stroke="#5A5A5A" stroke-width="8" stroke-linecap="round"/>
+    <path d="M716 274L742 300" stroke="#5A5A5A" stroke-width="8" stroke-linecap="round"/>
+    <path d="M742 216L716 242" stroke="#5A5A5A" stroke-width="8" stroke-linecap="round"/>
+    <path d="M684 274L658 300" stroke="#5A5A5A" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="633" cy="176" r="8" fill="#D0A13C"/>
+    <circle cx="767" cy="176" r="8" fill="#D0A13C"/>
+    <circle cx="633" cy="346" r="8" fill="#D0A13C"/>
+    <circle cx="767" cy="346" r="8" fill="#D0A13C"/>
+    <rect x="668" y="376" width="64" height="88" rx="20" fill="#121212"/>
+    <path d="M700 464L682 521H718L700 464Z" fill="#C89122"/>
+    <path d="M700 520V877C700 908 674 933 642 933H559" stroke="#D7A843" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M559 933H900" stroke="#D7A843" stroke-width="10" stroke-linecap="round"/>
+    <path d="M700 100L700 146" stroke="#3A3A3A" stroke-width="10" stroke-linecap="round"/>
+    <path d="M744 88L744 146" stroke="#3A3A3A" stroke-width="10" stroke-linecap="round"/>
+    <path d="M790 115C881 145 1002 165 1080 183" stroke="#2F2F2F" stroke-width="14" stroke-linecap="round"/>
+  </g>
+</svg>

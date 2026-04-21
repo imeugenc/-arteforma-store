@@ -1,0 +1,84 @@
+<svg width="1800" height="1400" viewBox="0 0 1800 1400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="goldFace" x1="384" y1="286" x2="1208" y2="1106" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF1B6"/>
+      <stop offset="0.22" stop-color="#F2CC6B"/>
+      <stop offset="0.52" stop-color="#D59B29"/>
+      <stop offset="0.8" stop-color="#A86809"/>
+      <stop offset="1" stop-color="#6E4000"/>
+    </linearGradient>
+    <linearGradient id="goldSide" x1="541" y1="364" x2="954" y2="1085" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#C98712"/>
+      <stop offset="1" stop-color="#4D2C00"/>
+    </linearGradient>
+    <linearGradient id="goldTop" x1="496" y1="220" x2="882" y2="367" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF7D4"/>
+      <stop offset="1" stop-color="#D8A139"/>
+    </linearGradient>
+    <linearGradient id="railMetal" x1="165" y1="194" x2="1269" y2="458" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7A7A7A"/>
+      <stop offset="0.45" stop-color="#252525"/>
+      <stop offset="1" stop-color="#8C8C8C"/>
+    </linearGradient>
+    <linearGradient id="wordGold" x1="289" y1="1034" x2="1544" y2="1317" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF1B6"/>
+      <stop offset="0.25" stop-color="#E9BE58"/>
+      <stop offset="0.58" stop-color="#C98D1F"/>
+      <stop offset="1" stop-color="#84510C"/>
+    </linearGradient>
+    <filter id="softGlow" x="149" y="138" width="1319" height="1118" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+      <feGaussianBlur stdDeviation="8" result="effect1_foregroundBlur"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#softGlow)">
+    <rect x="188" y="254" width="1088" height="30" rx="9" fill="url(#railMetal)"/>
+    <rect x="235" y="238" width="52" height="62" rx="10" fill="#161616" stroke="#C89227" stroke-width="6"/>
+    <rect x="1176" y="238" width="52" height="62" rx="10" fill="#161616" stroke="#C89227" stroke-width="6"/>
+
+    <path d="M430 1110V625L643 406H773V542L615 699V826L716 731V850L615 951V1110H430Z" fill="url(#goldFace)"/>
+    <path d="M773 406H1082V525H892V652H1048V766H892V1110H773V406Z" fill="url(#goldFace)"/>
+
+    <path d="M643 406L721 346H851L773 406H643Z" fill="url(#goldTop)"/>
+    <path d="M773 406L851 346H1162L1082 406H773Z" fill="url(#goldTop)"/>
+    <path d="M716 731L794 671V791L716 850V731Z" fill="url(#goldSide)"/>
+    <path d="M773 406L851 346V1050L773 1110V406Z" fill="url(#goldSide)"/>
+    <path d="M1082 406L1162 346V466L1082 525V406Z" fill="url(#goldSide)"/>
+    <path d="M1048 652L1128 593V707L1048 766V652Z" fill="url(#goldSide)"/>
+    <path d="M430 625L508 565V1050L430 1110V625Z" fill="url(#goldSide)"/>
+    <path d="M615 699L693 639V765L615 826V699Z" fill="#121212" fill-opacity="0.25"/>
+
+    <rect x="633" y="166" width="204" height="238" rx="24" fill="#1A1A1A" stroke="#666666" stroke-width="8"/>
+    <circle cx="735" cy="283" r="64" fill="#111111" stroke="#515151" stroke-width="8"/>
+    <circle cx="735" cy="283" r="20" fill="#232323"/>
+    <path d="M735 220V262" stroke="#626262" stroke-width="8" stroke-linecap="round"/>
+    <path d="M735 304V346" stroke="#626262" stroke-width="8" stroke-linecap="round"/>
+    <path d="M672 283H714" stroke="#626262" stroke-width="8" stroke-linecap="round"/>
+    <path d="M756 283H798" stroke="#626262" stroke-width="8" stroke-linecap="round"/>
+    <path d="M691 239L719 267" stroke="#626262" stroke-width="8" stroke-linecap="round"/>
+    <path d="M779 239L751 267" stroke="#626262" stroke-width="8" stroke-linecap="round"/>
+    <path d="M691 327L719 299" stroke="#626262" stroke-width="8" stroke-linecap="round"/>
+    <path d="M779 327L751 299" stroke="#626262" stroke-width="8" stroke-linecap="round"/>
+
+    <circle cx="665" cy="196" r="8" fill="#D7A23A"/>
+    <circle cx="805" cy="196" r="8" fill="#D7A23A"/>
+    <circle cx="665" cy="374" r="8" fill="#D7A23A"/>
+    <circle cx="805" cy="374" r="8" fill="#D7A23A"/>
+
+    <rect x="703" y="404" width="64" height="94" rx="18" fill="#121212"/>
+    <path d="M735 498L715 556H755L735 498Z" fill="#C68A1A"/>
+    <path d="M735 555V884C735 917 708 944 675 944H584" stroke="#D6A33B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M584 944H1012" stroke="#D6A33B" stroke-width="10" stroke-linecap="round"/>
+
+    <path d="M704 123V166" stroke="#3B3B3B" stroke-width="10" stroke-linecap="round"/>
+    <path d="M744 111V166" stroke="#3B3B3B" stroke-width="10" stroke-linecap="round"/>
+    <path d="M783 121C866 145 965 164 1046 182" stroke="#323232" stroke-width="14" stroke-linecap="round"/>
+  </g>
+
+  <text x="267" y="1210" fill="url(#wordGold)" font-family="Montserrat, Poppins, Arial, sans-serif" font-size="162" font-weight="800" letter-spacing="10">ARTEFORMA</text>
+  <path d="M229 1276H653" stroke="#A27218" stroke-width="8" stroke-linecap="round"/>
+  <path d="M1149 1276H1573" stroke="#A27218" stroke-width="8" stroke-linecap="round"/>
+  <text x="692" y="1315" fill="#EDE8DE" font-family="Montserrat, Poppins, Arial, sans-serif" font-size="58" font-weight="600" letter-spacing="24">MADE DIFFERENT</text>
+</svg>

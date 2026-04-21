@@ -1,0 +1,19 @@
+<svg width="1800" height="700" viewBox="0 0 1800 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="v5Gold" x1="132" y1="132" x2="1128" y2="546" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F6D57A"/>
+      <stop offset="0.5" stop-color="#D7A12A"/>
+      <stop offset="1" stop-color="#8A5C12"/>
+    </linearGradient>
+  </defs>
+
+  <path d="M161 514L271 185H312L422 514H377L352 436H230L205 514H161ZM241 402H341L291 251L241 402Z" fill="url(#v5Gold)"/>
+  <path d="M455 185H565C640 185 695 201 730 234C764 266 781 311 781 369C781 429 763 475 728 506C693 537 639 553 565 553H455V185ZM563 514C627 514 673 501 701 474C729 447 743 412 743 369C743 328 729 295 701 270C673 243 627 230 563 230H503V514H563Z" fill="url(#v5Gold)"/>
+  <path d="M852 185H1116V227H901V345H1096V387H901V511H1124V553H852V185Z" fill="url(#v5Gold)"/>
+  <path d="M1188 185H1444V227H1237V350H1416V392H1237V553H1188V185Z" fill="url(#v5Gold)"/>
+  <path d="M1506 185H1555V553H1506V185Z" fill="url(#v5Gold)"/>
+  <path d="M1600 553V185H1641L1870 487V185H1917V553H1877L1648 251V553H1600Z" fill="url(#v5Gold)" transform="translate(-166 0)"/>
+
+  <path d="M161 616H995" stroke="#B98A27" stroke-width="7" stroke-linecap="round" opacity="0.65"/>
+  <text x="164" y="646" fill="#151515" font-family="Montserrat, Poppins, Arial, sans-serif" font-size="34" font-weight="700" letter-spacing="14">MADE DIFFERENT</text>
+</svg>

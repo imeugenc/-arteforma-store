@@ -1,0 +1,66 @@
+<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="afGold" x1="267" y1="200" x2="904" y2="898" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF1B8"/>
+      <stop offset="0.18" stop-color="#FFD36A"/>
+      <stop offset="0.48" stop-color="#F0A915"/>
+      <stop offset="0.76" stop-color="#C57900"/>
+      <stop offset="1" stop-color="#8A4D00"/>
+    </linearGradient>
+    <linearGradient id="afShadow" x1="319" y1="195" x2="914" y2="899" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5A3200" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#0B0600" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="softGlow" x="176" y="112" width="847" height="977" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+      <feGaussianBlur stdDeviation="18" result="effect1_foregroundBlur"/>
+    </filter>
+    <filter id="spark" x="554" y="112" width="148" height="147" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+      <feGaussianBlur stdDeviation="4" result="effect1_foregroundBlur"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="1200" rx="120" fill="#060606"/>
+  <g opacity="0.4">
+    <path d="M149 146H1050" stroke="#131313" stroke-width="2"/>
+    <path d="M149 246H1050" stroke="#131313" stroke-width="2"/>
+    <path d="M149 346H1050" stroke="#131313" stroke-width="2"/>
+    <path d="M149 446H1050" stroke="#131313" stroke-width="2"/>
+    <path d="M149 546H1050" stroke="#131313" stroke-width="2"/>
+    <path d="M149 646H1050" stroke="#131313" stroke-width="2"/>
+    <path d="M149 746H1050" stroke="#131313" stroke-width="2"/>
+    <path d="M149 846H1050" stroke="#131313" stroke-width="2"/>
+    <path d="M149 946H1050" stroke="#131313" stroke-width="2"/>
+    <path d="M149 146V1054" stroke="#131313" stroke-width="2"/>
+    <path d="M249 146V1054" stroke="#131313" stroke-width="2"/>
+    <path d="M349 146V1054" stroke="#131313" stroke-width="2"/>
+    <path d="M449 146V1054" stroke="#131313" stroke-width="2"/>
+    <path d="M549 146V1054" stroke="#131313" stroke-width="2"/>
+    <path d="M649 146V1054" stroke="#131313" stroke-width="2"/>
+    <path d="M749 146V1054" stroke="#131313" stroke-width="2"/>
+    <path d="M849 146V1054" stroke="#131313" stroke-width="2"/>
+    <path d="M949 146V1054" stroke="#131313" stroke-width="2"/>
+  </g>
+  <g filter="url(#softGlow)" opacity="0.55">
+    <path d="M273 216L486 1038V884L401 560L541 451V323L273 216Z" fill="url(#afGold)"/>
+    <path d="M321 203V984L404 936V596L590 494V199L321 203Z" fill="url(#afGold)"/>
+    <path d="M612 202V1001L696 955V627L843 712L927 667V573L696 458V199L612 202Z" fill="url(#afGold)"/>
+    <path d="M612 202L926 366V461L696 342V199L612 202Z" fill="url(#afGold)"/>
+  </g>
+  <g>
+    <path d="M273 216L486 1038V884L401 560L541 451V323L273 216Z" fill="url(#afGold)"/>
+    <path d="M321 203V984L404 936V596L590 494V199L321 203Z" fill="url(#afGold)"/>
+    <path d="M612 202V1001L696 955V627L843 712L927 667V573L696 458V199L612 202Z" fill="url(#afGold)"/>
+    <path d="M612 202L926 366V461L696 342V199L612 202Z" fill="url(#afGold)"/>
+    <path d="M321 203V984L404 936V596L590 494V199L321 203Z" fill="url(#afShadow)"/>
+    <path d="M612 202V1001L696 955V627L843 712L927 667V573L696 458V199L612 202Z" fill="url(#afShadow)"/>
+  </g>
+  <path d="M612 153L612 105" stroke="#FFD66A" stroke-width="10" stroke-linecap="round" opacity="0.85"/>
+  <path d="M575 190L543 157" stroke="#FFD66A" stroke-width="10" stroke-linecap="round" opacity="0.7"/>
+  <path d="M648 190L681 157" stroke="#FFD66A" stroke-width="10" stroke-linecap="round" opacity="0.7"/>
+  <g filter="url(#spark)">
+    <path d="M626 143L632 165L654 171L632 177L626 199L620 177L598 171L620 165L626 143Z" fill="#FFF4C3"/>
+  </g>
+</svg>

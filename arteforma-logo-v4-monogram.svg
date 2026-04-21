@@ -1,0 +1,33 @@
+<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="v4GoldFront" x1="314" y1="206" x2="846" y2="944" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE9A3"/>
+      <stop offset="0.34" stop-color="#E0AF37"/>
+      <stop offset="0.7" stop-color="#A96F12"/>
+      <stop offset="1" stop-color="#6F4300"/>
+    </linearGradient>
+    <linearGradient id="v4GoldSide" x1="497" y1="245" x2="815" y2="910" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#C88716"/>
+      <stop offset="1" stop-color="#5C3400"/>
+    </linearGradient>
+    <linearGradient id="v4GoldTop" x1="367" y1="166" x2="741" y2="348" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF4C7"/>
+      <stop offset="1" stop-color="#D29A2C"/>
+    </linearGradient>
+  </defs>
+  <g fill="url(#v4GoldFront)">
+    <path d="M278 948L484 252H618L823 948H700L657 790H445L402 948H278ZM478 676H625L551 405L478 676Z"/>
+    <path d="M587 252H919V364H705V500H877V606H705V948H587V252Z"/>
+  </g>
+  <g fill="url(#v4GoldSide)">
+    <path d="M618 252L688 202L897 896L823 948L618 252Z"/>
+    <path d="M919 252L989 202V315L919 364V252Z"/>
+    <path d="M877 500L947 451V557L877 606V500Z"/>
+    <path d="M625 676L696 628L766 884L700 948L625 676Z"/>
+  </g>
+  <g fill="url(#v4GoldTop)">
+    <path d="M484 252L553 202H687L618 252H484Z"/>
+    <path d="M587 252L657 202H989L919 252H587Z"/>
+    <path d="M445 790L515 742H727L657 790H445Z"/>
+  </g>
+</svg>

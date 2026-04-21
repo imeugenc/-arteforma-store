@@ -1,0 +1,25 @@
+<svg width="1400" height="1000" viewBox="0 0 1400 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1400" height="1000" rx="64" fill="#111315"/>
+  <defs>
+    <linearGradient id="steelB" x1="292" y1="204" x2="978" y2="826" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D8DDE2"/>
+      <stop offset="0.45" stop-color="#85919D"/>
+      <stop offset="1" stop-color="#CED5DB"/>
+    </linearGradient>
+    <linearGradient id="electricB" x1="527" y1="265" x2="689" y2="473" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#47D8C9"/>
+      <stop offset="1" stop-color="#1E8E8B"/>
+    </linearGradient>
+  </defs>
+  <rect x="232" y="200" width="836" height="598" rx="42" stroke="url(#steelB)" stroke-width="18"/>
+  <path d="M323 732L509 266H604L790 732H700L661 628H452L413 732H323ZM483 551H630L556 366L483 551Z" fill="url(#steelB)"/>
+  <path d="M714 266H975V342H803V462H951V538H803V732H714V266Z" fill="url(#steelB)"/>
+  <path d="M528 228H687" stroke="url(#steelB)" stroke-width="18" stroke-linecap="round"/>
+  <path d="M562 228V281" stroke="url(#steelB)" stroke-width="14" stroke-linecap="round"/>
+  <path d="M654 228V281" stroke="url(#steelB)" stroke-width="14" stroke-linecap="round"/>
+  <rect x="530" y="281" width="186" height="54" rx="18" fill="url(#steelB)" opacity="0.92"/>
+  <path d="M623 335V408" stroke="url(#electricB)" stroke-width="16" stroke-linecap="round"/>
+  <path d="M586 436H660" stroke="url(#electricB)" stroke-width="15" stroke-linecap="round"/>
+  <path d="M578 469H668" stroke="url(#electricB)" stroke-width="11" stroke-linecap="round" opacity="0.75"/>
+  <path d="M232 847H1068" stroke="#2A2E32" stroke-width="8" stroke-linecap="round"/>
+</svg>

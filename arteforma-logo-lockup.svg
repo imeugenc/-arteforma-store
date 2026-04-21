@@ -1,0 +1,58 @@
+<svg width="1800" height="700" viewBox="0 0 1800 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="lockGold" x1="185" y1="88" x2="1174" y2="611" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF1B8"/>
+      <stop offset="0.18" stop-color="#FFD36A"/>
+      <stop offset="0.48" stop-color="#F0A915"/>
+      <stop offset="0.76" stop-color="#C57900"/>
+      <stop offset="1" stop-color="#8A4D00"/>
+    </linearGradient>
+    <filter id="wordGlow" x="0" y="0" width="1800" height="700" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+      <feGaussianBlur stdDeviation="10" result="effect1_foregroundBlur"/>
+    </filter>
+  </defs>
+  <rect width="1800" height="700" rx="48" fill="#070707"/>
+  <g opacity="0.25">
+    <path d="M68 82H1732" stroke="#121212" stroke-width="2"/>
+    <path d="M68 162H1732" stroke="#121212" stroke-width="2"/>
+    <path d="M68 242H1732" stroke="#121212" stroke-width="2"/>
+    <path d="M68 322H1732" stroke="#121212" stroke-width="2"/>
+    <path d="M68 402H1732" stroke="#121212" stroke-width="2"/>
+    <path d="M68 482H1732" stroke="#121212" stroke-width="2"/>
+    <path d="M68 562H1732" stroke="#121212" stroke-width="2"/>
+    <path d="M68 82V618" stroke="#121212" stroke-width="2"/>
+    <path d="M148 82V618" stroke="#121212" stroke-width="2"/>
+    <path d="M228 82V618" stroke="#121212" stroke-width="2"/>
+    <path d="M308 82V618" stroke="#121212" stroke-width="2"/>
+    <path d="M388 82V618" stroke="#121212" stroke-width="2"/>
+    <path d="M468 82V618" stroke="#121212" stroke-width="2"/>
+    <path d="M548 82V618" stroke="#121212" stroke-width="2"/>
+    <path d="M628 82V618" stroke="#121212" stroke-width="2"/>
+    <path d="M708 82V618" stroke="#121212" stroke-width="2"/>
+    <path d="M788 82V618" stroke="#121212" stroke-width="2"/>
+    <path d="M868 82V618" stroke="#121212" stroke-width="2"/>
+    <path d="M948 82V618" stroke="#121212" stroke-width="2"/>
+    <path d="M1028 82V618" stroke="#121212" stroke-width="2"/>
+    <path d="M1108 82V618" stroke="#121212" stroke-width="2"/>
+    <path d="M1188 82V618" stroke="#121212" stroke-width="2"/>
+    <path d="M1268 82V618" stroke="#121212" stroke-width="2"/>
+    <path d="M1348 82V618" stroke="#121212" stroke-width="2"/>
+    <path d="M1428 82V618" stroke="#121212" stroke-width="2"/>
+    <path d="M1508 82V618" stroke="#121212" stroke-width="2"/>
+    <path d="M1588 82V618" stroke="#121212" stroke-width="2"/>
+    <path d="M1668 82V618" stroke="#121212" stroke-width="2"/>
+  </g>
+  <g transform="translate(160 124) scale(0.36)">
+    <path d="M273 216L486 1038V884L401 560L541 451V323L273 216Z" fill="url(#lockGold)"/>
+    <path d="M321 203V984L404 936V596L590 494V199L321 203Z" fill="url(#lockGold)"/>
+    <path d="M612 202V1001L696 955V627L843 712L927 667V573L696 458V199L612 202Z" fill="url(#lockGold)"/>
+    <path d="M612 202L926 366V461L696 342V199L612 202Z" fill="url(#lockGold)"/>
+    <path d="M626 143L632 165L654 171L632 177L626 199L620 177L598 171L620 165L626 143Z" fill="#FFF4C3"/>
+  </g>
+  <g filter="url(#wordGlow)">
+    <text x="560" y="290" fill="url(#lockGold)" font-family="Montserrat, Poppins, Arial, sans-serif" font-size="128" font-weight="800" letter-spacing="4">ARTEFORMA</text>
+    <text x="669" y="392" fill="#F4F2EE" font-family="Montserrat, Poppins, Arial, sans-serif" font-size="48" font-weight="600" letter-spacing="16">MADE DIFFERENT</text>
+  </g>
+</svg>

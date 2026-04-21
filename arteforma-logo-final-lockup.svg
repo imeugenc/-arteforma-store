@@ -1,0 +1,49 @@
+<svg width="2200" height="1200" viewBox="0 0 2200 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="lgoldMain" x1="288" y1="310" x2="1240" y2="1014" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FCE7A1"/>
+      <stop offset="0.28" stop-color="#E2B84D"/>
+      <stop offset="0.62" stop-color="#BA7E17"/>
+      <stop offset="1" stop-color="#6F4300"/>
+    </linearGradient>
+    <linearGradient id="lmetal" x1="160" y1="120" x2="1214" y2="400" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#787878"/>
+      <stop offset="0.5" stop-color="#232323"/>
+      <stop offset="1" stop-color="#8B8B8B"/>
+    </linearGradient>
+  </defs>
+  <rect width="2200" height="1200" fill="#050505"/>
+  <g transform="translate(120 40) scale(0.72)">
+    <path d="M326 1098V526L566 356H698V487L530 603V747L638 671V804L530 881V1098H326Z" fill="url(#lgoldMain)"/>
+    <path d="M698 356H1016V482H818V632H981V751H818V1098H698V356Z" fill="url(#lgoldMain)"/>
+    <path d="M566 356L642 300H774L698 356H566Z" fill="#F3D68A"/>
+    <path d="M698 356L774 300H1093L1016 356H698Z" fill="#F3D68A"/>
+    <path d="M638 671L714 614V747L638 804V671Z" fill="#7B4A00"/>
+    <path d="M698 356L774 300V1042L698 1098V356Z" fill="#7B4A00"/>
+    <path d="M1016 356L1093 300V425L1016 482V356Z" fill="#7B4A00"/>
+    <path d="M981 632L1057 575V694L981 751V632Z" fill="#7B4A00"/>
+    <path d="M326 526L402 469V1042L326 1098V526Z" fill="#7B4A00"/>
+    <rect x="168" y="260" width="1064" height="34" rx="10" fill="url(#lmetal)"/>
+    <rect x="226" y="244" width="54" height="66" rx="10" fill="#171717" stroke="#C7962D" stroke-width="6"/>
+    <rect x="1120" y="244" width="54" height="66" rx="10" fill="#171717" stroke="#C7962D" stroke-width="6"/>
+    <rect x="602" y="146" width="196" height="230" rx="22" fill="#191919" stroke="#6A6A6A" stroke-width="8"/>
+    <circle cx="700" cy="258" r="60" fill="#101010" stroke="#505050" stroke-width="8"/>
+    <circle cx="700" cy="258" r="18" fill="#202020"/>
+    <path d="M700 198V237" stroke="#5A5A5A" stroke-width="8" stroke-linecap="round"/>
+    <path d="M700 279V318" stroke="#5A5A5A" stroke-width="8" stroke-linecap="round"/>
+    <path d="M640 258H679" stroke="#5A5A5A" stroke-width="8" stroke-linecap="round"/>
+    <path d="M721 258H760" stroke="#5A5A5A" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="633" cy="176" r="8" fill="#D0A13C"/>
+    <circle cx="767" cy="176" r="8" fill="#D0A13C"/>
+    <circle cx="633" cy="346" r="8" fill="#D0A13C"/>
+    <circle cx="767" cy="346" r="8" fill="#D0A13C"/>
+    <rect x="668" y="376" width="64" height="88" rx="20" fill="#121212"/>
+    <path d="M700 464L682 521H718L700 464Z" fill="#C89122"/>
+    <path d="M700 520V877C700 908 674 933 642 933H559" stroke="#D7A843" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M559 933H900" stroke="#D7A843" stroke-width="10" stroke-linecap="round"/>
+  </g>
+  <text x="432" y="1000" fill="url(#lgoldMain)" font-family="Montserrat, Poppins, Arial, sans-serif" font-size="174" font-weight="800" letter-spacing="10">ARTEFORMA</text>
+  <path d="M284 1064H756" stroke="#A9791A" stroke-width="8" stroke-linecap="round"/>
+  <path d="M1468 1064H1916" stroke="#A9791A" stroke-width="8" stroke-linecap="round"/>
+  <text x="808" y="1102" fill="#F2EFE9" font-family="Montserrat, Poppins, Arial, sans-serif" font-size="62" font-weight="600" letter-spacing="22">MADE DIFFERENT</text>
+</svg>

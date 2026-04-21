@@ -1,0 +1,16 @@
+<svg width="1800" height="700" viewBox="0 0 1800 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="goldLockV3" x1="160" y1="121" x2="1109" y2="595" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7D978"/>
+      <stop offset="0.48" stop-color="#D9A62B"/>
+      <stop offset="1" stop-color="#8C6112"/>
+    </linearGradient>
+  </defs>
+  <g fill="url(#goldLockV3)">
+    <path d="M160 586L264 214H335L440 586H376L355 508H244L223 586H160ZM260 450H340L300 300L260 450Z"/>
+    <path d="M324 214H498V272H386V343H481V399H386V586H324V214Z"/>
+  </g>
+  <path d="M300 300L324 214H335L361 300H300Z" fill="#FFF3BF" fill-opacity="0.35"/>
+  <text x="592" y="355" fill="url(#goldLockV3)" font-family="Montserrat, Poppins, Arial, sans-serif" font-size="156" font-weight="800" letter-spacing="4">ARTEFORMA</text>
+  <text x="600" y="468" fill="#0C0C0C" font-family="Montserrat, Poppins, Arial, sans-serif" font-size="46" font-weight="700" letter-spacing="18">CUSTOM 3D DESIGN</text>
+</svg>

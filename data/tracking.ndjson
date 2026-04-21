@@ -1,0 +1,5 @@
+{"timestamp":"2026-04-21T18:34:29.253Z","event":"add_to_cart","payload":{"slug":"bmw-e46-desk-totem","price":159,"size":"16 cm compact","color":"Negru Obsidian","material":"PLA Premium"}}
+{"timestamp":"2026-04-21T18:34:37.780Z","event":"add_to_cart","payload":{"slug":"bmw-e46-desk-totem","price":159,"size":"16 cm compact","color":"Negru Obsidian","material":"PLA Premium"}}
+{"timestamp":"2026-04-21T18:34:38.903Z","event":"add_to_cart","payload":{"slug":"bmw-e46-desk-totem","price":159,"size":"16 cm compact","color":"Negru Obsidian","material":"PLA Premium"}}
+{"timestamp":"2026-04-21T18:34:39.587Z","event":"add_to_cart","payload":{"slug":"bmw-e46-desk-totem","price":159,"size":"16 cm compact","color":"Negru Obsidian","material":"PLA Premium"}}
+{"timestamp":"2026-04-21T18:46:26.601Z","event":"checkout_start","payload":{"itemCount":1,"total":178}}

@@ -1,0 +1,22 @@
+<svg width="1400" height="1000" viewBox="0 0 1400 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1400" height="1000" rx="64" fill="#F7F3EE"/>
+  <defs>
+    <linearGradient id="graphiteC" x1="306" y1="210" x2="991" y2="812" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#292B31"/>
+      <stop offset="0.58" stop-color="#434750"/>
+      <stop offset="1" stop-color="#1F2126"/>
+    </linearGradient>
+    <linearGradient id="copperC" x1="552" y1="253" x2="712" y2="431" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#C77646"/>
+      <stop offset="1" stop-color="#8E4D2B"/>
+    </linearGradient>
+  </defs>
+  <path d="M349 748L553 244H647L851 748H747L704 638H496L452 748H349ZM529 560H672L600 376L529 560Z" fill="url(#graphiteC)"/>
+  <path d="M729 244H992V321H816V451H960V527H816V748H729V244Z" fill="url(#graphiteC)"/>
+  <path d="M516 205C516 177.386 538.386 155 566 155H634C661.614 155 684 177.386 684 205V205H728V229C728 251.091 710.091 269 688 269H512C489.909 269 472 251.091 472 229V205H516Z" fill="url(#graphiteC)"/>
+  <path d="M600 269V338" stroke="url(#copperC)" stroke-width="16" stroke-linecap="round"/>
+  <path d="M561 364H639" stroke="url(#copperC)" stroke-width="16" stroke-linecap="round"/>
+  <path d="M552 398H648" stroke="url(#copperC)" stroke-width="11" stroke-linecap="round" opacity="0.78"/>
+  <path d="M544 430H656" stroke="url(#copperC)" stroke-width="8" stroke-linecap="round" opacity="0.56"/>
+  <path d="M268 814H1054" stroke="#D8D0C6" stroke-width="9" stroke-linecap="round"/>
+</svg>
