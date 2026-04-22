@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
 import { Header, Footer } from "@/components/site-shell";
 import { CartProvider } from "@/components/cart/cart-provider";
 import { siteConfig } from "@/lib/site";
@@ -35,6 +36,7 @@ export default function RootLayout({
             <Footer />
           </div>
         </CartProvider>
+        <Analytics />
       </body>
     </html>
   );
