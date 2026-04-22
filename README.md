@@ -78,20 +78,13 @@ Behavior:
 
 ### Email for custom order requests
 
-- `SMTP_HOST`
-- `SMTP_PORT`
-- `SMTP_SECURE`
-- `SMTP_USER`
-- `SMTP_PASSWORD`
-- `SMTP_FROM`
-- `CUSTOM_ORDERS_TO_EMAIL`
+- `RESEND_API_KEY`
 
 Behavior:
 
-- The custom order form sends an email lead to `contact@arteforma.ro` or to `CUSTOM_ORDERS_TO_EMAIL` if you want a separate inbox.
+- The custom order form sends an email lead to `contact@arteforma.ro`.
 - This flow is intentionally independent from Supabase.
-- In local development, if SMTP is not configured, the request is stored locally for testing and still returns a success response.
-- In production, SMTP must be configured for the custom order form to work live.
+- In local development and production, configure Resend before using the form live.
 
 ### Supabase
 
@@ -122,14 +115,13 @@ This protects the lightweight internal pages in production:
 
 Recommended practical setup:
 
-1. Use the SMTP details for the mailbox or provider that will send mail on behalf of ArteForma
-2. Set `CUSTOM_ORDERS_TO_EMAIL=contact@arteforma.ro`
-3. Keep `replyTo` on the customer email so replies go directly back to the lead
+1. Add `RESEND_API_KEY`
+2. Use a verified Resend sender for `contact@arteforma.ro`
 
 Custom order emails include:
 
 - all form fields
-- a formatted summary in HTML + plain text
+- a formatted summary in HTML
 - file attachment when a file is uploaded
 
 Subject:
