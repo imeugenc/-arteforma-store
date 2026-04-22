@@ -1,33 +1,28 @@
 export const orderStatusSteps = [
   {
-    key: "placed",
-    label: "Plasată",
-    description: "Comanda a fost trimisă și confirmată.",
+    key: "paid",
+    label: "Plătită",
+    description: "Plata a fost confirmată, iar comanda a intrat în sistem.",
   },
   {
-    key: "received",
-    label: "Primită",
-    description: "Detaliile au fost verificate și comanda a intrat în lucru.",
-  },
-  {
-    key: "printing",
-    label: "Se produce",
-    description: "Piesa este în etapa de printare și verificare.",
-  },
-  {
-    key: "hand-finished",
-    label: "Se lucrează manual",
-    description: "Finisajele și ajustările finale sunt în curs.",
-  },
-  {
-    key: "packed",
-    label: "Împachetată",
-    description: "Produsul este pregătit pentru expediere.",
+    key: "in_production",
+    label: "În producție",
+    description: "Piesa este în lucru și trece prin etapele de producție și finisaj.",
   },
   {
     key: "shipped",
     label: "Expediată",
     description: "Comanda a plecat către client.",
+  },
+  {
+    key: "completed",
+    label: "Finalizată",
+    description: "Comanda a fost închisă cu succes.",
+  },
+  {
+    key: "cancelled",
+    label: "Anulată",
+    description: "Comanda a fost anulată.",
   },
 ] as const;
 

@@ -1,12 +1,25 @@
 import Stripe from "stripe";
 import { env } from "@/lib/env";
 import { getSupabaseAdminClient } from "@/lib/supabase";
-import type { OrderItemRecord, OrderRecord } from "@/lib/types";
+import type {
+  OrderItemRecord,
+  OrderRecord,
+  OrderStatus,
+  OrderStatusEventRecord,
+} from "@/lib/types";
 
 export type PersistedOrder = {
   order: OrderRecord;
   items: OrderItemRecord[];
 };
+
+export const ADMIN_ORDER_STATUSES: OrderStatus[] = [
+  "paid",
+  "in_production",
+  "shipped",
+  "completed",
+  "cancelled",
+];
 
 export type OrderConfirmationPayload = {
   orderId: string;
@@ -319,6 +332,189 @@ export async function getRecentOrders(limit = 20) {
   return {
     orders: ordersResult.data ?? [],
     items: itemsResult.data ?? [],
+  };
+}
+
+export async function getRecentOrdersFiltered({
+  limit = 25,
+  status,
+  email,
+}: {
+  limit?: number;
+  status?: string;
+  email?: string;
+}) {
+  const supabase = getSupabaseAdminClient();
+  if (!supabase) {
+    return null;
+  }
+
+  let query = supabase
+    .from(env.SUPABASE_ORDERS_TABLE)
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (status) {
+    query = query.eq("status", status);
+  }
+
+  if (email) {
+    query = query.ilike("customer_email", `%${email}%`);
+  }
+
+  const ordersResult = await query.returns<OrderRecord[]>();
+
+  if (ordersResult.error) {
+    throw ordersResult.error;
+  }
+
+  const orderIds = (ordersResult.data ?? []).map((order) => order.id);
+  const itemsResult = orderIds.length
+    ? await supabase
+        .from(env.SUPABASE_ORDER_ITEMS_TABLE)
+        .select("*")
+        .in("order_id", orderIds)
+        .returns<OrderItemRecord[]>()
+    : { data: [] as OrderItemRecord[], error: null };
+
+  if (itemsResult.error) {
+    throw itemsResult.error;
+  }
+
+  const eventsResult = orderIds.length
+    ? await supabase
+        .from("order_status_events")
+        .select("*")
+        .in("order_id", orderIds)
+        .order("created_at", { ascending: false })
+        .returns<OrderStatusEventRecord[]>()
+    : { data: [] as OrderStatusEventRecord[], error: null };
+
+  if (eventsResult.error) {
+    console.warn("[orders] Could not load status events:", eventsResult.error.message);
+  }
+
+  return {
+    orders: ordersResult.data ?? [],
+    items: itemsResult.data ?? [],
+    events: eventsResult.data ?? [],
+  };
+}
+
+export async function updateOrderStatus({
+  orderId,
+  status,
+  note,
+}: {
+  orderId: string;
+  status: OrderStatus;
+  note?: string;
+}) {
+  const supabase = getSupabaseAdminClient();
+  if (!supabase) {
+    throw new Error("Supabase nu este configurat.");
+  }
+
+  const updateResult = await supabase
+    .from(env.SUPABASE_ORDERS_TABLE)
+    .update({ status })
+    .eq("id", orderId)
+    .select("*")
+    .single<OrderRecord>();
+
+  if (updateResult.error) {
+    throw updateResult.error;
+  }
+
+  await insertOrderStatusEvent(supabase, {
+    order_id: orderId,
+    status,
+    note: note?.trim() || `Status actualizat la ${status}.`,
+  });
+
+  return updateResult.data;
+}
+
+export async function getCustomerOrderStatus({
+  identifier,
+  email,
+}: {
+  identifier: string;
+  email: string;
+}) {
+  const supabase = getSupabaseAdminClient();
+  if (!supabase) {
+    return null;
+  }
+
+  const normalizedIdentifier = identifier.trim();
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (!normalizedIdentifier || !normalizedEmail) {
+    return null;
+  }
+
+  const candidates: OrderRecord[] = [];
+
+  const byId = await supabase
+    .from(env.SUPABASE_ORDERS_TABLE)
+    .select("*")
+    .eq("id", normalizedIdentifier)
+    .returns<OrderRecord[]>();
+
+  if (!byId.error && byId.data?.length) {
+    candidates.push(...byId.data);
+  }
+
+  const bySession = await supabase
+    .from(env.SUPABASE_ORDERS_TABLE)
+    .select("*")
+    .eq("stripe_session_id", normalizedIdentifier)
+    .returns<OrderRecord[]>();
+
+  if (!bySession.error && bySession.data?.length) {
+    candidates.push(...bySession.data);
+  }
+
+  const order = candidates.find((candidate) => {
+    const emailCandidates = [candidate.customer_email, candidate.email]
+      .filter(Boolean)
+      .map((value) => String(value).toLowerCase());
+
+    return emailCandidates.includes(normalizedEmail);
+  });
+
+  if (!order) {
+    return null;
+  }
+
+  const itemsResult = await supabase
+    .from(env.SUPABASE_ORDER_ITEMS_TABLE)
+    .select("*")
+    .eq("order_id", order.id)
+    .returns<OrderItemRecord[]>();
+
+  if (itemsResult.error) {
+    throw itemsResult.error;
+  }
+
+  const eventsResult = await supabase
+    .from("order_status_events")
+    .select("*")
+    .eq("order_id", order.id)
+    .eq("visible_to_customer", true)
+    .order("created_at", { ascending: true })
+    .returns<OrderStatusEventRecord[]>();
+
+  if (eventsResult.error) {
+    console.warn("[orders] Could not load customer-visible status events:", eventsResult.error.message);
+  }
+
+  return {
+    order,
+    items: itemsResult.data ?? [],
+    events: eventsResult.data ?? [],
   };
 }
 

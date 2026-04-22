@@ -114,7 +114,7 @@ export default async function SuccessPage({
                 Următorul pas este să legăm aceste actualizări și de zona de cont client. Până atunci, poți cere actualizări direct pe email.
               </p>
             </div>
-            <StatusTimeline activeStep="received" compact />
+            <StatusTimeline activeStep="paid" compact />
           </div>
         ) : null}
 
@@ -135,9 +135,11 @@ function translateOrderStatus(status: string) {
   switch (status) {
     case "paid":
       return "Plătită";
-    case "processing":
-      return "În procesare";
-    case "fulfilled":
+    case "in_production":
+      return "În producție";
+    case "shipped":
+      return "Expediată";
+    case "completed":
       return "Finalizată";
     case "cancelled":
       return "Anulată";

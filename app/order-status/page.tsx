@@ -18,7 +18,7 @@ export default function OrderStatusPage() {
         description="Lucrăm la legarea acestei zone cu viitorul cont client. Până atunci, poți cere actualizări direct pe email, iar structura de mai jos este deja pregătită pentru fluxul viitor."
       />
       <div className="mt-10">
-        <StatusTimeline activeStep="printing" />
+        <StatusTimeline activeStep="in_production" />
       </div>
     </div>
   );

@@ -93,7 +93,12 @@ export type CustomOrderRecord = {
   fileUrl?: string;
 };
 
-export type OrderStatus = "paid" | "processing" | "fulfilled" | "cancelled";
+export type OrderStatus =
+  | "paid"
+  | "in_production"
+  | "shipped"
+  | "completed"
+  | "cancelled";
 
 export type OrderRecord = {
   id: string;
@@ -120,6 +125,7 @@ export type OrderRecord = {
 
 export type OrderItemRecord = {
   id: string;
+  created_at?: string;
   order_id: string;
   product_slug: string;
   product_name: string;
@@ -127,4 +133,13 @@ export type OrderItemRecord = {
   unit_price: number;
   quantity: number;
   line_total: number;
+};
+
+export type OrderStatusEventRecord = {
+  id: string;
+  order_id: string;
+  status: OrderStatus;
+  note?: string | null;
+  visible_to_customer?: boolean;
+  created_at: string;
 };
