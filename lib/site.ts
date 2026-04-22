@@ -111,6 +111,11 @@ export const faqItems = [
     answer:
       "Dacă vrei un obiect curat pentru expunere, PLA sau PLA Silk sunt de obicei cele mai potrivite. Dacă ai nevoie de ceva mai rezistent, PETG sau ABS pot fi opțiuni mai bune. Pentru piese flexibile, discutăm despre TPU. Dacă nu ești sigur, ne spui cum vrei să arate și unde va sta piesa, iar noi îți recomandăm varianta potrivită.",
   },
+  {
+    question: "Pot plăti și în crypto?",
+    answer:
+      "Pentru anumite comenzi personalizate, putem accepta și plată în crypto (BTC, USDT, USDC), la cerere. Menționează acest lucru în solicitare dacă te interesează. Nu este o opțiune integrată în checkout-ul standard.",
+  },
 ];
 
 export const trustPoints = [

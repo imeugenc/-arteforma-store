@@ -11,6 +11,7 @@ import type {
 export type PersistedOrder = {
   order: OrderRecord;
   items: OrderItemRecord[];
+  isNew: boolean;
 };
 
 export const ADMIN_ORDER_STATUSES: OrderStatus[] = [
@@ -66,6 +67,7 @@ export async function persistStripeOrder({
     return {
       order: existing.data,
       items: existingItems.data ?? [],
+      isNew: false,
     };
   }
 
@@ -170,6 +172,7 @@ export async function persistStripeOrder({
   return {
     order: orderInsert.data,
     items: orderItems,
+    isNew: true,
   };
 }
 
@@ -521,7 +524,10 @@ export async function getCustomerOrderStatus({
 export function buildOrderConfirmationPayload({
   order,
   items,
-}: PersistedOrder): OrderConfirmationPayload {
+}: {
+  order: OrderRecord;
+  items: OrderItemRecord[];
+}): OrderConfirmationPayload {
   return {
     orderId: order.id,
     customerName: order.customer_name,

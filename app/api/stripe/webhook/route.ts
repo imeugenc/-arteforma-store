@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { env } from "@/lib/env";
 import { persistStripeOrder } from "@/lib/orders";
+import { sendPaidOrderEmails } from "@/lib/order-emails";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -71,6 +72,7 @@ export async function POST(request: Request) {
       console.log("[stripe-webhook] Order persistence result:", {
         sessionId: session.id,
         persisted: Boolean(persisted),
+        isNew: persisted?.isNew ?? false,
         amount: (session.amount_total ?? 0) / 100,
         email:
           session.customer_details?.email ?? session.metadata?.customer_email ?? null,
@@ -79,8 +81,24 @@ export async function POST(request: Request) {
         status: "paid",
       });
 
-      // Future transactional email hook:
-      // Add order confirmation email enqueue/send logic here after persistence succeeds.
+      if (persisted?.isNew) {
+        await sendPaidOrderEmails({
+          orderId: persisted.order.id,
+          customerName: persisted.order.customer_name,
+          customerEmail: persisted.order.customer_email,
+          totalAmount: persisted.order.total_amount,
+          currency: persisted.order.currency,
+          leadTime: "2–5 zile lucrătoare",
+          shippingMethod: persisted.order.shipping_method,
+          items: persisted.items.map((item) => ({
+            name: item.product_name,
+            quantity: item.quantity,
+            unitPrice: item.unit_price,
+            lineTotal: item.line_total,
+            variantSummary: item.variant_summary,
+          })),
+        });
+      }
     }
 
     return NextResponse.json({ ok: true }, { status: 200 });

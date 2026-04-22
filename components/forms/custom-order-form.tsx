@@ -150,6 +150,9 @@ export function CustomOrderForm() {
           {status === "loading" ? "Trimitem solicitarea..." : "Trimite cererea custom"}
         </Button>
       </div>
+      <div className="sm:col-span-2 rounded-[1.3rem] border border-white/8 bg-white/[0.03] px-4 py-4 text-[13px] leading-7 text-white/60">
+        Pentru anumite comenzi personalizate, putem accepta și plată în crypto (BTC, USDT, USDC), la cerere. Menționează acest lucru în solicitare dacă te interesează.
+      </div>
       {message ? (
         <p
           className={`sm:col-span-2 text-[13px] ${status === "success" ? "text-[#e8d08b]" : "text-red-300"}`}
