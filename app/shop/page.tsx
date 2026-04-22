@@ -1,28 +1,40 @@
 import { Metadata } from "next";
-import { products } from "@/lib/catalog";
+import { categories, products } from "@/lib/catalog";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { ProductCard } from "@/components/catalog/product-card";
+import { ShopBrowser } from "@/components/catalog/shop-browser";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Magazin obiecte premium printate 3D",
+  title: "Magazin obiecte printate 3D",
   description:
-    "Descoperă obiecte premium printate 3D pentru birou, piese crypto, siluete auto, cadouri și produse pregătite pentru personalizare, realizate la comandă în România.",
+    "Descoperă obiecte printate 3D pentru birou, decor, auto, crypto și cadouri, realizate la comandă în România.",
   path: "/shop",
 });
 
 export default function ShopPage() {
   return (
     <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
-      <SectionHeading
-        eyebrow="Magazin"
-        title="Obiecte gândite să stea la vedere în spațiul cuiva."
-        description="Prețuri clare în RON, prezentare premium, producție la comandă în România și piese alese pentru identitate, nu pentru volum generic."
-      />
-      <div className="mt-10 grid gap-6 lg:grid-cols-3">
-        {products.map((product) => (
-          <ProductCard key={product.slug} product={product} />
+      <div className="surface-panel-strong rounded-[2.4rem] p-8 lg:p-10">
+        <SectionHeading
+          eyebrow="Magazin"
+          title="Piese pentru birou, decor, cadouri și proiecte custom realizate în Brașov."
+          description="Prețuri clare în RON, producție în 2–5 zile lucrătoare și o navigare mai simplă după categorie, buget sau tipul de piesă pe care îl cauți."
+        />
+      </div>
+      <div className="mt-8 grid gap-4 md:grid-cols-4">
+        {[
+          "Realizat la comandă în România",
+          "Plată securizată",
+          "Ambalare premium pentru cadou",
+          "Comenzi custom analizate manual",
+        ].map((item) => (
+          <div key={item} className="surface-panel rounded-[1.5rem] px-4 py-4 text-sm text-white/68">
+            {item}
+          </div>
         ))}
+      </div>
+      <div className="mt-10">
+        <ShopBrowser products={products} categories={categories} />
       </div>
     </div>
   );

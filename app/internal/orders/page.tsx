@@ -1,14 +1,12 @@
-import { notFound } from "next/navigation";
-import { env, isProduction } from "@/lib/env";
 import { getRecentOrders } from "@/lib/orders";
 import { formatPrice } from "@/lib/utils";
-import { buildMetadata } from "@/lib/seo";
+import { buildInternalMetadata, requireInternalAccess } from "@/lib/internal";
 
-export const metadata = buildMetadata({
-  title: "Comenzi interne",
-  description: "Vizualizare internă ArteForma pentru comenzile plătite recent.",
-  path: "/internal/orders",
-});
+export const metadata = buildInternalMetadata(
+  "Comenzi interne",
+  "Vizualizare internă ArteForma pentru comenzile plătite recent.",
+  "/internal/orders",
+);
 
 export default async function InternalOrdersPage({
   searchParams,
@@ -16,15 +14,12 @@ export default async function InternalOrdersPage({
   searchParams: Promise<{ token?: string }>;
 }) {
   const { token } = await searchParams;
-
-  if (isProduction && env.INTERNAL_ORDERS_TOKEN && token !== env.INTERNAL_ORDERS_TOKEN) {
-    notFound();
-  }
+  requireInternalAccess(token);
 
   const bundle = await getRecentOrders(25);
 
   return (
-    <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
+    <div>
       <h1 className="font-serif-display text-4xl text-white">Comenzi recente</h1>
       <p className="mt-4 text-white/65">
         Vizualizare internă simplă pentru comenzile de produse plătite și stocate după un checkout Stripe reușit.

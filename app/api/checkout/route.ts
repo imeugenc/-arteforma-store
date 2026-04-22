@@ -3,15 +3,26 @@ import { NextResponse } from "next/server";
 import { checkoutSchema } from "@/lib/schemas";
 import { env, isProduction } from "@/lib/env";
 import { getProductBySlug } from "@/lib/catalog";
+import { getShipping } from "@/lib/checkout";
 import { siteConfig } from "@/lib/site";
+
+function isLocalOrigin(origin: string) {
+  return origin.includes("localhost") || origin.includes("127.0.0.1");
+}
 
 function buildVariantSummary(item: {
   size?: string;
   color?: string;
   material?: string;
+  personalizationSelected?: boolean;
   personalization?: string;
 }) {
-  return [item.size, item.color, item.material, item.personalization]
+  return [
+    item.size,
+    item.color,
+    item.material,
+    item.personalizationSelected ? `Personalizare${item.personalization ? `: ${item.personalization}` : ""}` : "",
+  ]
     .filter(Boolean)
     .join(" · ");
 }
@@ -44,6 +55,7 @@ function getValidatedCartItems(items: ReturnType<typeof checkoutSchema.parse>["i
       size: item.size,
       color: item.color,
       material: item.material,
+      personalizationSelected: item.personalizationSelected ?? false,
       personalization: item.personalization,
       variantSummary: buildVariantSummary(item),
     };
@@ -54,14 +66,19 @@ export async function POST(request: Request) {
   try {
     const parsed = checkoutSchema.parse(await request.json());
     const validatedItems = getValidatedCartItems(parsed.items);
+    const giftPackaging = parsed.giftPackaging ?? false;
     const origin = request.headers.get("origin") ?? env.NEXT_PUBLIC_SITE_URL ?? siteConfig.url;
 
+    if (!validatedItems.length) {
+      throw new Error("Coșul este gol.");
+    }
+
     if (!env.STRIPE_SECRET_KEY) {
-      if (isProduction) {
+      if (isProduction || !isLocalOrigin(origin)) {
         return NextResponse.json(
           {
             ok: false,
-            message: "Stripe nu este configurat. Adaugă STRIPE_SECRET_KEY înainte de lansare.",
+            message: "Plata nu este configurată complet încă. Activează cheile Stripe în producție înainte de a accepta comenzi reale.",
           },
           { status: 503 },
         );
@@ -76,8 +93,27 @@ export async function POST(request: Request) {
 
     const stripe = new Stripe(env.STRIPE_SECRET_KEY);
     const itemsTotal = validatedItems.reduce(
-      (sum, item) => sum + item.unitPrice * item.quantity,
+      (sum, item) =>
+        sum +
+        (item.unitPrice +
+          (item.personalizationSelected ? siteConfig.personalizationPrice : 0)) *
+          item.quantity,
       0,
+    );
+    const shippingCost = getShipping(
+      validatedItems.map((item) => ({
+        id: item.slug,
+        slug: item.slug,
+        name: item.name,
+        price: item.unitPrice,
+        quantity: item.quantity,
+        size: item.size,
+        color: item.color,
+        material: item.material,
+        personalizationSelected: item.personalizationSelected,
+        personalization: item.personalization,
+        accent: "#d7a12a",
+      })),
     );
 
     const lineItems = [
@@ -85,11 +121,14 @@ export async function POST(request: Request) {
         quantity: item.quantity,
         price_data: {
           currency: "ron",
-          unit_amount: item.unitPrice * 100,
+          unit_amount:
+            (item.unitPrice +
+              (item.personalizationSelected ? siteConfig.personalizationPrice : 0)) *
+            100,
           product_data: {
             name: item.name,
             description:
-              item.variantSummary || "Realizat la comandă în România · Timp de producție: 3–7 zile lucrătoare",
+              item.variantSummary || "Realizat la comandă în România · Timp de producție: 2–5 zile lucrătoare",
             metadata: {
               product_slug: item.slug,
               product_name: item.name,
@@ -98,22 +137,46 @@ export async function POST(request: Request) {
           },
         },
       })),
-      {
-        quantity: 1,
-        price_data: {
-          currency: "ron",
-          unit_amount: siteConfig.flatShipping * 100,
-          product_data: {
-            name: "Livrare cu tarif fix",
-            description: "Doar în România · Realizat la comandă în România",
-            metadata: {
-              product_slug: "shipping",
-              product_name: "Livrare cu tarif fix",
-              variant_summary: "Livrare în România",
+      ...(giftPackaging
+        ? [
+            {
+              quantity: 1,
+              price_data: {
+                currency: "ron",
+                unit_amount: siteConfig.giftPackagingPrice * 100,
+                product_data: {
+                  name: "Ambalare premium",
+                  description: "Opțiune suplimentară pentru prezentare de cadou",
+                  metadata: {
+                    product_slug: "gift-packaging",
+                    product_name: "Ambalare premium",
+                    variant_summary: "Extra opțional",
+                  },
+                },
+              },
             },
-          },
-        },
-      },
+          ]
+        : []),
+      ...(shippingCost
+        ? [
+            {
+              quantity: 1,
+              price_data: {
+                currency: "ron",
+                unit_amount: shippingCost * 100,
+                product_data: {
+                  name: "Livrare",
+                  description: "Livrare în România",
+                  metadata: {
+                    product_slug: "shipping",
+                    product_name: "Livrare",
+                    variant_summary: "Livrare în România",
+                  },
+                },
+              },
+            },
+          ]
+        : []),
     ];
 
     const session = await stripe.checkout.sessions.create({
@@ -132,8 +195,9 @@ export async function POST(request: Request) {
       metadata: {
         channel: "arteforma-web",
         source: "website",
-        shipping_method: "Tarif fix România",
-        shipping_cost: String(siteConfig.flatShipping),
+        shipping_method: shippingCost ? "Livrare standard România" : "Livrare gratuită România",
+        shipping_cost: String(shippingCost),
+        gift_packaging: giftPackaging ? "true" : "false",
         items_total: String(itemsTotal),
       },
       custom_text: {

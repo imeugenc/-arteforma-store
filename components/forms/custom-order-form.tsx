@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/analytics";
+import { siteConfig } from "@/lib/site";
 
 const orderTypes = [
   "Artă de perete",
@@ -23,6 +24,21 @@ export function CustomOrderForm() {
     setMessage("");
 
     try {
+      const usage = String(formData.get("usage") ?? "").trim();
+      const materialPreference = String(formData.get("materialPreference") ?? "").trim();
+      const importantDetails = String(formData.get("importantDetails") ?? "").trim();
+      const aspect = String(formData.get("description") ?? "").trim();
+      const combinedDescription = [
+        aspect ? `Aspect dorit: ${aspect}` : "",
+        usage ? `Utilizare: ${usage}` : "",
+        materialPreference ? `Material: ${materialPreference}` : "",
+        importantDetails ? `Detalii importante: ${importantDetails}` : "",
+      ]
+        .filter(Boolean)
+        .join("\n\n");
+
+      formData.set("description", combinedDescription || aspect);
+
       const response = await fetch("/api/custom-orders", {
         method: "POST",
         body: formData,
@@ -40,7 +56,7 @@ export function CustomOrderForm() {
       setStatus("success");
       setMessage(
         data.message ||
-          "Solicitarea ta a fost trimisă. O analizăm manual și revenim cu următorul pas.",
+          `Solicitarea ta a fost trimisă. O analizăm manual și revenim cu următorul pas. Dacă vrei să adaugi ceva între timp, scrie-ne la ${siteConfig.email}.`,
       );
       void trackEvent("custom_order_submit", {
         type: formData.get("type"),
@@ -58,21 +74,31 @@ export function CustomOrderForm() {
   return (
     <form
       action={onSubmit}
-      className="surface-panel grid gap-5 rounded-[2rem] p-6 sm:grid-cols-2 sm:p-8"
+      className="surface-panel grid gap-4 rounded-[1.75rem] p-5 sm:grid-cols-2 sm:gap-5 sm:p-7"
     >
       <Field label="Nume" name="name" required />
       <Field label="Email" name="email" type="email" required />
-      <Field label="Telefon (opțional)" name="phone" />
+      <Field label="Telefon" name="phone" required />
       <SelectField label="Ce vrei să realizăm?" name="type" options={orderTypes} required />
       <Field
         label="Dimensiune dorită"
         name="desiredSize"
-        placeholder="Exemplu: piesă de birou de 30 cm sau obiect de perete de 50 cm"
+        placeholder="Exemplu: piesă de birou de 18 cm sau obiect de perete de 20 × 20 cm"
       />
       <Field
-        label="Culori / finisaj"
+        label="Material"
+        name="materialPreference"
+        placeholder="PLA, PLA Silk, PETG, TPU, ABS sau lasă-ne pe noi să recomandăm"
+      />
+      <Field
+        label="Finisaj"
         name="colors"
-        placeholder="Negru + auriu, grafit, negru mat etc."
+        placeholder="Negru Grafit, Auriu Silk, Transparent Cristal, mat, satinat sau alt aspect dorit"
+      />
+      <Field
+        label="Utilizare"
+        name="usage"
+        placeholder="Birou, perete, cadou, decor de setup sau alt context de folosire"
       />
       <Field
         label="Buget (opțional)"
@@ -85,15 +111,21 @@ export function CustomOrderForm() {
         placeholder="Dacă timpul contează, spune-ne aici"
       />
       <label className="sm:col-span-2">
-        <span className="mb-2 block text-sm font-medium text-white">Descrie obiectul</span>
+        <span className="mb-2 block text-sm font-medium text-white">Aspect dorit</span>
         <textarea
           name="description"
           required
           rows={6}
           className="w-full rounded-[1.5rem] border border-white/10 bg-black/30 px-4 py-3 text-white outline-none transition placeholder:text-white/30 focus:border-[#d7a12a]/40"
-          placeholder="Cum ar trebui să arate? Unde va sta? Ce prezență sau emoție ar trebui să transmită? Cu cât brief-ul este mai clar, cu atât rezultatul va fi mai bun."
+          placeholder="Cum vrei să arate piesa? Poate fi mai curată, mai tehnică, mai elegantă sau mai jucăușă. Dacă ai o referință bună, spune-ne aici."
         />
       </label>
+      <Field
+        label="Detalii importante"
+        name="importantDetails"
+        placeholder="Termen limită, text personalizat, piese separate, montaj sau alte informații utile"
+        className="sm:col-span-2"
+      />
       <label className="sm:col-span-2">
         <span className="mb-2 block text-sm font-medium text-white">Fișier de referință</span>
         <input
@@ -106,15 +138,16 @@ export function CustomOrderForm() {
         </p>
       </label>
       <div className="sm:col-span-2 rounded-[1.5rem] border border-[#d7a12a]/14 bg-[#d7a12a]/6 p-4 text-sm leading-7 text-white/65">
-        <p>Fiecare solicitare este analizată manual înainte să revenim cu un răspuns.</p>
-        <p>Realizat la comandă în România. Finisaj premium. Pași clari mai departe.</p>
+        <p>Fiecare solicitare este analizată manual înainte de a-ți răspunde.</p>
+        <p>Îți oferim o variantă realistă, adaptată designului și utilizării finale.</p>
+        <p>Pentru piese dintr-o singură bucată, dimensiunea maximă este 20 × 20 × 24 cm.</p>
       </div>
       <div className="sm:col-span-2 flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-white/55">
-          Livrare doar în România în v1. Răspundem cu direcție clară, nu cu mesaje automate fără sens.
+          Livrare doar în România în v1. Dacă vrei să completezi cererea cu alte detalii, ne poți scrie și la {siteConfig.email}.
         </p>
         <Button type="submit" disabled={status === "loading"}>
-          {status === "loading" ? "Trimitem solicitarea..." : "Trimite brief-ul custom"}
+          {status === "loading" ? "Trimitem solicitarea..." : "Trimite cererea custom"}
         </Button>
       </div>
       {message ? (
@@ -134,15 +167,17 @@ function Field({
   type = "text",
   required,
   placeholder,
+  className,
 }: {
   label: string;
   name: string;
   type?: string;
   required?: boolean;
   placeholder?: string;
+  className?: string;
 }) {
   return (
-    <label>
+    <label className={className}>
       <span className="mb-2 block text-sm font-medium text-white">{label}</span>
       <input
         type={type}

@@ -60,7 +60,7 @@ export function organizationStructuredData() {
     name: siteConfig.name,
     url: siteConfig.url,
     email: siteConfig.email,
-    telephone: siteConfig.phone,
+    sameAs: [siteConfig.instagramUrl, siteConfig.tiktokUrl],
     address: {
       "@type": "PostalAddress",
       addressLocality: siteConfig.city,

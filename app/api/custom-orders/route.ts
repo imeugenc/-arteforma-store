@@ -5,6 +5,7 @@ import { ZodError } from "zod";
 import { customOrderSchema } from "@/lib/schemas";
 import { env, isProduction } from "@/lib/env";
 import { getSupabaseAdminClient, isSupabaseConfigured } from "@/lib/supabase";
+import { siteConfig } from "@/lib/site";
 
 const MAX_FILE_SIZE = 8 * 1024 * 1024;
 
@@ -87,7 +88,7 @@ export async function POST(request: Request) {
       return NextResponse.json({
         ok: true,
         id,
-        message: "Solicitarea custom a fost primită. O analizăm și revenim cu următorul pas.",
+        message: `Solicitarea custom a fost primită. O analizăm și revenim cu următorul pas. Dacă vrei să completezi ceva, ne poți scrie la ${siteConfig.email}.`,
       });
     }
 
@@ -108,7 +109,7 @@ export async function POST(request: Request) {
       ok: true,
       id,
       message:
-        "Solicitarea custom a fost salvată în modul local de development. Configurează Supabase înainte de lansarea în producție.",
+        `Solicitarea custom a fost salvată în modul local de development. Configurează Supabase înainte de lansarea în producție. Pentru completări, folosește ${siteConfig.email}.`,
       mode: "development-fallback",
     });
   } catch (error) {

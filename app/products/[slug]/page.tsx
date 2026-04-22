@@ -6,7 +6,10 @@ import { getProductBySlug, products } from "@/lib/catalog";
 import { formatPrice } from "@/lib/utils";
 import { ProductVisual } from "@/components/ui/product-visual";
 import { AddToCartForm } from "@/components/catalog/add-to-cart-form";
+import { Button } from "@/components/ui/button";
 import { buildMetadata, productStructuredData } from "@/lib/seo";
+import { getMaterialDetails } from "@/lib/materials";
+import { testimonials } from "@/lib/site";
 
 export async function generateStaticParams() {
   return products.map((product) => ({ slug: product.slug }));
@@ -43,6 +46,9 @@ export default async function ProductPage({
     notFound();
   }
 
+  const materialDetails = getMaterialDetails(product.materials);
+  const galleryLabels = ["Imagine principală", "Din apropiere", "În ambient"];
+
   return (
     <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
       <Script
@@ -69,7 +75,7 @@ export default async function ProductPage({
             className="min-h-[560px]"
           />
           <div className="grid gap-5 sm:grid-cols-3">
-            {["detaliu", "finisaj", "context"].map((tag, index) => (
+            {galleryLabels.map((tag, index) => (
               <ProductVisual
                 key={tag}
                 accent={product.visual.accent}
@@ -82,7 +88,7 @@ export default async function ProductPage({
           </div>
         </div>
 
-        <div className="space-y-8">
+        <div className="space-y-6">
           <div className="space-y-5">
             {product.badge ? (
               <p className="text-[11px] font-semibold uppercase tracking-[0.38em] text-[#d7a12a]">
@@ -102,47 +108,161 @@ export default async function ProductPage({
           <div className="surface-panel rounded-[2rem] p-6">
             <ul className="space-y-3 text-sm text-white/72">
               <li>Timp de producție: {product.leadTime}</li>
-              <li>{product.shippingNote}</li>
-              <li>{product.packagingNote}</li>
+              <li>Livrare în România</li>
+              <li>Fiecare comandă este pregătită atent pentru transport și livrare în siguranță.</li>
             </ul>
           </div>
 
           <AddToCartForm product={product} />
+        </div>
+      </div>
 
+      <div className="mt-10 grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <div className="space-y-6">
           <div className="surface-panel rounded-[2rem] p-6">
             <h2 className="font-serif-display text-2xl text-white">Despre această piesă</h2>
             <p className="mt-4 leading-8 text-white/68">{product.longDescription}</p>
-            <p className="mt-4 border-l border-[#d7a12a]/30 pl-4 text-sm leading-7 text-[#f0ddb0]">
-              {product.story}
-            </p>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-3">
+          <div className="surface-panel rounded-[2rem] p-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="font-serif-display text-2xl text-white">Opțiuni disponibile</h2>
+                <p className="mt-2 max-w-3xl text-sm leading-7 text-white/64">
+                  Alegi dimensiunea, finisajul și materialul direct din comandă. Dacă vrei altă variantă decât cele afișate, o discutăm separat.
+                </p>
+              </div>
+            </div>
+            <div className="mt-6 grid gap-4 lg:grid-cols-3">
+              <OptionBlock title={product.sizeLabel ?? "Dimensiuni"} values={product.sizes} />
+              <OptionBlock title={product.colorLabel ?? "Culori"} values={product.colors} />
+              <OptionBlock title={product.materialLabel ?? "Materiale"} values={product.materials} />
+            </div>
+          </div>
+
+          <div className="surface-panel rounded-[2rem] p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="font-serif-display text-2xl text-white">Finisaje și materiale pentru piesa aceasta</h2>
+                <p className="mt-3 max-w-3xl text-sm leading-7 text-white/64">
+                  Aici vezi doar opțiunile relevante pentru modelul acesta. Ghidul complet despre materialele și finisajele ArteForma este în pagina Despre.
+                </p>
+              </div>
+              <Link href="/about" className="text-sm font-medium text-[#f3dfae] transition hover:text-white">
+                Vezi ghidul complet
+              </Link>
+            </div>
+            <div className="mt-6 grid gap-4 lg:grid-cols-2">
+              {materialDetails.map((material) => (
+                <MaterialCard key={material.title} material={material} />
+              ))}
+            </div>
+          </div>
+
+          <div className="surface-panel rounded-[2rem] p-6">
+            <p className="text-sm uppercase tracking-[0.28em] text-[#d7a12a]">Recenzii</p>
+            <h2 className="mt-3 font-serif-display text-3xl text-white">Cum sunt percepute piesele după livrare</h2>
+            <div className="mt-6 grid gap-4 lg:grid-cols-2">
+              {testimonials.map((review) => (
+                <blockquote
+                  key={review.name}
+                  className="rounded-[1.5rem] border border-white/8 bg-black/20 p-5"
+                >
+                  <p className="text-sm leading-7 text-white/74">„{review.quote}”</p>
+                  <footer className="mt-4">
+                    <p className="text-sm font-medium text-white">{review.name}</p>
+                    <p className="text-xs uppercase tracking-[0.24em] text-white/36">{review.role}</p>
+                  </footer>
+                </blockquote>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-6 xl:sticky xl:top-24 xl:self-start">
+          <div className="grid gap-4 sm:grid-cols-3 xl:grid-cols-1">
             <InfoCard title="Potrivită pentru" items={product.idealFor} />
-            <InfoCard title="Personalizare" items={product.customization} />
+            <InfoCard title="Detalii produs" items={product.customization} />
             <InfoCard
               title="Producție și livrare"
               items={[
-                "Realizat la comandă în România",
-                product.leadTime,
-                product.shippingNote,
+                `Timp de producție: ${product.leadTime}`,
+                "Livrare în România",
+                "Pregătită atent pentru transport și livrare în siguranță.",
               ]}
             />
           </div>
 
+          <div className="surface-panel rounded-[2rem] p-6">
+            <p className="text-sm uppercase tracking-[0.28em] text-[#d7a12a]">Personalizare și extra opționale</p>
+            <h2 className="mt-3 font-serif-display text-3xl text-white">
+              Poți adăuga personalizare și ambalare premium direct din comandă.
+            </h2>
+            <ul className="mt-4 space-y-3 text-sm leading-7 text-white/68">
+              <li>Personalizare disponibilă pentru produsele care au câmp dedicat.</li>
+              <li>Costul suplimentar apare clar în coș și în checkout.</li>
+              <li>Ambalarea premium se poate adăuga separat pentru comenzile care merg direct într-un cadou.</li>
+            </ul>
+          </div>
+
           <div className="surface-panel-strong rounded-[2rem] p-6">
-            <p className="text-sm uppercase tracking-[0.28em] text-[#d7a12a]">Vrei o versiune custom?</p>
-            <p className="mt-3 text-white/72">
-              Vrei altă dimensiune, altă siluetă, propriul logo sau o interpretare mai personală a acestei piese?
+            <p className="text-sm uppercase tracking-[0.28em] text-[#d7a12a]">Adaptare personalizată</p>
+            <h2 className="mt-3 font-serif-display text-3xl text-white">
+              Vrei o variantă apropiată de modelul tău sau de ideea ta?
+            </h2>
+            <p className="mt-3 text-sm leading-7 text-white/68">
+              Trimite-ne ideea, referința sau contextul în care va fi folosită piesa, iar noi revenim cu o variantă realistă și potrivită pentru produsul final.
             </p>
-            <Link
-              href="/custom-orders"
-              className="mt-5 inline-flex text-sm font-semibold uppercase tracking-[0.22em] text-white"
-            >
-              Pornește o cerere custom
-            </Link>
+            <div className="mt-6">
+              <Link href="/custom-orders">
+                <Button
+                  variant="secondary"
+                  className="border-[#d7a12a]/24 bg-[#d7a12a]/8 text-[#f3dfae] hover:text-white"
+                >
+                  Creează o piesă personalizată
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function OptionBlock({ title, values }: { title: string; values: string[] }) {
+  return (
+    <div className="rounded-[1.5rem] border border-white/8 bg-black/20 p-5">
+      <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#d7a12a]">{title}</p>
+      <div className="mt-4 flex flex-wrap gap-3 text-sm text-white/72">
+        {values.map((value) => (
+          <span key={value} className="rounded-full border border-white/8 px-3 py-2">
+            {value}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MaterialCard({
+  material,
+}: {
+  material: { title: string; aspect: string; resistance: string; use: string };
+}) {
+  return (
+    <div className="rounded-[1.5rem] border border-white/8 bg-black/20 p-5">
+      <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#d7a12a]">{material.title}</p>
+      <div className="mt-4 space-y-3 text-sm leading-7 text-white/68">
+        <p>
+          <span className="text-white">Aspect:</span> {material.aspect}
+        </p>
+        <p>
+          <span className="text-white">Rezistență:</span> {material.resistance}
+        </p>
+        <p>
+          <span className="text-white">Utilizare:</span> {material.use}
+        </p>
       </div>
     </div>
   );

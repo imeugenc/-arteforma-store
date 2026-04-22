@@ -2,8 +2,8 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ShieldCheck, Sparkles, Truck, WandSparkles } from "lucide-react";
-import { categories, getFeaturedProducts } from "@/lib/catalog";
-import { siteConfig, testimonials, trustPoints } from "@/lib/site";
+import { categories, getFeaturedProducts, getProductsByCategory } from "@/lib/catalog";
+import { testimonials, trustPoints } from "@/lib/site";
 import { buildMetadata } from "@/lib/seo";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Button } from "@/components/ui/button";
@@ -12,139 +12,266 @@ import { ProductCard } from "@/components/catalog/product-card";
 
 export const metadata = buildMetadata({
   description:
-    "ArteForma creează în Brașov obiecte premium printate 3D, din colecție și custom, pentru birouri, setup-uri, cadouri și interioare cu personalitate.",
+    "ArteForma creează în Brașov obiecte printate 3D, din colecție și la comandă, pentru birou, decor, auto, cadouri și spații în care detaliile contează.",
   path: "/",
 });
 
 export default function HomePage() {
   const featured = getFeaturedProducts();
+  const deskProducts = getProductsByCategory("desk-setup").slice(0, 3);
+  const autoProducts = getProductsByCategory("auto-moto").slice(0, 3);
+  const cryptoProducts = getProductsByCategory("crypto-trading").slice(0, 2);
+  const giftProducts = getProductsByCategory("gifts").slice(0, 2);
+  const collectionHighlights = [
+    {
+      title: "Lămpi",
+      body: "Piese luminoase pentru birou, raft sau cadou, cu accent mai puternic pe atmosferă și prezentare.",
+    },
+    {
+      title: "Ceasuri de perete",
+      body: "Modele statement pentru spații personale, birouri sau zone de display unde obiectul trebuie să conteze vizual.",
+    },
+    {
+      title: "Vaze decorative",
+      body: "Pentru utilizare decorativă. Rezistența la apă poate varia în funcție de model și finisaj.",
+    },
+  ];
 
   return (
     <div className="pb-20">
-      <section className="mx-auto grid max-w-7xl gap-10 px-5 pb-18 pt-12 sm:px-8 lg:grid-cols-[1.02fr_0.98fr] lg:items-center lg:gap-12 lg:pt-20">
-        <div className="space-y-8">
+      <section className="mx-auto grid max-w-7xl gap-8 px-5 pb-12 pt-8 sm:px-8 lg:min-h-[70vh] lg:grid-cols-[0.94fr_1.06fr] lg:items-center lg:gap-10 lg:pt-12">
+        <div className="space-y-6">
           <div className="inline-flex items-center gap-3 rounded-full border border-[#d7a12a]/20 bg-[#d7a12a]/8 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.34em] text-[#e8cf93]">
             <Sparkles className="h-4 w-4" />
             Realizat la comandă în România
           </div>
-          <div className="space-y-6">
+          <div className="space-y-4">
             <p className="text-sm uppercase tracking-[0.4em] text-white/34">ArteForma, Brașov</p>
-            <h1 className="font-serif-display text-5xl leading-[0.94] text-white sm:text-6xl lg:text-[5.25rem]">
-              Din idee în realitate.
+            <h1 className="max-w-2xl font-serif-display text-4xl leading-[1.02] text-white sm:text-5xl lg:text-[4.2rem]">
+              Obiecte premium printate 3D, create pentru spațiul tău.
             </h1>
-            <p className="max-w-xl text-lg leading-8 text-white/70 sm:text-xl">
-              Artă printată 3D, creată pentru spațiul tău.
-              <span className="block text-[#f2dfaf]">{siteConfig.heroStatement}</span>
+            <p className="max-w-xl text-base leading-7 text-white/70 sm:text-lg">
+              Cadouri, decor și piese custom realizate la comandă.
             </p>
           </div>
-          <div className="flex flex-col gap-4 sm:flex-row">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <Link href="/shop">
-              <Button>Intră în magazin</Button>
+              <Button>Vezi colecția</Button>
             </Link>
             <Link href="/custom-orders">
-              <Button variant="secondary">Începe o comandă custom</Button>
+              <Button variant="secondary">Creează o piesă personalizată</Button>
             </Link>
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
-            <Stat label="Producție" value="3–7 zile lucrătoare" />
-            <Stat label="Livrare" value="Oriunde în România" />
-            <Stat label="Semnătură" value="Piesă custom premium" />
+            <Stat label="Realizat în" value="Brașov, România" />
+            <Stat label="Producție" value="2–5 zile lucrătoare" />
+            <Stat label="Plată" value="Securizată online" />
           </div>
         </div>
 
-        <div className="surface-panel-strong relative overflow-hidden rounded-[2.75rem] p-5 sm:p-7">
+        <div className="surface-panel-strong relative overflow-hidden rounded-[2.35rem] p-4 sm:p-5">
           <div className="absolute inset-0 premium-grid opacity-30" />
           <div className="absolute -left-16 top-20 h-44 w-44 rounded-full bg-[#d7a12a]/14 blur-3xl" />
           <div className="absolute bottom-10 right-2 h-56 w-56 rounded-full bg-[#d7a12a]/10 blur-3xl" />
           <div className="relative">
-            <div className="grid gap-5 lg:grid-cols-[1fr_auto]">
+            <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
               <div className="space-y-3">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.4em] text-[#d7a12a]">
-                  Identitate premium-tech
+                  Selecție ArteForma
                 </p>
                 <p className="max-w-md text-sm leading-7 text-white/58">
-                  Construit pentru cultura auto, birouri de trading, spații de creator, cadouri și obiecte de brand care au nevoie de prezență reală.
+                  Piese pentru auto, crypto, birou și cadouri, într-o prezentare mai clară și mai ușor de cumpărat.
                 </p>
               </div>
               <div className="hidden items-start lg:flex">
-                <FeaturePill icon={<WandSparkles className="h-4 w-4" />} label="Brand construit în jurul pieselor custom" />
+                <FeaturePill icon={<WandSparkles className="h-4 w-4" />} label="Colecție + comenzi custom analizate manual" />
               </div>
             </div>
-            <div className="mt-6 overflow-hidden rounded-[2.25rem] border border-white/8 bg-[radial-gradient(circle_at_top,rgba(215,161,42,0.16),transparent_32%),linear-gradient(145deg,#111_0%,#070707_55%,#050505_100%)] p-5 sm:p-8">
+            <div className="mt-5 overflow-hidden rounded-[2rem] border border-white/8 bg-[radial-gradient(circle_at_top,rgba(215,161,42,0.16),transparent_32%),linear-gradient(145deg,#111_0%,#070707_55%,#050505_100%)] p-3 sm:p-4">
               <Image
-                src="/brand/arteforma-logo-full.png"
-                alt="Logo ArteForma"
-                width={1002}
-                height={638}
-                className="mx-auto w-full object-contain"
+                src="/brand/1.jpg"
+                alt="Piese ArteForma expuse într-un context premium"
+                width={1024}
+                height={1024}
+                className="mx-auto aspect-square w-full rounded-[1.65rem] object-cover"
                 priority
               />
-              <p className="mt-5 text-center text-[11px] font-semibold uppercase tracking-[0.55em] text-[#d7a12a]">
-                Made Different
-              </p>
             </div>
-            <div className="mt-6 grid gap-4 sm:grid-cols-3">
-              <FeaturePill icon={<ShieldCheck className="h-4 w-4" />} label="Finisaj premium" />
+            <div className="mt-5 grid gap-3 sm:grid-cols-3">
+              <FeaturePill icon={<ShieldCheck className="h-4 w-4" />} label="Plată securizată" />
               <FeaturePill icon={<Truck className="h-4 w-4" />} label="Livrare în România" />
-              <FeaturePill icon={<Sparkles className="h-4 w-4" />} label="Ambalare potrivită și pentru cadou" />
+              <FeaturePill icon={<Sparkles className="h-4 w-4" />} label="Ambalare premium" />
             </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-18 sm:px-8">
+      <section className="mx-auto max-w-7xl px-5 py-12 sm:px-8">
+        <div className="surface-panel-strong grid gap-6 rounded-[2.35rem] p-5 sm:p-6 lg:grid-cols-[1.02fr_0.98fr]">
+          <div className="overflow-hidden rounded-[1.8rem] border border-white/8 bg-black/20">
+            <Image
+              src="/brand/2.jpg"
+              alt="ArteForma într-un context de brand premium"
+              width={1024}
+              height={1024}
+              className="h-full w-full object-cover"
+            />
+          </div>
+          <div className="grid gap-4">
+            <div className="rounded-[1.5rem] border border-white/8 bg-black/20 p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.34em] text-[#d7a12a]">
+                Cum se citește produsul
+              </p>
+              <p className="mt-3 text-sm leading-7 text-white/68">
+                O piesă bună trebuie înțeleasă repede: ce este, unde arată bine și de ce merită cumpărată. De aceea insistăm pe volum clar, finisaj curat și prezență reală în spațiu.
+              </p>
+            </div>
+            <div className="rounded-[1.5rem] border border-white/8 bg-black/20 p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.34em] text-[#d7a12a]">
+                Pentru cadouri și decor
+              </p>
+              <p className="mt-3 text-sm leading-7 text-white/68">
+                Fie că merg spre birou, perete sau cadou, piesele trebuie să fie suficient de clare încât clientul să le înțeleagă imediat și să simtă că se potrivesc locului în care ajung.
+              </p>
+            </div>
+            <div className="rounded-[1.5rem] border border-white/8 bg-black/20 p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.34em] text-[#d7a12a]">
+                Ce urmează în colecție
+              </p>
+              <p className="mt-3 text-sm leading-7 text-white/68">
+                Pe lângă siluete auto, desk pieces și cadouri, colecția poate merge natural și spre lămpi, ceasuri de perete și vaze decorative gândite pentru utilizare decorativă.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
+        <div className="mb-10 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <SectionHeading
+            eyebrow="Best sellers"
+            title="Produsele pe care oamenii le înțeleg și le comandă repede."
+            description="Cele mai clare piese pentru birou, cadouri, auto și setup. Preț vizibil, producție clară și opțiuni ușor de ales."
+          />
+          <Link href="/shop">
+            <Button variant="ghost">Vezi tot magazinul</Button>
+          </Link>
+        </div>
+        <div className="grid gap-6 lg:grid-cols-3">
+          {featured.slice(0, 3).map((product) => (
+            <ProductCard key={product.slug} product={product} />
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
         <SectionHeading
-          eyebrow="Alege după stilul tău"
-          title="Colecția este organizată în jurul vieții în care va ajunge obiectul."
-          description="Auto. Trading. Birou. Cadouri. Obiecte care se înțeleg repede, pentru că omul potrivit știe deja de ce contează."
+          eyebrow="Categorii"
+          title="Găsești repede ce vrei după tipul de piesă și spațiul în care va ajunge."
+          description="Auto / Moto, Crypto / Trading, Birou / Setup, Cadouri și obiecte cu personalitate. Totul este organizat ca un magazin real, nu ca o colecție greu de descifrat."
         />
         <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-5">
           {categories.map((category) => (
             <CategoryCard key={category.slug} category={category} />
           ))}
         </div>
+        <div className="mt-8 grid gap-4 lg:grid-cols-3">
+          {collectionHighlights.map((item) => (
+            <div key={item.title} className="surface-panel rounded-[1.75rem] p-5 text-sm leading-7 text-white/68">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.34em] text-[#d7a12a]">
+                {item.title}
+              </p>
+              <p className="mt-3">{item.body}</p>
+            </div>
+          ))}
+        </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-18 sm:px-8">
+      <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
         <div className="mb-10 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <SectionHeading
-            eyebrow="Piese alese"
-            title="Obiectele pe care oamenii le aleg când vor ca spațiul să spună mai mult."
-            description="Selecția ArteForma cu cele mai căutate piese, alese pentru prezență vizuală, valoare de cadou și conversie clară."
+            eyebrow="Piese pentru birou"
+            title="Piese pentru birou, trading și branding fizic care se cumpără ușor."
+            description="Pentru birouri curate, rafturi bine controlate vizual și spații în care fiecare detaliu trebuie să pară intenționat."
           />
           <Link href="/shop">
-            <Button variant="ghost">Vezi toate produsele</Button>
+            <Button variant="ghost">Vezi toate piesele de birou</Button>
           </Link>
         </div>
         <div className="grid gap-6 lg:grid-cols-3">
-          {featured.map((product) => (
+          {deskProducts.map((product) => (
             <ProductCard key={product.slug} product={product} />
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-18 sm:px-8">
+      <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="surface-panel rounded-[2.5rem] p-7 lg:p-8">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.4em] text-[#d7a12a]">
+                  Auto / Moto
+                </p>
+                <h2 className="mt-4 font-serif-display text-3xl text-white">
+                  Siluete și obiecte pentru oameni care recunosc imediat forma potrivită.
+                </h2>
+              </div>
+              <Link href="/categories/auto-moto">
+                <Button variant="ghost">Vezi categoria</Button>
+              </Link>
+            </div>
+            <div className="mt-6 grid gap-6">
+              {autoProducts.map((product) => (
+                <ProductCard key={product.slug} product={product} />
+              ))}
+            </div>
+          </div>
+          <div className="surface-panel rounded-[2.5rem] p-7 lg:p-8">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.4em] text-[#d7a12a]">
+                  Crypto / Trading & Cadouri
+                </p>
+                <h2 className="mt-4 font-serif-display text-3xl text-white">
+                  Piese de birou și cadouri cu prezență clară, nu doar bune pentru o poză.
+                </h2>
+              </div>
+              <Link href="/categories/crypto-trading">
+                <Button variant="ghost">Vezi colecțiile</Button>
+              </Link>
+            </div>
+            <div className="mt-6 grid gap-6">
+              {[...cryptoProducts, ...giftProducts].map((product) => (
+                <ProductCard key={product.slug} product={product} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
         <div className="surface-panel-strong grid gap-8 rounded-[2.5rem] p-8 lg:grid-cols-[1.15fr_0.85fr] lg:p-10">
           <div className="space-y-5">
             <p className="text-[11px] font-semibold uppercase tracking-[0.4em] text-[#d7a12a]">
               Comenzi custom
             </p>
             <h2 className="font-serif-display text-4xl leading-tight text-white lg:text-5xl">
-              Tu trimiți ideea. Noi construim obiectul în jurul ei.
+              Trimite-ne ideea, referința sau contextul în care va fi folosită piesa.
             </h2>
             <p className="max-w-2xl text-lg leading-8 text-white/68">
-              Logo-uri, siluete auto, cadouri, piese pentru birou, obiecte de perete sau ceva ce nu găsești nicăieri gata făcut. Avantajul real ArteForma nu este doar catalogul, ci faptul că putem construi versiunea ta.
+              Revenim cu o variantă realistă și potrivită pentru produsul final, după ce verificăm dimensiunea, materialul și felul în care va fi folosită piesa.
             </p>
             <Link href="/custom-orders">
-              <Button>Cere o piesă custom</Button>
+              <Button>Creează o piesă personalizată</Button>
             </Link>
           </div>
           <div className="rounded-[2rem] border border-white/8 bg-black/25 p-6">
             <ol className="space-y-5">
               {[
                 "Ne trimiți o referință, un logo, o poză sau o idee clară.",
-                "Analizăm dimensiunea, finisajul, fezabilitatea și contextul de utilizare.",
-                "Modelăm piesa ca să aibă impact vizual și prezență premium.",
+                "Analizăm dimensiunea, finisajul, fezabilitatea și locul în care va sta piesa.",
+                "Pregătim o variantă clară, proporționată și potrivită pentru producție.",
                 "Printăm, finisăm și livrăm din Brașov.",
               ].map((step, index) => (
                 <li key={step} className="flex gap-4">
@@ -159,29 +286,29 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-18 sm:px-8">
+      <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
         <SectionHeading
           eyebrow="Proces"
-          title="Clar, premium și făcut să se miște repede."
-          description="Experiența de cumpărare trebuie să se simtă la fel de controlată ca obiectul pe care îl primești."
+          title="Cum funcționează, din alegere până la livrare."
+          description="Vrem să înțelegi repede ce cumperi, cât durează și ce urmează după plasarea comenzii."
         />
         <div className="mt-10 grid gap-6 lg:grid-cols-4">
           {[
             {
-              title: "Idee",
-              body: "Alegi o piesă din colecție sau ne trimiți un brief bun, cu referințe, dimensiuni și context.",
+              title: "Alegi piesa",
+              body: "Intri direct în colecție sau pornești o cerere custom, cu referințe, dimensiuni și context clar.",
             },
             {
-              title: "Design",
-              body: "Transformăm ideea într-un obiect echilibrat, bun de expus și coerent cu estetica ArteForma.",
+              title: "Confirmăm detaliile",
+              body: "Verificăm materialul, finisajul, dimensiunea și opțiunile de personalizare înainte de producție.",
             },
             {
-              title: "Print",
-              body: "Fiecare obiect este realizat la comandă în România, cu accent pe finisaj și verificare atentă înainte de ambalare.",
+              title: "Producem",
+              body: "Fiecare obiect este realizat la comandă în România, cu verificare atentă înainte de ambalare.",
             },
             {
               title: "Livrare",
-              body: "Livrare cu tarif fix în România, ambalare premium și un produs care ajunge cu prezență, nu cu scuze.",
+              body: "Livrăm în România, cu tarif fix, ambalare atentă și opțiune separată de ambalare premium pentru cadou.",
             },
           ].map((step, index) => (
             <div key={step.title} className="surface-panel rounded-[2rem] p-6">
@@ -195,13 +322,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-18 sm:px-8">
+      <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
         <SectionHeading
           eyebrow="De ce ArteForma"
-          title="De ce convertește mai bine decât un magazin generic de print."
-          description="Clientul nu plătește doar pentru un print. Plătește pentru gust, identitate și siguranța că obiectul chiar va aparține spațiului lui."
+          title="Motive clare pentru care oamenii comandă cu mai multă încredere."
+          description="Nu ne bazăm doar pe vizual. Contează producția, claritatea opțiunilor, livrarea și faptul că fiecare cerere custom este analizată manual."
         />
-        <div className="mt-10 grid gap-6 lg:grid-cols-4">
+        <div className="mt-10 grid gap-6 lg:grid-cols-5">
           {trustPoints.map((point) => (
             <div key={point} className="surface-panel rounded-[2rem] p-6 text-sm leading-7 text-white/72">
               {point}
@@ -212,39 +339,9 @@ export default function HomePage() {
 
       <section className="mx-auto max-w-7xl px-5 py-18 sm:px-8">
         <SectionHeading
-          eyebrow="Galerie"
-          title="Obiecte gândite să stea la vedere, în spații reale."
-          description="Setup-uri dark, colțuri de birou, momente de gifting și contexte premium de display care îl ajută pe client să își imagineze rapid produsul în viața lui."
-        />
-        <div className="mt-10 grid gap-6 lg:grid-cols-[1.12fr_0.88fr]">
-          <div className="surface-panel overflow-hidden rounded-[2rem]">
-            <Image
-              src="/mockups/arteforma-mockups-board.png"
-              alt="Mockup-uri premium ArteForma"
-              width={1536}
-              height={1024}
-              className="h-full w-full object-cover"
-            />
-          </div>
-          <div className="grid gap-6">
-            {[
-              "Vizualurile mari ajută oamenii să înțeleagă calitatea în mai puțin de trei secunde.",
-              "Ambalarea premium contează mult, pentru că multe comenzi sunt și cadouri.",
-              "Direcția black & gold face brandul să se simtă high-end înainte ca prețul să intre în discuție.",
-            ].map((item) => (
-              <div key={item} className="surface-panel rounded-[2rem] p-6 text-white/70">
-                {item}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-5 py-18 sm:px-8">
-        <SectionHeading
           eyebrow="Ce spun clienții"
-          title="Premium funcționează doar când produsul confirmă promisiunea."
-          description="Scopul e simplu: obiectul trebuie să se simtă mai bine în realitate decât părea în pagina de produs."
+          title="Contează ca piesa să confirme ce promite pagina."
+          description="Recenzii scurte, directe, despre felul în care produsul arată după livrare și cum se simte în spațiul clientului."
           align="center"
         />
         <div className="mt-10 grid gap-6 lg:grid-cols-3">
@@ -262,23 +359,23 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 pb-10 pt-12 sm:px-8">
+      <section className="mx-auto max-w-7xl px-5 pb-8 pt-10 sm:px-8">
         <div className="surface-panel-strong rounded-[2.75rem] p-8 text-center lg:p-12">
           <p className="text-[11px] font-semibold uppercase tracking-[0.4em] text-[#d7a12a]">
             Ultimul pas
           </p>
           <h2 className="mx-auto mt-5 max-w-3xl font-serif-display text-4xl text-white lg:text-5xl">
-            Construiește ceva care pare făcut exact pentru spațiul tău.
+            Vezi colecția sau pornește de la ideea ta.
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-white/68">
-            Fie din colecție, fie complet custom, fiecare obiect ArteForma este realizat la comandă în România și gândit să se simtă personal.
+            Fie din colecție, fie complet custom, fiecare obiect ArteForma este realizat la comandă în România și intră în producție doar după ce detaliile sunt clare.
           </p>
           <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
             <Link href="/shop">
-              <Button>Intră în shop</Button>
+              <Button>Vezi colecția</Button>
             </Link>
             <Link href="/custom-orders">
-              <Button variant="secondary">Vorbește cu noi despre o piesă custom</Button>
+              <Button variant="secondary">Creează o piesă personalizată</Button>
             </Link>
           </div>
         </div>

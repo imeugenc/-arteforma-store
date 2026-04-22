@@ -9,14 +9,16 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
-import { CartItem } from "@/lib/types";
+import { CartItem, CartStorage } from "@/lib/types";
 
 type CartContextValue = {
   items: CartItem[];
   addItem: (item: CartItem) => void;
-  updateQuantity: (slug: string, quantity: number) => void;
-  removeItem: (slug: string) => void;
+  updateQuantity: (id: string, quantity: number) => void;
+  removeItem: (id: string) => void;
   clearCart: () => void;
+  giftPackaging: boolean;
+  setGiftPackaging: (value: boolean) => void;
   itemCount: number;
 };
 
@@ -24,68 +26,115 @@ const CartContext = createContext<CartContextValue | null>(null);
 
 const STORAGE_KEY = "arteforma-cart";
 
+function buildCartItemId(item: Partial<CartItem>) {
+  return [
+    item.slug ?? "",
+    item.size ?? "",
+    item.color ?? "",
+    item.material ?? "",
+    item.personalizationSelected ? "personalized" : "standard",
+    item.personalization ?? "",
+  ].join("::");
+}
+
+function normalizeCartItem(item: CartItem | Omit<CartItem, "id">) {
+  return {
+    ...item,
+    id: "id" in item && item.id ? item.id : buildCartItemId(item),
+  };
+}
+
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>(() => {
+  const [cart, setCart] = useState<CartStorage>(() => {
     if (typeof window === "undefined") {
-      return [];
+      return { items: [], giftPackaging: false };
     }
 
     const saved = window.localStorage.getItem(STORAGE_KEY);
     if (!saved) {
-      return [];
+      return { items: [], giftPackaging: false };
     }
 
     try {
-      return JSON.parse(saved) as CartItem[];
+      const parsed = JSON.parse(saved) as CartStorage | CartItem[];
+
+      if (Array.isArray(parsed)) {
+        return {
+          items: parsed.map(normalizeCartItem),
+          giftPackaging: false,
+        };
+      }
+
+      return {
+        items: (parsed.items ?? []).map(normalizeCartItem),
+        giftPackaging: parsed.giftPackaging ?? false,
+      };
     } catch {
       window.localStorage.removeItem(STORAGE_KEY);
-      return [];
+      return { items: [], giftPackaging: false };
     }
   });
 
+  const items = cart.items;
+  const giftPackaging = cart.giftPackaging;
+
   useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  }, [items]);
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
+  }, [cart]);
 
   const addItem = useCallback((item: CartItem) => {
-    setItems((current) => {
-      const existing = current.find(
-        (entry) =>
-          entry.slug === item.slug &&
-          entry.size === item.size &&
-          entry.color === item.color &&
-          entry.material === item.material &&
-          entry.personalization === item.personalization,
-      );
+    setCart((current) => {
+      const normalizedItem = normalizeCartItem(item);
+      const existing = current.items.find((entry) => entry.id === normalizedItem.id);
 
       if (!existing) {
-        return [...current, item];
+        return {
+          ...current,
+          items: [...current.items, normalizedItem],
+        };
       }
 
-      return current.map((entry) =>
-        entry === existing
-          ? { ...entry, quantity: entry.quantity + item.quantity }
-          : entry,
-      );
+      return {
+        ...current,
+        items: current.items.map((entry) =>
+          entry.id === normalizedItem.id
+            ? { ...entry, quantity: entry.quantity + normalizedItem.quantity }
+            : entry,
+        ),
+      };
     });
   }, []);
 
-  const updateQuantity = useCallback((slug: string, quantity: number) => {
-    setItems((current) =>
-      current
+  const updateQuantity = useCallback((id: string, quantity: number) => {
+    setCart((current) => ({
+      ...current,
+      items: current.items
         .map((item) =>
-          item.slug === slug ? { ...item, quantity: Math.max(1, quantity) } : item,
+          item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item,
         )
         .filter((item) => item.quantity > 0),
-    );
+    }));
   }, []);
 
-  const removeItem = useCallback((slug: string) => {
-    setItems((current) => current.filter((item) => item.slug !== slug));
+  const removeItem = useCallback((id: string) => {
+    setCart((current) => ({
+      ...current,
+      items: current.items.filter((item) => item.id !== id),
+    }));
   }, []);
 
   const clearCart = useCallback(() => {
-    setItems((current) => (current.length ? [] : current));
+    setCart((current) =>
+      current.items.length || current.giftPackaging
+        ? { items: [], giftPackaging: false }
+        : current,
+    );
+  }, []);
+
+  const setGiftPackaging = useCallback((value: boolean) => {
+    setCart((current) =>
+      current.giftPackaging === value ? current : { ...current, giftPackaging: value },
+    );
   }, []);
 
   const value = useMemo(
@@ -95,9 +144,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
       updateQuantity,
       removeItem,
       clearCart,
+      giftPackaging,
+      setGiftPackaging,
       itemCount: items.reduce((total, item) => total + item.quantity, 0),
     }),
-    [items, addItem, updateQuantity, removeItem, clearCart],
+    [items, addItem, updateQuantity, removeItem, clearCart, giftPackaging, setGiftPackaging],
   );
 
   return (

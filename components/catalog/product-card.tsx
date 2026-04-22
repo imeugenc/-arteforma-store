@@ -3,20 +3,20 @@ import { ArrowUpRight } from "lucide-react";
 import { Product } from "@/lib/types";
 import { formatPrice } from "@/lib/utils";
 import { ProductVisual } from "@/components/ui/product-visual";
+import { Button } from "@/components/ui/button";
 
 export function ProductCard({ product }: { product: Product }) {
   return (
-    <Link
-      href={`/products/${product.slug}`}
-      className="group surface-panel flex h-full flex-col overflow-hidden rounded-[2rem] transition hover:-translate-y-1"
-    >
-      <ProductVisual
-        accent={product.visual.accent}
-        glow={product.visual.glow}
-        motif={product.visual.motif}
-        label={product.category.replace("-", " ")}
-        className="min-h-[300px] rounded-b-none"
-      />
+    <div className="group surface-panel flex h-full flex-col overflow-hidden rounded-[2rem] transition hover:-translate-y-1">
+      <Link href={`/products/${product.slug}`} className="block">
+        <ProductVisual
+          accent={product.visual.accent}
+          glow={product.visual.glow}
+          motif={product.visual.motif}
+          label={product.category.replace("-", " ")}
+          className="min-h-[300px] rounded-b-none"
+        />
+      </Link>
       <div className="flex flex-1 flex-col gap-5 p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -25,7 +25,11 @@ export function ProductCard({ product }: { product: Product }) {
                 {product.badge}
               </p>
             ) : null}
-            <h3 className="font-serif-display text-[1.65rem] leading-tight text-white">{product.name}</h3>
+            <Link href={`/products/${product.slug}`} className="inline-block">
+              <h3 className="font-serif-display text-[1.65rem] leading-tight text-white transition group-hover:text-[#f4e0ad]">
+                {product.name}
+              </h3>
+            </Link>
             <p className="mt-3 text-sm leading-7 text-white/64">{product.shortDescription}</p>
           </div>
           <ArrowUpRight className="mt-1 h-5 w-5 shrink-0 text-[#d7a12a] transition group-hover:translate-x-1 group-hover:-translate-y-1" />
@@ -45,11 +49,13 @@ export function ProductCard({ product }: { product: Product }) {
             <span className="text-xs uppercase tracking-[0.28em] text-white/35">De la</span>
             <div className="mt-1 text-xl font-semibold text-[#f6d57a]">{formatPrice(product.price)}</div>
           </div>
-          <span className="text-xs font-semibold uppercase tracking-[0.28em] text-white/38">
-            Vezi piesa
-          </span>
+          <Link href={`/products/${product.slug}`}>
+            <Button variant="secondary" className="px-4 py-3 text-xs tracking-[0.22em]">
+              Vezi piesa
+            </Button>
+          </Link>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }

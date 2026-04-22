@@ -8,6 +8,23 @@ export type PersistedOrder = {
   items: OrderItemRecord[];
 };
 
+export type OrderConfirmationPayload = {
+  orderId: string;
+  customerName: string;
+  customerEmail: string;
+  totalAmount: number;
+  currency: string;
+  leadTime: string;
+  shippingMethod: string;
+  items: Array<{
+    name: string;
+    quantity: number;
+    unitPrice: number;
+    lineTotal: number;
+    variantSummary?: string | null;
+  }>;
+};
+
 export async function persistStripeOrder({
   session,
   lineItems,
@@ -39,7 +56,7 @@ export async function persistStripeOrder({
     };
   }
 
-  const customerName = session.customer_details?.name ?? session.metadata?.customer_name ?? "Customer";
+  const customerName = session.customer_details?.name ?? session.metadata?.customer_name ?? "Client";
   const customerEmail = session.customer_details?.email ?? session.metadata?.customer_email ?? "";
   const customerPhone = session.customer_details?.phone ?? session.metadata?.customer_phone ?? null;
   const shippingCost = session.shipping_cost?.amount_total
@@ -58,7 +75,7 @@ export async function persistStripeOrder({
     stripe_session_id: session.id,
     stripe_payment_intent_id:
       typeof session.payment_intent === "string" ? session.payment_intent : null,
-    shipping_method: session.metadata?.shipping_method ?? "Flat-rate Romania",
+    shipping_method: session.metadata?.shipping_method ?? "Tarif fix România",
     shipping_cost: shippingCost,
     notes: session.metadata?.notes ?? null,
     source: session.metadata?.source ?? "website",
@@ -110,8 +127,14 @@ export async function persistStripeOrder({
     }
   }
 
+  const confirmationPayload = buildOrderConfirmationPayload({
+    order: orderInsert.data,
+    items: orderItems,
+  });
+
   // Future email hook:
-  // This is the place to enqueue a confirmation email once transactional email is configured.
+  // Use `confirmationPayload` here when transactional email is configured.
+  void confirmationPayload;
 
   return {
     order: orderInsert.data,
@@ -144,6 +167,42 @@ export async function getOrderBySessionId(sessionId: string) {
   return {
     order: orderResult.data,
     items: itemsResult.data ?? [],
+  };
+}
+
+export async function getCheckoutSessionSnapshot(sessionId: string) {
+  if (!env.STRIPE_SECRET_KEY) {
+    return null;
+  }
+
+  const stripe = new Stripe(env.STRIPE_SECRET_KEY);
+  const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+  if (session.status !== "complete") {
+    return null;
+  }
+
+  const lineItems = await stripe.checkout.sessions.listLineItems(sessionId, {
+    expand: ["data.price.product"],
+  });
+
+  return {
+    order: {
+      id: session.id,
+      customer_name: session.customer_details?.name ?? "Client",
+      customer_email: session.customer_details?.email ?? "",
+      total_amount: (session.amount_total ?? 0) / 100,
+      status: "paid" as const,
+      shipping_method: session.metadata?.shipping_method ?? "Tarif fix România",
+      currency: (session.currency ?? "ron").toUpperCase(),
+    },
+    items: lineItems.data
+      .filter((item) => item.quantity && item.description !== "Livrare cu tarif fix")
+      .map((item) => ({
+        id: item.id,
+        product_name: item.description ?? "ArteForma item",
+        quantity: item.quantity ?? 1,
+      })),
   };
 }
 
@@ -181,5 +240,27 @@ export async function getRecentOrders(limit = 20) {
   return {
     orders: ordersResult.data ?? [],
     items: itemsResult.data ?? [],
+  };
+}
+
+export function buildOrderConfirmationPayload({
+  order,
+  items,
+}: PersistedOrder): OrderConfirmationPayload {
+  return {
+    orderId: order.id,
+    customerName: order.customer_name,
+    customerEmail: order.customer_email,
+    totalAmount: order.total_amount,
+    currency: order.currency,
+    leadTime: "2–5 zile lucrătoare",
+    shippingMethod: order.shipping_method,
+    items: items.map((item) => ({
+      name: item.product_name,
+      quantity: item.quantity,
+      unitPrice: item.unit_price,
+      lineTotal: item.line_total,
+      variantSummary: item.variant_summary,
+    })),
   };
 }

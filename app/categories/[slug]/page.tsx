@@ -44,11 +44,25 @@ export default async function CategoryPage({
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
-      <SectionHeading
-        eyebrow="Categorie"
-        title={category.name}
-        description={`${category.description} ${category.hook}`}
-      />
+      <div className="surface-panel-strong rounded-[2.4rem] p-8 lg:p-10">
+        <SectionHeading
+          eyebrow="Categorie"
+          title={category.name}
+          description={`${category.description} ${category.hook}`}
+        />
+      </div>
+      <div className="mt-8 grid gap-4 md:grid-cols-4">
+        {[
+          "Realizat la comandă în România",
+          "Timp de producție: 2–5 zile lucrătoare",
+          "Ambalare premium",
+          "Livrare în România",
+        ].map((item) => (
+          <div key={item} className="surface-panel rounded-[1.5rem] px-4 py-4 text-sm text-white/68">
+            {item}
+          </div>
+        ))}
+      </div>
       <div className="mt-10 grid gap-6 lg:grid-cols-3">
         {filteredProducts.map((product) => (
           <ProductCard key={product.slug} product={product} />

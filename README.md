@@ -2,6 +2,12 @@
 
 Premium ecommerce storefront for ArteForma, built with Next.js App Router, TypeScript, Tailwind CSS, Stripe Checkout and Supabase-backed persistence.
 
+Customer-facing contact is centered on:
+
+- `contact@arteforma.ro`
+- Instagram: `@arteformaro`
+- TikTok: ArteForma official account
+
 ## Stack
 
 - Next.js App Router
@@ -72,9 +78,12 @@ Behavior:
 
 - `INTERNAL_ORDERS_TOKEN`
 
-This protects the lightweight internal orders page in production:
+This protects the lightweight internal pages in production:
 
 - `/internal/orders?token=YOUR_TOKEN`
+- `/internal/products?token=YOUR_TOKEN`
+- `/internal/media?token=YOUR_TOKEN`
+- `/internal?token=YOUR_TOKEN`
 
 ## Supabase setup
 
@@ -141,6 +150,114 @@ Once Supabase and the webhook are configured, you can view recent orders at:
 
 This is intentionally lightweight and practical for a small launch.
 
+## Product management right now
+
+The current catalog is code-based and lives in:
+
+- `lib/catalog.ts`
+
+How to manage products in the current version:
+
+1. Open `lib/catalog.ts`
+2. Find the product by `slug`
+3. Update:
+   - `price`
+   - `shortDescription`
+   - `longDescription`
+   - `sizes`
+   - `colors`
+   - `materials`
+   - `badge`
+   - `featured`
+4. To hide a product without deleting it, set:
+
+```ts
+enabled: false
+```
+
+5. For static brand/product visuals, place assets in `public/brand` or another `public/*` folder and update the component/path that renders them.
+
+There are also lightweight internal views:
+
+```text
+/internal/products?token=YOUR_INTERNAL_ORDERS_TOKEN
+/internal/media?token=YOUR_INTERNAL_ORDERS_TOKEN
+/internal?token=YOUR_INTERNAL_ORDERS_TOKEN
+```
+
+This is not a full CMS yet. It is a practical internal admin direction plus a cleaner structure for hiding/showing products during launch.
+
+### Recommended next step for a minimal CMS
+
+For real non-technical product management, the next step should be:
+
+- a `products` table in Supabase
+- image storage in Supabase Storage
+- a small protected admin UI for add/edit/disable/image replace
+
+That would allow:
+
+- adding products without code edits
+- updating prices and descriptions from a form
+- enabling/disabling products
+- replacing images directly from an admin area
+
+### SQL prepared for the next admin step
+
+The repo now also includes:
+
+- `supabase/store-admin.sql`
+
+This prepares the next scalable layer for:
+
+- `products`
+- `product_media`
+- `customer_profiles`
+- `order_status_events`
+
+It is not wired live yet, but it gives a clean next-step schema for:
+
+- product CRUD
+- product media management
+- future customer accounts
+- future customer-visible order status updates
+
+## Customer account direction
+
+The project now includes a prepared customer-account route structure:
+
+- `/account`
+- `/account/login`
+- `/account/orders`
+- `/account/status`
+
+These pages are intentionally future-facing and noindexed for now.
+
+Recommended MVP direction:
+
+- Supabase Auth with email OTP or magic link
+- link orders to customer email / customer profile
+- show order history and order status in account
+- save basic profile details for returning customers
+
+This keeps the experience simple and scalable without adding unnecessary social login complexity.
+
+## Media and image strategy
+
+Recommended practical workflow:
+
+1. Prepare/crop/compress images before upload
+2. Keep web-ready assets around 1600–2200 px on the long side for most product use cases
+3. Prefer JPEG or WebP for most product photography and lifestyle images
+4. Use Supabase Storage for long-term product/admin media
+5. Keep folder structure separated by product / hero / brand assets
+
+Important:
+
+- Do not upload large raw photos directly into storage as live product assets
+- Admin uploads should eventually save optimized variants, not originals straight from camera
+- This keeps storage costs, performance, and bandwidth under control
+
 ## Analytics
 
 Current tracked events:
@@ -167,3 +284,5 @@ Tracking currently goes through the internal `/api/track` endpoint and is struct
 - Paid orders persist only after Stripe webhook delivery, which is the correct production path
 - Success page becomes most useful when webhook delivery is configured and reachable
 - Product catalog is still code-based, which is acceptable for launch but can later move to a CMS or database
+- Internal pages are protected with `INTERNAL_ORDERS_TOKEN` and are not intended for public/customer use
+- Customer accounts are prepared as route structure and data direction, but auth is not fully activated yet

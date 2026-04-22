@@ -15,10 +15,10 @@ export default function FAQPage() {
     <div className="mx-auto max-w-5xl px-5 py-16 sm:px-8">
       <SectionHeading
         eyebrow="FAQ"
-        title="Răspunsuri care fac decizia de cumpărare mai clară."
-        description="Premium trebuie să rămână ușor de înțeles. Aici sunt întrebările pe care oamenii le au înainte să aibă încredere în comandă, în brand și în finisaj."
+        title="Întrebări care apar firesc înainte de o comandă."
+        description="Am adunat aici răspunsuri utile despre materiale, producție, ambalare, dimensiuni, livrare și modul în care funcționează comenzile custom."
       />
-      <div className="mt-10 space-y-4">
+      <div className="mt-10 grid gap-4">
         {faqItems.map((item) => (
           <details key={item.question} className="rounded-[1.75rem] border border-white/8 bg-white/[0.03] p-6">
             <summary className="cursor-pointer list-none font-semibold text-white">{item.question}</summary>

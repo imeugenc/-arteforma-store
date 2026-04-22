@@ -11,7 +11,7 @@ export type ProductOptionGroup = {
 };
 
 export type ProductUseCase =
-  | "Desk setup"
+  | "Birou / setup"
   | "Raft de birou"
   | "Perete de garaj"
   | "Cadou cu impact"
@@ -24,6 +24,7 @@ export type Product = {
   name: string;
   category: ProductCategory;
   price: number;
+  enabled?: boolean;
   shortDescription: string;
   longDescription: string;
   story: string;
@@ -58,6 +59,7 @@ export type Category = {
 };
 
 export type CartItem = {
+  id: string;
   slug: string;
   name: string;
   price: number;
@@ -65,8 +67,14 @@ export type CartItem = {
   size?: string;
   color?: string;
   material?: string;
+  personalizationSelected?: boolean;
   personalization?: string;
   accent: string;
+};
+
+export type CartStorage = {
+  items: CartItem[];
+  giftPackaging: boolean;
 };
 
 export type CustomOrderRecord = {
