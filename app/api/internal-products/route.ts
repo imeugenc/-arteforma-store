@@ -78,11 +78,13 @@ export async function POST(request: Request) {
 
     return NextResponse.redirect(
       new URL(`/internal/products?saved=1#product-${saved.id}`, request.url),
+      { status: 303 },
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : "Produsul nu a putut fi salvat.";
     return NextResponse.redirect(
       new URL(`/internal/products?error=${encodeURIComponent(message)}`, request.url),
+      { status: 303 },
     );
   }
 }

@@ -31,7 +31,7 @@ export const materialGuide = {
   },
   "Transparent / translucid": {
     title: "Transparent / translucid",
-    aspect: "Ușor aerisit, cu joc de lumină și un look mai special în funcție de piesă.",
+    aspect: "Ușor aerisit, cu joc de lumină și un look mai special în funcție de produs.",
     resistance: "Depinde de materialul ales la bază și de forma piesei.",
     use: "Potrivit pentru accente luminoase, piese de cadou, obiecte cu iluminare sau detalii decorative.",
   },

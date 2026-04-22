@@ -83,7 +83,7 @@ export function CustomOrderForm() {
       <Field
         label="Dimensiune dorită"
         name="desiredSize"
-        placeholder="Exemplu: piesă de birou de 18 cm sau obiect de perete de 20 × 20 cm"
+        placeholder="Exemplu: produs de birou de 18 cm sau obiect de perete de 20 × 20 cm"
       />
       <Field
         label="Material"
@@ -117,7 +117,7 @@ export function CustomOrderForm() {
           required
           rows={6}
           className="w-full rounded-[1.5rem] border border-white/10 bg-black/30 px-4 py-3 text-white outline-none transition placeholder:text-white/30 focus:border-[#d7a12a]/40"
-          placeholder="Cum vrei să arate piesa? Poate fi mai curată, mai tehnică, mai elegantă sau mai jucăușă. Dacă ai o referință bună, spune-ne aici."
+          placeholder="Cum vrei să arate produsul? Poate fi mai curat, mai tehnic, mai elegant sau mai jucăuș. Dacă ai o referință bună, spune-ne aici."
         />
       </label>
       <Field

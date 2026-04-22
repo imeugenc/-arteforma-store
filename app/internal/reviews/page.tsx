@@ -22,7 +22,15 @@ export default async function InternalReviewsPage({
   const { token, saved, deleted, error } = await searchParams;
   await requireInternalAccess(token, "/internal/reviews");
 
-  const [reviews, products] = await Promise.all([getAdminReviews(), getAdminProducts()]);
+  let reviews: Awaited<ReturnType<typeof getAdminReviews>> = null;
+  let products: Awaited<ReturnType<typeof getAdminProducts>> = null;
+  let loadError = error;
+
+  try {
+    [reviews, products] = await Promise.all([getAdminReviews(), getAdminProducts()]);
+  } catch (loadFailure) {
+    loadError = loadFailure instanceof Error ? loadFailure.message : "Pagina de recenzii nu a putut fi încărcată.";
+  }
 
   return (
     <div className="space-y-8">
@@ -37,7 +45,7 @@ export default async function InternalReviewsPage({
         </p>
         {saved ? <p className="mt-4 text-sm text-[#f2dfaf]">Recenzie salvată.</p> : null}
         {deleted ? <p className="mt-4 text-sm text-[#f2dfaf]">Recenzie ștearsă.</p> : null}
-        {error ? <p className="mt-4 text-sm text-red-300">{error}</p> : null}
+        {loadError ? <p className="mt-4 text-sm text-red-300">{loadError}</p> : null}
       </div>
 
       <div className="surface-panel rounded-[2rem] p-6 lg:p-7">

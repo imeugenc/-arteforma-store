@@ -49,7 +49,7 @@ export function Header() {
             href="/custom-orders"
             className="hidden items-center gap-2 rounded-full border border-[#d7a12a]/18 bg-[#d7a12a]/8 px-3.5 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#f4deb0] transition hover:border-[#d7a12a]/40 hover:text-white xl:flex"
           >
-            Creează o piesă personalizată
+            Creează un produs personalizat
             <ArrowRight className="h-3 w-3" />
           </Link>
           <CartButton />

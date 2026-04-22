@@ -60,7 +60,7 @@ export default async function HomePage() {
               <Button>Vezi colecția</Button>
             </Link>
             <Link href="/custom-orders">
-              <Button variant="secondary">Creează o piesă personalizată</Button>
+              <Button variant="secondary">Creează un produs personalizat</Button>
             </Link>
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
@@ -124,7 +124,7 @@ export default async function HomePage() {
                 Cum se citește produsul
               </p>
               <p className="mt-3 text-sm leading-7 text-white/68">
-                O piesă bună trebuie înțeleasă repede: ce este, unde arată bine și de ce merită cumpărată. De aceea insistăm pe volum clar, finisaj curat și prezență reală în spațiu.
+                Un produs bun trebuie înțeles repede: ce este, unde arată bine și de ce merită cumpărat. De aceea insistăm pe volum clar, finisaj curat și prezență reală în spațiu.
               </p>
             </div>
             <div className="rounded-[1.5rem] border border-white/8 bg-black/20 p-5">
@@ -168,7 +168,7 @@ export default async function HomePage() {
       <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
         <SectionHeading
           eyebrow="Categorii"
-          title="Găsești repede ce vrei după tipul de piesă și spațiul în care va ajunge."
+          title="Găsești repede ce vrei după tipul de produs și spațiul în care va ajunge."
           description="Auto / Moto, Crypto / Trading, Birou / Setup, Cadouri și obiecte cu personalitate. Totul este organizat ca un magazin real, nu ca o colecție greu de descifrat."
         />
         <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-5">
@@ -258,20 +258,20 @@ export default async function HomePage() {
               Comenzi custom
             </p>
             <h2 className="font-serif-display text-[2.15rem] leading-tight text-white lg:text-[2.9rem]">
-              Trimite-ne ideea, referința sau contextul în care va fi folosită piesa.
+              Trimite-ne ideea, referința sau contextul în care va fi folosit produsul.
             </h2>
             <p className="max-w-2xl text-sm leading-8 text-white/68 sm:text-[15px]">
-              Revenim cu o variantă realistă și potrivită pentru produsul final, după ce verificăm dimensiunea, materialul și felul în care va fi folosită piesa.
+              Revenim cu o variantă realistă și potrivită pentru produsul final, după ce verificăm dimensiunea, materialul și felul în care va fi folosit produsul.
             </p>
             <Link href="/custom-orders">
-              <Button>Creează o piesă personalizată</Button>
+              <Button>Creează un produs personalizat</Button>
             </Link>
           </div>
           <div className="rounded-[2rem] border border-white/8 bg-black/25 p-6">
             <ol className="space-y-5">
               {[
                 "Ne trimiți o referință, un logo, o poză sau o idee clară.",
-                "Analizăm dimensiunea, finisajul, fezabilitatea și locul în care va sta piesa.",
+                "Analizăm dimensiunea, finisajul, fezabilitatea și locul în care va sta produsul.",
                 "Pregătim o variantă clară, proporționată și potrivită pentru producție.",
                 "Printăm, finisăm și livrăm din Brașov.",
               ].map((step, index) => (
@@ -296,7 +296,7 @@ export default async function HomePage() {
         <div className="mt-10 grid gap-6 lg:grid-cols-4">
           {[
             {
-              title: "Alegi piesa",
+              title: "Alegi produsul",
               body: "Intri direct în colecție sau pornești o cerere custom, cu referințe, dimensiuni și context clar.",
             },
             {
@@ -341,7 +341,7 @@ export default async function HomePage() {
       <section className="mx-auto max-w-7xl px-5 py-18 sm:px-8">
         <SectionHeading
           eyebrow="Ce spun clienții"
-          title="Contează ca piesa să confirme ce promite pagina."
+          title="Contează ca produsul să confirme ce promite pagina."
           description="Recenzii scurte, directe, despre felul în care produsul arată după livrare și cum se simte în spațiul clientului."
           align="center"
         />
@@ -376,7 +376,7 @@ export default async function HomePage() {
               <Button>Vezi colecția</Button>
             </Link>
             <Link href="/custom-orders">
-              <Button variant="secondary">Creează o piesă personalizată</Button>
+              <Button variant="secondary">Creează un produs personalizat</Button>
             </Link>
           </div>
         </div>

@@ -38,11 +38,12 @@ export async function POST(request: Request) {
 
     await saveReview(parsed);
 
-    return NextResponse.redirect(new URL("/internal/reviews?saved=1", request.url));
+    return NextResponse.redirect(new URL("/internal/reviews?saved=1", request.url), { status: 303 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Recenzia nu a putut fi salvată.";
     return NextResponse.redirect(
       new URL(`/internal/reviews?error=${encodeURIComponent(message)}`, request.url),
+      { status: 303 },
     );
   }
 }

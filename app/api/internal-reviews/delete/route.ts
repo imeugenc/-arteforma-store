@@ -24,11 +24,12 @@ export async function POST(request: Request) {
 
     await deleteReview(parsed.reviewId);
 
-    return NextResponse.redirect(new URL("/internal/reviews?deleted=1", request.url));
+    return NextResponse.redirect(new URL("/internal/reviews?deleted=1", request.url), { status: 303 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Recenzia nu a putut fi ștearsă.";
     return NextResponse.redirect(
       new URL(`/internal/reviews?error=${encodeURIComponent(message)}`, request.url),
+      { status: 303 },
     );
   }
 }

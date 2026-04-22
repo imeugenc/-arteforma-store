@@ -176,7 +176,7 @@ export default async function ProductPage({
       <div className="mt-10 grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
         <div className="space-y-6">
           <div className="surface-panel rounded-[2rem] p-6">
-            <h2 className="font-serif-display text-2xl text-white">Despre această piesă</h2>
+            <h2 className="font-serif-display text-2xl text-white">Despre acest produs</h2>
             <p className="mt-4 leading-8 text-white/68">{product.longDescription}</p>
           </div>
 
@@ -199,7 +199,7 @@ export default async function ProductPage({
           <div className="surface-panel rounded-[2rem] p-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <h2 className="font-serif-display text-2xl text-white">Finisaje și materiale pentru piesa aceasta</h2>
+                <h2 className="font-serif-display text-2xl text-white">Finisaje și materiale pentru produsul acesta</h2>
                 <p className="mt-3 max-w-3xl text-sm leading-7 text-white/64">
                   Aici vezi doar opțiunile relevante pentru modelul acesta. Ghidul complet despre materialele și finisajele ArteForma este în pagina Despre.
                 </p>
@@ -269,7 +269,7 @@ export default async function ProductPage({
               Vrei o variantă apropiată de modelul tău sau de ideea ta?
             </h2>
             <p className="mt-3 text-sm leading-7 text-white/68">
-              Trimite-ne ideea, referința sau contextul în care va fi folosită piesa, iar noi revenim cu o variantă realistă și potrivită pentru produsul final.
+              Trimite-ne ideea, referința sau contextul în care va fi folosit produsul, iar noi revenim cu o variantă realistă și potrivită pentru produsul final.
             </p>
             <div className="mt-6">
               <Link href="/custom-orders">
@@ -277,7 +277,7 @@ export default async function ProductPage({
                   variant="secondary"
                   className="border-[#d7a12a]/24 bg-[#d7a12a]/8 text-[#f3dfae] hover:text-white"
                 >
-                  Creează o piesă personalizată
+                  Creează un produs personalizat
                 </Button>
               </Link>
             </div>

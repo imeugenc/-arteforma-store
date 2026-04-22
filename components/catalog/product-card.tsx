@@ -67,7 +67,7 @@ export function ProductCard({ product }: { product: Product }) {
           </div>
           <Link href={`/products/${product.slug}`}>
             <Button variant="secondary" className="px-4 py-3 text-xs tracking-[0.22em]">
-              Vezi piesa
+              Vezi Produs
             </Button>
           </Link>
         </div>

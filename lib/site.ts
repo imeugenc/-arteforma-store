@@ -34,7 +34,7 @@ export const testimonials = [
     name: "Mihai V.",
     role: "Client, nișa auto",
     quote:
-      "A arătat bine din prima, fără să pară un obiect făcut în grabă. Exact genul de piesă pe care o lași la vedere.",
+      "A arătat bine din prima, fără să pară un obiect făcut în grabă. Exact genul de produs pe care îl lași la vedere.",
   },
   {
     name: "Andreea P.",
@@ -67,19 +67,19 @@ export const faqItems = [
       "Da. În versiunea actuală livrăm doar în România, cu tarif fix. Așa putem păstra control mai bun pe ambalare, timpi și experiența finală.",
   },
   {
-    question: "Pot cere o piesă personalizată?",
+    question: "Pot cere un produs personalizat?",
     answer:
-      "Da. Ne poți trimite un logo, o fotografie, o referință vizuală sau o idee clară. Verificăm dacă piesa este realistă pentru formatul și dimensiunea dorită și revenim cu o direcție fezabilă.",
+      "Da. Ne poți trimite un logo, o fotografie, o referință vizuală sau o idee clară. Verificăm dacă produsul este realist pentru formatul și dimensiunea dorită și revenim cu o direcție fezabilă.",
   },
   {
-    question: "Care este dimensiunea maximă pentru o piesă?",
+    question: "Care este dimensiunea maximă pentru un produs?",
     answer:
       "Pentru piese dintr-o singură bucată, volumul maxim de printare este 20 × 20 × 24 cm. Dacă un obiect trebuie să fie mai mare, putem discuta o construcție din mai multe părți, atunci când designul o permite.",
   },
   {
     question: "Pot face o comandă pentru cadou?",
     answer:
-      "Da. Multe piese ArteForma ajung direct în cadouri pentru parteneri, prieteni sau colegi. Dacă vrei o piesă gândită pentru un cadou, te putem ghida și la alegerea materialului, a finisajului și a mesajului personalizat.",
+      "Da. Multe produse ArteForma ajung direct în cadouri pentru parteneri, prieteni sau colegi. Dacă vrei un produs gândit pentru cadou, te putem ghida și la alegerea materialului, a finisajului și a mesajului personalizat.",
   },
   {
     question: "Cum funcționează ambalarea premium pentru cadouri?",
@@ -94,10 +94,10 @@ export const faqItems = [
   {
     question: "Ce se întâmplă după ce plasez o comandă?",
     answer:
-      "După plată, comanda este confirmată și intră în fluxul nostru de producție. Verificăm detaliile, pregătim piesa, facem finisajele necesare și o ambalăm pentru livrare în România.",
+      "După plată, comanda este confirmată și intră în fluxul nostru de producție. Verificăm detaliile, pregătim produsul, facem finisajele necesare și îl ambalăm pentru livrare în România.",
   },
   {
-    question: "Pot comanda o piesă inspirată dintr-o referință?",
+    question: "Pot comanda un produs inspirat dintr-o referință?",
     answer:
       "Da, atât timp cât referința este clară și poate fi adaptată realist într-un obiect printat 3D. Este suficient să ne trimiți o imagine, o fotografie sau un exemplu de direcție vizuală.",
   },
@@ -109,7 +109,7 @@ export const faqItems = [
   {
     question: "Cum aleg materialul potrivit?",
     answer:
-      "Dacă vrei un obiect curat pentru expunere, PLA sau PLA Silk sunt de obicei cele mai potrivite. Dacă ai nevoie de ceva mai rezistent, PETG sau ABS pot fi opțiuni mai bune. Pentru piese flexibile, discutăm despre TPU. Dacă nu ești sigur, ne spui cum vrei să arate și unde va sta piesa, iar noi îți recomandăm varianta potrivită.",
+      "Dacă vrei un obiect curat pentru expunere, PLA sau PLA Silk sunt de obicei cele mai potrivite. Dacă ai nevoie de ceva mai rezistent, PETG sau ABS pot fi opțiuni mai bune. Pentru produse flexibile, discutăm despre TPU. Dacă nu ești sigur, ne spui cum vrei să arate și unde va sta produsul, iar noi îți recomandăm varianta potrivită.",
   },
   {
     question: "Pot plăti și în crypto?",

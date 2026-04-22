@@ -91,7 +91,7 @@ export default async function InternalProductsPage({
               <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[#d7a12a]">
                 Produs nou
               </p>
-              <h2 className="font-serif-display text-2xl text-white">Adaugă o piesă nouă în catalog</h2>
+              <h2 className="font-serif-display text-2xl text-white">Adaugă un produs nou în catalog</h2>
             </div>
             <div className="mt-6">
               <ProductEditor defaults={getProductFormDefaults()} />

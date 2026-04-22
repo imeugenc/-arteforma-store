@@ -6,7 +6,7 @@ export const categories: Category[] = [
     name: "Auto / Moto",
     description:
       "Siluete și obiecte pentru birou, perete sau garaj, inspirate din modele auto și moto ușor de identificat.",
-    hook: "Pentru pasionați care vor o piesă clară și ușor de integrat în spațiul lor.",
+    hook: "Pentru pasionați care vor un produs clar și ușor de integrat în spațiul lor.",
   },
   {
     slug: "crypto-trading",
@@ -45,15 +45,15 @@ export const products: Product[] = [
     category: "auto-moto",
     price: 189,
     shortDescription:
-      "O piesă de perete curată, construită în jurul uneia dintre cele mai ușor de recunoscut siluete auto create vreodată.",
+      "Un produs de perete curat, construit în jurul uneia dintre cele mai ușor de recunoscut siluete auto create vreodată.",
     longDescription:
       "Placa siluetă Porsche 911 este gândită pentru birouri, garaje și spații în care contează forma și proporția. Este ușor de recunoscut pentru omul potrivit și suficient de curată ca să stea firesc într-un birou sau într-un colț de colecționar.",
     story:
       "Pentru cei care nu au nevoie de un logo ca să recunoască forma. Piesa asta vorbește despre statut discret și gust auto transformat în obiect.",
-    sizes: ["18 cm compact", "28 cm semnătură", "40 cm piesă mare"],
+    sizes: ["18 cm compact", "28 cm semnătură", "40 cm format mare"],
     colors: ["Negru Grafit", "Gri Urban", "Auriu Silk"],
     materials: ["PLA", "PLA Silk", "PETG", "ABS"],
-    sizeLabel: "Dimensiune piesă",
+    sizeLabel: "Dimensiune produs",
     colorLabel: "Finisaj",
     materialLabel: "Material",
     personalizationLabel: "Text opțional pe plăcuță",
@@ -84,7 +84,7 @@ export const products: Product[] = [
       "Piesa aceasta transformă nostalgia E46 într-un obiect de birou curat și ușor de integrat. Este compactă, arhitecturală și citește bine de la distanță, ceea ce o face potrivită pentru rafturi, birouri și spații care au nevoie de un accent clar.",
     story:
       "Nu orice mașină merită să devină obiect. E46 merită, pentru că încă spune ceva oamenilor care știu.",
-    sizes: ["16 cm compact", "24 cm piesă de birou"],
+    sizes: ["16 cm compact", "24 cm format de birou"],
     colors: ["Negru Grafit", "Gri Urban", "Auriu Silk"],
     materials: ["PLA", "PETG", "ABS"],
     sizeLabel: "Dimensiune totem",
@@ -116,7 +116,7 @@ export const products: Product[] = [
       "Moto Line Wall Art este făcut pentru riderii care vor ca spațiul lor să poarte aceeași energie ca motocicleta. Geometria rămâne curată, profilul rămâne clar, iar rezultatul se simte mai aproape de design de obiect decât de decor de hobby.",
     story:
       "Pentru cei care vor să păstreze energia unei motociclete sport într-un obiect curat și bine integrat.",
-    sizes: ["30 cm perete", "45 cm piesă mare"],
+    sizes: ["30 cm perete", "45 cm format mare"],
     colors: ["Negru Grafit", "Gri Urban", "Auriu Silk"],
     materials: ["PLA", "PLA Silk", "PETG"],
     sizeLabel: "Dimensiune perete",
@@ -143,15 +143,15 @@ export const products: Product[] = [
     category: "crypto-trading",
     price: 129,
     shortDescription:
-      "O piesă de birou pentru cei care vor ca simbolul să fie prezent în spațiu, nu ascuns într-un wallpaper.",
+      "Un produs de birou pentru cei care vor ca simbolul să fie prezent în spațiu, nu ascuns într-un wallpaper.",
     longDescription:
       "Bitcoin Crest Desk Art este gândit pentru setup-uri curate, birouri de trading și rafturi moderne. Obiectul rămâne simplu și vizual puternic, ca să arate bine la vedere și să evite senzația de produs generic.",
     story:
       "Creat pentru oamenii care nu simt nevoia să explice de ce simbolul contează. Ei știu deja.",
-    sizes: ["15 cm accent de birou", "22 cm piesă de expus"],
+    sizes: ["15 cm accent de birou", "22 cm format de expus"],
     colors: ["Negru Grafit", "Auriu Silk", "Alb Satinat", "Transparent Cristal"],
     materials: ["PLA", "PLA Silk", "PETG", "Transparent / translucid"],
-    sizeLabel: "Dimensiune piesă",
+    sizeLabel: "Dimensiune produs",
     colorLabel: "Finisaj",
     materialLabel: "Material",
     leadTime: "2–5 zile lucrătoare",
@@ -179,8 +179,8 @@ export const products: Product[] = [
     longDescription:
       "Ethereum Monolith păstrează geometria clară și reduce zgomotul vizual la minimum. Este gândit pentru birouri și rafturi care merg spre modern și minimal și funcționează bine în interioare cu un singur accent vizual clar.",
     story:
-      "O piesă care funcționează bine în setup-uri moderne, curate și foarte controlate vizual.",
-    sizes: ["20 cm standard", "28 cm piesă mare"],
+      "Un produs care funcționează bine în setup-uri moderne, curate și foarte controlate vizual.",
+    sizes: ["20 cm standard", "28 cm format mare"],
     colors: ["Gri Urban", "Alb Satinat", "Auriu Silk"],
     materials: ["PLA", "PETG", "ABS"],
     sizeLabel: "Dimensiune monolit",
@@ -206,11 +206,11 @@ export const products: Product[] = [
     category: "crypto-trading",
     price: 229,
     shortDescription:
-      "O piesă de conversație pentru traderii care vor ca spațiul lor să poarte aceeași tensiune pe care o trăiesc zilnic.",
+      "Un produs de conversație pentru traderii care vor ca spațiul lor să poarte aceeași tensiune pe care o trăiesc zilnic.",
     longDescription:
       "Această sculptură echilibrează tensiunea și simetria dintre cele două arhetipuri de piață. Este construită să aibă greutate vizuală pe raft sau pe birou fără să devină teatrală, exact de aceea funcționează bine în spații premium.",
     story:
-      "O piesă care are sens în birouri în care dinamica pieței face deja parte din rutina zilnică.",
+      "Un produs care are sens în birouri în care dinamica pieței face deja parte din rutina zilnică.",
     sizes: ["24 cm standard", "34 cm colecționar"],
     colors: ["Negru Grafit", "Gri Urban", "Alb Satinat", "Auriu Silk"],
     materials: ["PLA", "PLA Silk", "PETG", "ABS"],
@@ -300,9 +300,9 @@ export const products: Product[] = [
     category: "gifts",
     price: 179,
     shortDescription:
-      "O piesă personalizată cu impact emoțional, gândită să arate bine chiar din momentul în care este oferită.",
+      "Un produs personalizat cu impact emoțional, gândit să arate bine chiar din momentul în care este oferit.",
     longDescription:
-      "Construită în jurul unui nume sau al unui mesaj scurt, această bază iluminată transformă un detaliu personal într-un obiect vizibil și memorabil. Funcționează foarte bine ca piesă de cadou pentru zi de naștere, aniversare sau upgrade de birou.",
+      "Construită în jurul unui nume sau al unui mesaj scurt, această bază iluminată transformă un detaliu personal într-un obiect vizibil și memorabil. Funcționează foarte bine ca produs de cadou pentru zi de naștere, aniversare sau upgrade de birou.",
     story:
       "Un cadou nu ar trebui să pară generic în secunda în care se deschide cutia. Piesa asta face exact opusul.",
     sizes: ["Mic", "Mediu"],
@@ -367,7 +367,7 @@ export const products: Product[] = [
     shortDescription:
       "O versiune mai curată și mai bună de expus a dragonului articulat viral pe care oamenii chiar vor să îl țină la vedere.",
     longDescription:
-      "Versiunea asta păstrează mișcarea și forma pe care lumea le iubește, dar pune mai mult accent pe finisaj, siluetă și felul în care piesa arată la vedere.",
+      "Versiunea asta păstrează mișcarea și forma pe care lumea le iubește, dar pune mai mult accent pe finisaj, siluetă și felul în care produsul arată la vedere.",
     story:
       "Ce devine viral poate arăta în continuare curat și bine dacă execuția e corectă.",
     sizes: ["Mic", "Mediu", "XL"],
@@ -434,7 +434,7 @@ export const products: Product[] = [
       "Transformăm logo-ul tău într-un obiect de expus, cu proporții echilibrate, prezență clară pe raft și finisaj potrivit pentru birouri, studiouri și cadouri de brand.",
     story:
       "Brandul tău nu ar trebui să existe doar pe ecrane. Ar trebui să ocupe și spațiul fizic.",
-    sizes: ["25 cm de expus", "35 cm principal", "50 cm piesă mare"],
+    sizes: ["25 cm de expus", "35 cm principal", "50 cm format mare"],
     colors: ["Negru Grafit", "Gri Urban", "Alb Satinat", "Auriu Silk"],
     materials: ["PLA", "PETG", "ABS"],
     sizeLabel: "Dimensiune logo",

@@ -123,7 +123,7 @@ export default async function SuccessPage({
             <Button>Înapoi în magazin</Button>
           </Link>
           <Link href="/custom-orders">
-            <Button variant="secondary">Creează o piesă personalizată</Button>
+            <Button variant="secondary">Creează un produs personalizat</Button>
           </Link>
         </div>
       </div>

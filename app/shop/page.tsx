@@ -21,7 +21,7 @@ export default async function ShopPage() {
         <SectionHeading
           eyebrow="Magazin"
           title="Piese pentru birou, decor, cadouri și proiecte custom realizate în Brașov."
-          description="Prețuri clare în RON, producție în 2–5 zile lucrătoare și o navigare mai simplă după categorie, buget sau tipul de piesă pe care îl cauți."
+          description="Prețuri clare în RON, producție în 2–5 zile lucrătoare și o navigare mai simplă după categorie, buget sau tipul de produs pe care îl cauți."
         />
       </div>
       <div className="mt-8 grid gap-4 md:grid-cols-4">

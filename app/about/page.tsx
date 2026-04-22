@@ -20,12 +20,12 @@ const editorialCards = [
   {
     title: "Pentru cine lucrăm",
     body:
-      "Pentru oameni care vor o piesă clară, bine proporționată și potrivită spațiului în care ajunge: birou, studio, perete, raft sau cadou.",
+      "Pentru oameni care vor un produs clar, bine proporționat și potrivit spațiului în care ajunge: birou, studio, perete, raft sau cadou.",
   },
   {
     title: "Ce înseamnă «realizat la comandă în România»",
     body:
-      "Mai mult control pe producție, mai multă atenție pe detalii și o comunicare mai directă atunci când piesa are nevoie de ajustări sau clarificări.",
+      "Mai mult control pe producție, mai multă atenție pe detalii și o comunicare mai directă atunci când produsul are nevoie de ajustări sau clarificări.",
   },
 ];
 
@@ -60,7 +60,7 @@ export default function AboutPage() {
           <div className="surface-panel-strong rounded-[2.5rem] p-8 lg:p-10">
             <div className="space-y-5 text-base leading-8 text-white/68">
               <p>
-                ArteForma lucrează atât cu piese din colecție, cât și cu proiecte pornite de la o idee, un logo sau o referință vizuală. Uneori clientul știe exact ce vrea. Alteori are doar direcția. În ambele cazuri, filtrul rămâne același: piesa trebuie să fie credibilă, bine rezolvată și potrivită pentru producție.
+                ArteForma lucrează atât cu produse din colecție, cât și cu proiecte pornite de la o idee, un logo sau o referință vizuală. Uneori clientul știe exact ce vrea. Alteori are doar direcția. În ambele cazuri, filtrul rămâne același: produsul trebuie să fie credibil, bine rezolvat și potrivit pentru producție.
               </p>
               <p>
                 Tocmai de aceea nu promitem orice formă sau orice idee instant. Preferăm să spunem clar ce se poate face bine, în ce dimensiune, din ce material și cu ce rezultat realist în produsul final.
@@ -83,7 +83,7 @@ export default function AboutPage() {
         <SectionHeading
           eyebrow="Cum lucrăm"
           title="Proces simplu, clar și potrivit pentru piese din colecție sau proiecte personalizate"
-          description="Important este să știm ce trebuie să iasă bine în produsul final: forma, dimensiunea, finisajul și felul în care va fi folosită piesa."
+          description="Important este să știm ce trebuie să iasă bine în produsul final: forma, dimensiunea, finisajul și felul în care va fi folosit produsul."
         />
         <div className="mt-8 grid gap-5 lg:grid-cols-4">
           {processSteps.map((step, index) => (
@@ -134,9 +134,9 @@ export default function AboutPage() {
 
       <div className="mt-14 grid gap-6 lg:grid-cols-[1fr_1fr]">
         <div className="surface-panel rounded-[2rem] p-6">
-          <h2 className="font-serif-display text-2xl text-white">Când o piesă merită făcută custom</h2>
+          <h2 className="font-serif-display text-2xl text-white">Când un produs merită făcut custom</h2>
           <p className="mt-4 text-sm leading-8 text-white/68">
-            Atunci când obiectul trebuie adaptat unui model anume, unui logo, unui cadou sau unui context clar de utilizare. Acolo diferența nu stă doar în idee, ci în cum este tradusă bine într-o piesă fizică.
+            Atunci când obiectul trebuie adaptat unui model anume, unui logo, unui cadou sau unui context clar de utilizare. Acolo diferența nu stă doar în idee, ci în cum este tradus bine într-un produs fizic.
           </p>
         </div>
         <div className="surface-panel rounded-[2rem] p-6">

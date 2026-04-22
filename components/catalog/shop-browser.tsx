@@ -57,7 +57,7 @@ export function ShopBrowser({
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Caută după produs, categorie sau tip de piesă"
+              placeholder="Caută după produs, categorie sau tip de produs"
               className="w-full rounded-full border border-white/10 bg-black/30 px-11 py-3.5 text-sm text-white outline-none transition placeholder:text-white/28 focus:border-[#d7a12a]/45"
             />
           </div>

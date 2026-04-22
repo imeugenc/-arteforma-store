@@ -20,11 +20,11 @@ export default function CustomOrdersPage() {
           <SectionHeading
             eyebrow="Comenzi custom"
             title="Trimite-ne ideea, referința sau contextul, iar noi îți spunem ce variantă este realistă și potrivită."
-            description="Poți să ne trimiți un logo, o schiță, o fotografie sau câteva idei clare. Analizăm fezabilitatea, dimensiunea, materialul și felul în care piesa ar trebui să arate în produsul final."
+            description="Poți să ne trimiți un logo, o schiță, o fotografie sau câteva idei clare. Analizăm fezabilitatea, dimensiunea, materialul și felul în care produsul ar trebui să arate în forma finală."
           />
           <div className="surface-panel rounded-[1.75rem] p-5 text-sm leading-7 text-white/68">
             <p className="text-white">
-              Ne ajută mult să știm unde va sta piesa, ce dimensiune îți imaginezi și dacă există un termen care contează pentru tine.
+              Ne ajută mult să știm unde va sta produsul, ce dimensiune îți imaginezi și dacă există un termen care contează pentru tine.
             </p>
             <ul className="mt-4 space-y-2">
               <li>Obiecte de perete pentru birou, garaj sau studio</li>
@@ -63,7 +63,7 @@ export default function CustomOrdersPage() {
             },
             {
               title: "Siluetă auto / moto",
-              body: "Pentru forme ușor de identificat, adaptate după referință, dimensiunea dorită și locul în care va sta piesa.",
+              body: "Pentru forme ușor de identificat, adaptate după referință, dimensiunea dorită și locul în care va sta produsul.",
             },
           ].map((example) => (
             <div key={example.title} className="surface-panel rounded-[1.8rem] p-5 text-sm leading-7 text-white/66">
@@ -78,7 +78,7 @@ export default function CustomOrdersPage() {
       <div className="mt-10">
         <SectionHeading
           eyebrow="Materiale"
-          title="Îți recomandăm materialul potrivit după aspect, rezistență și locul în care va sta piesa."
+          title="Îți recomandăm materialul potrivit după aspect, rezistență și locul în care va sta produsul."
           description="Nu trebuie să alegi tehnic. Spune-ne cum vrei să arate și cum va fi folosită, iar noi te ghidăm spre varianta potrivită."
         />
         <div className="mt-6 grid gap-4 lg:grid-cols-5">

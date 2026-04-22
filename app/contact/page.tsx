@@ -17,7 +17,7 @@ export default function ContactPage() {
       <SectionHeading
         eyebrow="Contact"
         title="Întrebări, colaborări sau cereri personalizate"
-        description="Scrie-ne dacă vrei detalii despre un produs, ai o idee pentru o piesă personalizată sau vrei să discutăm o colaborare."
+        description="Scrie-ne dacă vrei detalii despre un produs, ai o idee pentru un produs personalizat sau vrei să discutăm o colaborare."
       />
       <div className="mt-10 grid gap-6 md:grid-cols-3">
         <ContactCard
