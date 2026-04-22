@@ -1,21 +1,37 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { Product } from "@/lib/types";
+import { getPrimaryProductMedia } from "@/lib/product-media";
 import { formatPrice } from "@/lib/utils";
 import { ProductVisual } from "@/components/ui/product-visual";
 import { Button } from "@/components/ui/button";
 
 export function ProductCard({ product }: { product: Product }) {
+  const primaryMedia = getPrimaryProductMedia(product.media);
+
   return (
     <div className="group surface-panel flex h-full flex-col overflow-hidden rounded-[2rem] transition hover:-translate-y-1">
       <Link href={`/products/${product.slug}`} className="block">
-        <ProductVisual
-          accent={product.visual.accent}
-          glow={product.visual.glow}
-          motif={product.visual.motif}
-          label={product.category.replace("-", " ")}
-          className="min-h-[300px] rounded-b-none"
-        />
+        {primaryMedia?.public_url ? (
+          <div className="overflow-hidden rounded-b-none border-b border-white/8 bg-black/20">
+            <Image
+              src={primaryMedia.public_url}
+              alt={primaryMedia.alt_text ?? product.name}
+              width={1200}
+              height={1200}
+              className="aspect-[1.08/1] w-full object-cover"
+            />
+          </div>
+        ) : (
+          <ProductVisual
+            accent={product.visual.accent}
+            glow={product.visual.glow}
+            motif={product.visual.motif}
+            label={product.category.replace("-", " ")}
+            className="min-h-[300px] rounded-b-none"
+          />
+        )}
       </Link>
       <div className="flex flex-1 flex-col gap-5 p-6">
         <div className="flex items-start justify-between gap-4">

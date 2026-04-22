@@ -74,17 +74,20 @@ export function productStructuredData({
   description,
   price,
   slug,
+  image,
 }: {
   name: string;
   description: string;
   price: number;
   slug: string;
+  image?: string;
 }) {
   return {
     "@context": "https://schema.org",
     "@type": "Product",
     name,
     description,
+    ...(image ? { image: [image] } : {}),
     brand: {
       "@type": "Brand",
       name: siteConfig.name,

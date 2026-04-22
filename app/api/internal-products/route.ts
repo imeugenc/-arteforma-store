@@ -58,7 +58,7 @@ export async function POST(request: Request) {
       idealFor: formData.get("idealFor")?.toString(),
     });
 
-    await saveAdminProduct({
+    const saved = await saveAdminProduct({
       productId: parsed.productId,
       name: parsed.name,
       slug: parsed.slug,
@@ -76,7 +76,9 @@ export async function POST(request: Request) {
       idealFor: parseListInput(parsed.idealFor ?? ""),
     });
 
-    return NextResponse.redirect(new URL("/internal/products?saved=1", request.url));
+    return NextResponse.redirect(
+      new URL(`/internal/products?saved=1#product-${saved.id}`, request.url),
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : "Produsul nu a putut fi salvat.";
     return NextResponse.redirect(

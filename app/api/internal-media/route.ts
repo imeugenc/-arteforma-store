@@ -9,6 +9,7 @@ const schema = z.object({
   altText: z.string().optional(),
   sortOrder: z.coerce.number().int().min(0).default(0),
   kind: z.string().optional(),
+  returnTo: z.string().optional(),
 });
 
 export async function POST(request: Request) {
@@ -32,6 +33,7 @@ export async function POST(request: Request) {
       altText: formData.get("altText")?.toString(),
       sortOrder: formData.get("sortOrder"),
       kind: formData.get("kind")?.toString(),
+      returnTo: formData.get("returnTo")?.toString(),
     });
 
     await uploadProductMedia({
@@ -42,7 +44,9 @@ export async function POST(request: Request) {
       kind: parsed.kind,
     });
 
-    return NextResponse.redirect(new URL("/internal/media?uploaded=1", request.url));
+    return NextResponse.redirect(
+      new URL(parsed.returnTo || "/internal/media?uploaded=1", request.url),
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : "Imaginea nu a putut fi încărcată.";
     return NextResponse.redirect(

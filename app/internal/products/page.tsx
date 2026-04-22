@@ -1,12 +1,17 @@
 import type { ReactNode } from "react";
 import { buildInternalMetadata, requireInternalAccess } from "@/lib/internal";
-import { canUseAdminCatalog, getAdminProducts, getProductFormDefaults } from "@/lib/admin-catalog";
+import {
+  canUseAdminCatalog,
+  getAdminProducts,
+  getProductFormDefaults,
+} from "@/lib/admin-catalog";
+import { getPrimaryProductMedia } from "@/lib/product-media";
 import { formatPrice } from "@/lib/utils";
-import type { ProductCategory } from "@/lib/types";
+import type { ProductCategory, ProductMediaRecord } from "@/lib/types";
 
 export const metadata = buildInternalMetadata(
   "Catalog intern",
-  "Administrare internă ArteForma pentru produse, opțiuni și starea catalogului.",
+  "Administrare internă ArteForma pentru produse, opțiuni și media.",
   "/internal/products",
 );
 
@@ -16,6 +21,13 @@ const categoryOptions: Array<{ value: ProductCategory; label: string }> = [
   { value: "desk-setup", label: "Birou / Setup" },
   { value: "gifts", label: "Cadouri" },
   { value: "funny-viral", label: "Funny / Viral" },
+];
+
+const mediaKindOptions = [
+  { value: "cover", label: "Copertă / prezentare" },
+  { value: "gallery", label: "Galerie" },
+  { value: "detail", label: "Detaliu" },
+  { value: "lifestyle", label: "Context / ambient" },
 ];
 
 export default async function InternalProductsPage({
@@ -43,10 +55,12 @@ export default async function InternalProductsPage({
               Catalog intern
             </p>
             <h1 className="mt-5 font-serif-display text-[2rem] text-white lg:text-[2.6rem]">
-              Produse, opțiuni și controlul catalogului
+              Produse, opțiuni și media într-un singur loc
             </h1>
             <p className="mt-4 max-w-3xl text-sm leading-8 text-white/68 sm:text-[15px]">
-              Aici poți adăuga produse, edita catalogul existent și activa sau dezactiva piese fără să mai umbli direct în cod. Storefront-ul citește produsele din Supabase când există și revine pe fallback-ul din cod dacă baza e goală.
+              Creezi produsul, apoi îi gestionezi imaginile direct în aceeași zonă. Imaginea marcată ca
+              „Copertă / prezentare” devine varianta principală pentru produs și poate fi folosită în
+              storefront și pentru social sharing.
             </p>
           </div>
           <form action="/api/internal-products/import" method="POST">
@@ -81,38 +95,78 @@ export default async function InternalProductsPage({
             </div>
             <div className="mt-6">
               <ProductEditor defaults={getProductFormDefaults()} />
+              <div className="mt-6 rounded-[1.5rem] border border-white/8 bg-black/20 p-5 text-sm leading-7 text-white/62">
+                Salvează mai întâi produsul, apoi secțiunea de imagini apare automat sub el și poți încărca
+                pozele direct din aceeași pagină.
+              </div>
             </div>
           </div>
 
           {!products?.length ? (
             <div className="surface-panel rounded-[2rem] p-6 text-white/65">
-              Tabelul `products` este încă gol. Apasă pe butonul de import de mai sus ca să copiezi catalogul actual în Supabase și să poți gestiona apoi media și editările din admin.
+              Tabelul `products` este încă gol. Apasă pe butonul de import de mai sus ca să copiezi catalogul
+              actual în Supabase și să poți gestiona apoi imaginile și editările din admin.
             </div>
           ) : (
             <div className="space-y-6">
-              {products.map((product) => (
-                <div key={product.id} className="surface-panel rounded-[2rem] p-6">
-                  <div className="grid gap-6 xl:grid-cols-[0.34fr_0.66fr]">
-                    <div className="rounded-[1.5rem] border border-white/8 bg-black/20 p-5">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#d7a12a]">
-                        Rezumat
-                      </p>
-                      <div className="mt-4 space-y-3 text-sm text-white/68">
-                        <InfoRow label="Produs" value={product.name} />
-                        <InfoRow label="Slug" value={product.slug} />
-                        <InfoRow label="Categorie" value={product.category} />
-                        <InfoRow label="Preț" value={formatPrice(product.price)} />
-                        <InfoRow label="Status" value={product.enabled ? "Activ" : "Inactiv"} />
-                        <InfoRow label="Featured" value={product.featured ? "Da" : "Nu"} />
-                        <InfoRow label="Media" value={`${product.media?.length ?? 0} imagini`} />
+              {products.map((product) => {
+                const primaryMedia = getPrimaryProductMedia(product.media);
+
+                return (
+                  <div
+                    key={product.id}
+                    id={`product-${product.id}`}
+                    className="surface-panel rounded-[2rem] p-6 scroll-mt-28"
+                  >
+                    <div className="grid gap-6 xl:grid-cols-[0.3fr_0.7fr]">
+                      <div className="space-y-5">
+                        <div className="overflow-hidden rounded-[1.6rem] border border-white/8 bg-black/20">
+                          {primaryMedia?.public_url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={primaryMedia.public_url}
+                              alt={primaryMedia.alt_text ?? product.name}
+                              className="aspect-square h-full w-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex aspect-square items-center justify-center text-sm text-white/45">
+                              Fără imagine de copertă
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="rounded-[1.5rem] border border-white/8 bg-black/20 p-5">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#d7a12a]">
+                            Rezumat
+                          </p>
+                          <div className="mt-4 space-y-3 text-sm text-white/68">
+                            <InfoRow label="Produs" value={product.name} />
+                            <InfoRow label="Slug" value={product.slug} />
+                            <InfoRow label="Categorie" value={product.category} />
+                            <InfoRow label="Preț" value={formatPrice(product.price)} />
+                            <InfoRow label="Status" value={product.enabled ? "Activ" : "Inactiv"} />
+                            <InfoRow label="Featured" value={product.featured ? "Da" : "Nu"} />
+                            <InfoRow label="Media" value={`${product.media?.length ?? 0} imagini`} />
+                            <InfoRow
+                              label="Imagine principală"
+                              value={primaryMedia ? primaryMedia.kind : "Nesetată"}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-6">
+                        <ProductEditor defaults={getProductFormDefaults(product)} />
+                        <ProductMediaSection
+                          productId={product.id}
+                          productName={product.name}
+                          media={product.media ?? []}
+                        />
                       </div>
                     </div>
-                    <div>
-                      <ProductEditor defaults={getProductFormDefaults(product)} />
-                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </>
@@ -131,22 +185,10 @@ function ProductEditor({
       <input type="hidden" name="productId" value={defaults.productId} />
       <div className="grid gap-4 lg:grid-cols-2">
         <Field label="Nume">
-          <input
-            type="text"
-            name="name"
-            defaultValue={defaults.name}
-            required
-            className="input-field"
-          />
+          <input type="text" name="name" defaultValue={defaults.name} required className="input-field" />
         </Field>
         <Field label="Slug">
-          <input
-            type="text"
-            name="slug"
-            defaultValue={defaults.slug}
-            required
-            className="input-field"
-          />
+          <input type="text" name="slug" defaultValue={defaults.slug} required className="input-field" />
         </Field>
       </div>
 
@@ -161,14 +203,7 @@ function ProductEditor({
           </select>
         </Field>
         <Field label="Preț (RON)">
-          <input
-            type="number"
-            min={1}
-            name="price"
-            defaultValue={defaults.price}
-            required
-            className="input-field"
-          />
+          <input type="number" min={1} name="price" defaultValue={defaults.price} required className="input-field" />
         </Field>
         <CheckboxField label="Featured">
           <input type="checkbox" name="featured" defaultChecked={defaults.featured} className="checkbox-field" />
@@ -203,10 +238,7 @@ function ProductEditor({
       </Field>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Field
-          label="Dimensiuni"
-          hint="Un rând per opțiune. Exemplu: 20 cm standard"
-        >
+        <Field label="Dimensiuni" hint="Un rând per opțiune. Exemplu: 20 cm standard">
           <textarea name="sizes" defaultValue={defaults.sizes} rows={5} className="textarea-field" />
         </Field>
         <Field label="Culori" hint="Un rând per opțiune. Exemplu: Negru Grafit">
@@ -216,12 +248,7 @@ function ProductEditor({
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Field label="Materiale" hint="Un rând per opțiune. Exemplu: PLA Silk">
-          <textarea
-            name="materials"
-            defaultValue={defaults.materials}
-            rows={5}
-            className="textarea-field"
-          />
+          <textarea name="materials" defaultValue={defaults.materials} rows={5} className="textarea-field" />
         </Field>
         <Field label="Personalizare" hint="Listează clar opțiunile sau adaptările posibile">
           <textarea
@@ -232,12 +259,7 @@ function ProductEditor({
           />
         </Field>
         <Field label="Ideal pentru" hint="Exemplu: Birou / setup">
-          <textarea
-            name="idealFor"
-            defaultValue={defaults.idealFor}
-            rows={5}
-            className="textarea-field"
-          />
+          <textarea name="idealFor" defaultValue={defaults.idealFor} rows={5} className="textarea-field" />
         </Field>
       </div>
 
@@ -250,6 +272,170 @@ function ProductEditor({
         </button>
       </div>
     </form>
+  );
+}
+
+function ProductMediaSection({
+  productId,
+  productName,
+  media,
+}: {
+  productId: string;
+  productName: string;
+  media: ProductMediaRecord[];
+}) {
+  const returnTo = `/internal/products?updated=media#product-${productId}`;
+
+  return (
+    <div className="rounded-[1.8rem] border border-white/8 bg-black/20 p-5">
+      <div className="flex flex-col gap-2">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[#d7a12a]">Imagini</p>
+        <h3 className="font-serif-display text-2xl text-white">Media pentru {productName}</h3>
+        <p className="text-sm leading-7 text-white/62">
+          Poți urca poze direct aici, poți seta imaginea de copertă și ajusta ordinea în care apar în
+          galerie.
+        </p>
+      </div>
+
+      <form
+        action="/api/internal-media"
+        method="POST"
+        encType="multipart/form-data"
+        className="mt-6 grid gap-4 lg:grid-cols-[0.9fr_0.3fr_0.45fr]"
+      >
+        <input type="hidden" name="productId" value={productId} />
+        <input type="hidden" name="returnTo" value={`${returnTo}&uploaded=1`} />
+        <Field label="Alt text">
+          <input type="text" name="altText" className="input-field" placeholder="Descriere scurtă a imaginii" />
+        </Field>
+        <Field label="Ordine">
+          <input type="number" min={0} name="sortOrder" defaultValue={media.length} className="input-field" />
+        </Field>
+        <Field label="Tip imagine">
+          <select name="kind" defaultValue="gallery" className="input-field">
+            {mediaKindOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Fișier imagine">
+          <input
+            type="file"
+            name="file"
+            accept="image/*"
+            required
+            className="block w-full text-sm text-white/68 file:mr-4 file:rounded-full file:border-0 file:bg-[#d7a12a] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-black"
+          />
+        </Field>
+        <div className="lg:col-span-3 flex justify-end">
+          <button
+            type="submit"
+            className="inline-flex items-center justify-center rounded-full bg-[#d7a12a] px-5 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-black"
+          >
+            Adaugă imaginea
+          </button>
+        </div>
+      </form>
+
+      {!media.length ? (
+        <div className="mt-6 rounded-[1.4rem] border border-white/8 bg-white/[0.02] p-4 text-sm text-white/55">
+          Produsul nu are încă imagini. Prima imagine marcată ca „Copertă / prezentare” va deveni varianta
+          principală pentru produs.
+        </div>
+      ) : (
+        <div className="mt-6 grid gap-4">
+          {media.map((item) => (
+            <div key={item.id} className="rounded-[1.5rem] border border-white/8 bg-white/[0.02] p-4">
+              <div className="grid gap-4 lg:grid-cols-[0.26fr_0.74fr]">
+                <div className="overflow-hidden rounded-[1.2rem] border border-white/8 bg-black/20">
+                  {item.public_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={item.public_url}
+                      alt={item.alt_text ?? productName}
+                      className="aspect-square h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex aspect-square items-center justify-center text-sm text-white/45">
+                      Preview indisponibil
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-4">
+                  <form action="/api/internal-media/update" method="POST" encType="multipart/form-data" className="grid gap-4">
+                    <input type="hidden" name="mediaId" value={item.id} />
+                    <input type="hidden" name="returnTo" value={`${returnTo}&updated=1`} />
+                    <div className="grid gap-4 lg:grid-cols-[1fr_0.28fr_0.46fr]">
+                      <Field label="Alt text">
+                        <input
+                          type="text"
+                          name="altText"
+                          defaultValue={item.alt_text ?? ""}
+                          className="input-field"
+                        />
+                      </Field>
+                      <Field label="Ordine">
+                        <input
+                          type="number"
+                          min={0}
+                          name="sortOrder"
+                          defaultValue={item.sort_order}
+                          className="input-field"
+                        />
+                      </Field>
+                      <Field label="Tip imagine">
+                        <select name="kind" defaultValue={item.kind} className="input-field">
+                          {mediaKindOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      </Field>
+                    </div>
+                    <Field label="Înlocuiește fișierul">
+                      <input
+                        type="file"
+                        name="replacementFile"
+                        accept="image/*"
+                        className="block w-full text-sm text-white/68 file:mr-4 file:rounded-full file:border-0 file:bg-white/10 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white"
+                      />
+                    </Field>
+                    <div className="flex flex-wrap gap-3">
+                      <button
+                        type="submit"
+                        className="inline-flex items-center justify-center rounded-full bg-[#d7a12a] px-5 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-black"
+                      >
+                        Salvează imaginea
+                      </button>
+                      {item.kind === "cover" ? (
+                        <span className="inline-flex items-center rounded-full border border-[#d7a12a]/30 bg-[#d7a12a]/8 px-4 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#f2dfaf]">
+                          Imagine principală
+                        </span>
+                      ) : null}
+                    </div>
+                  </form>
+
+                  <form action="/api/internal-media/delete" method="POST">
+                    <input type="hidden" name="mediaId" value={item.id} />
+                    <input type="hidden" name="returnTo" value={`${returnTo}&deleted=1`} />
+                    <button
+                      type="submit"
+                      className="inline-flex items-center justify-center rounded-full border border-red-400/30 bg-red-400/10 px-5 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-red-200"
+                    >
+                      Șterge imaginea
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 

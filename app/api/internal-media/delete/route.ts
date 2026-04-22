@@ -6,6 +6,7 @@ import { deleteProductMedia } from "@/lib/admin-catalog";
 
 const schema = z.object({
   mediaId: z.string().uuid("Imagine invalidă."),
+  returnTo: z.string().optional(),
 });
 
 export async function POST(request: Request) {
@@ -20,11 +21,14 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const parsed = schema.parse({
       mediaId: formData.get("mediaId"),
+      returnTo: formData.get("returnTo")?.toString(),
     });
 
     await deleteProductMedia(parsed.mediaId);
 
-    return NextResponse.redirect(new URL("/internal/media?deleted=1", request.url));
+    return NextResponse.redirect(
+      new URL(parsed.returnTo || "/internal/media?deleted=1", request.url),
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : "Imaginea nu a putut fi ștearsă.";
     return NextResponse.redirect(

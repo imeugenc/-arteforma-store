@@ -5,6 +5,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { products } from "@/lib/catalog";
 import { getCatalogProductBySlug } from "@/lib/admin-catalog";
+import { getPrimaryProductMedia } from "@/lib/product-media";
 import { formatPrice } from "@/lib/utils";
 import { ProductVisual } from "@/components/ui/product-visual";
 import { AddToCartForm } from "@/components/catalog/add-to-cart-form";
@@ -29,10 +30,13 @@ export async function generateMetadata({
     return {};
   }
 
+  const primaryMedia = getPrimaryProductMedia(product.media);
+
   return buildMetadata({
     title: product.seoTitle,
     description: product.seoDescription,
     path: `/products/${product.slug}`,
+    image: primaryMedia?.public_url,
   });
 }
 
@@ -49,9 +53,20 @@ export default async function ProductPage({
   }
 
   const materialDetails = getMaterialDetails(product.materials);
+  const primaryMedia = getPrimaryProductMedia(product.media);
   const galleryLabels = ["Imagine principală", "Din apropiere", "În ambient"];
   const galleryMedia = product.media?.length
-    ? [...product.media].sort((left, right) => left.sort_order - right.sort_order)
+    ? [...product.media].sort((left, right) => {
+        if (left.kind === "cover" && right.kind !== "cover") {
+          return -1;
+        }
+
+        if (right.kind === "cover" && left.kind !== "cover") {
+          return 1;
+        }
+
+        return left.sort_order - right.sort_order;
+      })
     : [];
 
   return (
@@ -66,6 +81,7 @@ export default async function ProductPage({
               description: product.seoDescription,
               price: product.price,
               slug: product.slug,
+              image: primaryMedia?.public_url,
             }),
           ),
         }}

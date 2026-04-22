@@ -1,6 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { env } from "@/lib/env";
 import { products as fallbackProducts } from "@/lib/catalog";
+import { getPrimaryProductMedia } from "@/lib/product-media";
 import { getSupabaseAdminClient, isSupabaseConfigured } from "@/lib/supabase";
 import { slugify } from "@/lib/utils";
 import type { Product, ProductAdminRecord, ProductCategory, ProductMediaRecord } from "@/lib/types";
@@ -215,7 +216,7 @@ export async function getAdminProducts() {
   }
 
   const [productsResult, mediaResult] = await Promise.all([
-    supabase.from("products").select("*").order("updated_at", { ascending: false }),
+    supabase.from("products").select("*").order("created_at", { ascending: true }),
     supabase.from("product_media").select("*").order("sort_order", { ascending: true }),
   ]);
 
@@ -377,8 +378,13 @@ export async function saveAdminProduct(values: ProductFormValues) {
   };
 
   const query = values.productId
-    ? supabase.from("products").update(payload).eq("id", values.productId).select("slug, category").single()
-    : supabase.from("products").insert(payload).select("slug, category").single();
+    ? supabase
+        .from("products")
+        .update(payload)
+        .eq("id", values.productId)
+        .select("id, slug, category")
+        .single()
+    : supabase.from("products").insert(payload).select("id, slug, category").single();
 
   const result = await query;
 
@@ -387,6 +393,7 @@ export async function saveAdminProduct(values: ProductFormValues) {
   }
 
   await revalidateCatalogPaths(result.data.slug, result.data.category as ProductCategory);
+  return result.data;
 }
 
 export async function seedCatalogProductsFromCode() {
