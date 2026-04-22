@@ -17,8 +17,8 @@ export function LegalPage({
     <div className="mx-auto max-w-5xl px-5 py-16 sm:px-8">
       <div className="surface-panel-strong rounded-[2.4rem] p-8 lg:p-10">
         <p className="text-xs font-semibold uppercase tracking-[0.35em] text-[#d7a12a]">ArteForma</p>
-        <h1 className="mt-5 font-serif-display text-4xl text-white lg:text-5xl">{title}</h1>
-        <p className="mt-6 max-w-3xl text-lg leading-8 text-white/68">{intro}</p>
+        <h1 className="mt-5 font-serif-display text-[2.1rem] text-white lg:text-[2.7rem]">{title}</h1>
+        <p className="mt-6 max-w-3xl text-sm leading-8 text-white/68 sm:text-[15px]">{intro}</p>
       </div>
 
       <div className="mt-8 grid gap-6">

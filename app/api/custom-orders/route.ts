@@ -3,11 +3,27 @@ import path from "node:path";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { customOrderSchema } from "@/lib/schemas";
-import { env, isProduction } from "@/lib/env";
-import { getSupabaseAdminClient, isSupabaseConfigured } from "@/lib/supabase";
+import { isProduction } from "@/lib/env";
 import { siteConfig } from "@/lib/site";
+import { buildCustomOrderEmail } from "@/lib/custom-order-email";
+import { isEmailConfigured, sendEmail } from "@/lib/email";
 
 const MAX_FILE_SIZE = 8 * 1024 * 1024;
+
+type CustomOrderPayload = {
+  id: string;
+  created_at: string;
+  name: string;
+  email: string;
+  phone: string;
+  type: string;
+  description: string;
+  desiredSize?: string;
+  colors?: string;
+  budget?: string;
+  deadline?: string;
+  file_name: string | null;
+};
 
 export async function POST(request: Request) {
   try {
@@ -35,60 +51,38 @@ export async function POST(request: Request) {
       );
     }
 
-    const id = crypto.randomUUID();
-    const payload = {
-      id,
+    const payload: CustomOrderPayload = {
+      id: crypto.randomUUID(),
       created_at: new Date().toISOString(),
       ...validated,
-      file_name: file instanceof File ? file.name : null,
-      file_url: null as string | null,
-      source: "website",
+      file_name: file instanceof File && file.size > 0 ? file.name : null,
     };
 
-    if (isSupabaseConfigured()) {
-      const supabase = getSupabaseAdminClient();
+    const emailContent = buildCustomOrderEmail(payload);
+    const attachments =
+      file instanceof File && file.size > 0
+        ? [
+            {
+              filename: file.name,
+              content: Buffer.from(await file.arrayBuffer()),
+              contentType: file.type || "application/octet-stream",
+            },
+          ]
+        : undefined;
 
-      if (!supabase) {
-        throw new Error("Clientul Supabase nu este disponibil.");
-      }
-
-      let uploadedFileUrl: string | null = null;
-
-      if (file instanceof File && file.size > 0) {
-        const filePath = `${id}/${file.name}`;
-        const buffer = Buffer.from(await file.arrayBuffer());
-        const uploadResult = await supabase.storage
-          .from(env.SUPABASE_CUSTOM_ORDERS_BUCKET)
-          .upload(filePath, buffer, {
-            contentType: file.type || "application/octet-stream",
-            upsert: false,
-          });
-
-        if (uploadResult.error) {
-          throw uploadResult.error;
-        }
-
-        const publicUrl = supabase.storage
-          .from(env.SUPABASE_CUSTOM_ORDERS_BUCKET)
-          .getPublicUrl(filePath);
-        uploadedFileUrl = publicUrl.data.publicUrl;
-      }
-
-      const insertResult = await supabase
-        .from(env.SUPABASE_CUSTOM_ORDERS_TABLE)
-        .insert({
-          ...payload,
-          file_url: uploadedFileUrl,
-        });
-
-      if (insertResult.error) {
-        throw insertResult.error;
-      }
+    if (isEmailConfigured()) {
+      await sendEmail({
+        subject: emailContent.subject,
+        html: emailContent.html,
+        text: emailContent.text,
+        replyTo: payload.email,
+        attachments,
+      });
 
       return NextResponse.json({
         ok: true,
-        id,
-        message: `Solicitarea custom a fost primită. O analizăm și revenim cu următorul pas. Dacă vrei să completezi ceva, ne poți scrie la ${siteConfig.email}.`,
+        id: payload.id,
+        message: "Cererea a fost trimisă. Revenim pe email în 12–24h.",
       });
     }
 
@@ -97,19 +91,18 @@ export async function POST(request: Request) {
         {
           ok: false,
           message:
-            "Comenzile custom nu sunt configurate încă. Conectează Supabase înainte de a accepta cereri reale.",
+            "Fluxul de email pentru cereri personalizate nu este configurat încă. Configurează SMTP înainte de a folosi formularul live.",
         },
         { status: 503 },
       );
     }
 
-    await storeCustomOrderLocally({ id, payload, file });
+    await storeCustomOrderLocally({ payload, file, emailContent });
 
     return NextResponse.json({
       ok: true,
-      id,
-      message:
-        `Solicitarea custom a fost salvată în modul local de development. Configurează Supabase înainte de lansarea în producție. Pentru completări, folosește ${siteConfig.email}.`,
+      id: payload.id,
+      message: "Cererea a fost trimisă. Revenim pe email în 12–24h.",
       mode: "development-fallback",
     });
   } catch (error) {
@@ -127,29 +120,34 @@ export async function POST(request: Request) {
     const message =
       error instanceof Error
         ? error.message
-        : "Nu am putut trimite comanda ta custom acum.";
+        : `Nu am putut trimite cererea acum. Scrie-ne direct la ${siteConfig.email}.`;
 
     return NextResponse.json({ ok: false, message }, { status: 500 });
   }
 }
 
 async function storeCustomOrderLocally({
-  id,
   payload,
   file,
+  emailContent,
 }: {
-  id: string;
-  payload: Record<string, unknown>;
+  payload: CustomOrderPayload;
   file: FormDataEntryValue | null;
+  emailContent: { subject: string; html: string; text: string };
 }) {
   const dataDir = path.join(process.cwd(), "data");
   await mkdir(dataDir, { recursive: true });
   await appendFile(path.join(dataDir, "custom-orders.ndjson"), `${JSON.stringify(payload)}\n`, "utf8");
+  await appendFile(
+    path.join(dataDir, "custom-order-emails.ndjson"),
+    `${JSON.stringify({ subject: emailContent.subject, text: emailContent.text, created_at: payload.created_at })}\n`,
+    "utf8",
+  );
 
   if (file instanceof File && file.size > 0) {
     const uploadsDir = path.join(dataDir, "uploads");
     await mkdir(uploadsDir, { recursive: true });
     const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(path.join(uploadsDir, `${id}-${file.name}`), buffer);
+    await writeFile(path.join(uploadsDir, `${payload.id}-${file.name}`), buffer);
   }
 }

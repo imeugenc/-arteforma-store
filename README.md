@@ -1,6 +1,6 @@
 # ArteForma Store
 
-Premium ecommerce storefront for ArteForma, built with Next.js App Router, TypeScript, Tailwind CSS, Stripe Checkout and Supabase-backed persistence.
+Premium ecommerce storefront for ArteForma, built with Next.js App Router, TypeScript, Tailwind CSS, Stripe Checkout and a separated architecture for custom leads vs store orders.
 
 Customer-facing contact is centered on:
 
@@ -14,7 +14,26 @@ Customer-facing contact is centered on:
 - TypeScript
 - Tailwind CSS
 - Stripe Checkout + Stripe webhooks
-- Supabase for custom orders and paid ecommerce orders
+- SMTP email flow for custom order requests
+- Supabase for paid store orders and next-step admin/account/status direction
+
+## Flow separation
+
+### Custom orders
+
+- route: `/api/custom-orders`
+- purpose: lead / inquiry flow
+- delivery: server-side email
+- destination: `contact@arteforma.ro`
+- Supabase dependency: none
+
+### Store orders
+
+- routes: `/api/checkout` + `/api/stripe/webhook`
+- purpose: paid product orders
+- payment: Stripe Checkout
+- persistence: Supabase
+- next-step use: admin orders, customer account history, order status
 
 ## Local development
 
@@ -57,21 +76,35 @@ Behavior:
 - In production, missing Stripe configuration returns a clear error instead of pretending checkout works.
 - Paid order persistence happens after the Stripe webhook confirms `checkout.session.completed`.
 
+### Email for custom order requests
+
+- `SMTP_HOST`
+- `SMTP_PORT`
+- `SMTP_SECURE`
+- `SMTP_USER`
+- `SMTP_PASSWORD`
+- `SMTP_FROM`
+- `CUSTOM_ORDERS_TO_EMAIL`
+
+Behavior:
+
+- The custom order form sends an email lead to `contact@arteforma.ro` or to `CUSTOM_ORDERS_TO_EMAIL` if you want a separate inbox.
+- This flow is intentionally independent from Supabase.
+- In local development, if SMTP is not configured, the request is stored locally for testing and still returns a success response.
+- In production, SMTP must be configured for the custom order form to work live.
+
 ### Supabase
 
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_CUSTOM_ORDERS_TABLE`
-- `SUPABASE_CUSTOM_ORDERS_BUCKET`
 - `SUPABASE_ORDERS_TABLE`
 - `SUPABASE_ORDER_ITEMS_TABLE`
 
 Behavior:
 
-- In local development, if Supabase is not configured, custom orders fall back to local file storage for testing.
-- In production, Supabase must be configured or the custom order endpoint returns a setup error.
+- Supabase is the direction for paid product orders, internal order management, future customer accounts and future product/media admin tools.
 - Paid product orders should be considered production-ready only after Supabase and Stripe webhooks are configured.
 
 ### Internal order view
@@ -80,31 +113,46 @@ Behavior:
 
 This protects the lightweight internal pages in production:
 
+- `/internal?token=YOUR_TOKEN`
 - `/internal/orders?token=YOUR_TOKEN`
 - `/internal/products?token=YOUR_TOKEN`
 - `/internal/media?token=YOUR_TOKEN`
-- `/internal?token=YOUR_TOKEN`
+
+## Email setup for custom orders
+
+Recommended practical setup:
+
+1. Use the SMTP details for the mailbox or provider that will send mail on behalf of ArteForma
+2. Set `CUSTOM_ORDERS_TO_EMAIL=contact@arteforma.ro`
+3. Keep `replyTo` on the customer email so replies go directly back to the lead
+
+Custom order emails include:
+
+- all form fields
+- a formatted summary in HTML + plain text
+- file attachment when a file is uploaded
+
+Subject:
+
+- `New Custom Order Request – ArteForma`
 
 ## Supabase setup
 
 1. Create a Supabase project
-2. Run the SQL from [supabase/custom-orders.sql](/Users/eugencostache/Documents/Codex/2026-04-21-tu-ai-putea-s-mi-faci/supabase/custom-orders.sql)
+2. Run the SQL from [supabase/store-admin.sql](/Users/eugencostache/Documents/Codex/2026-04-21-tu-ai-putea-s-mi-faci/supabase/store-admin.sql)
 3. Add the following env vars:
    - `SUPABASE_URL`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 4. Keep these defaults unless you intentionally rename resources:
-   - `SUPABASE_CUSTOM_ORDERS_TABLE=custom_orders`
-   - `SUPABASE_CUSTOM_ORDERS_BUCKET=custom-order-files`
    - `SUPABASE_ORDERS_TABLE=orders`
    - `SUPABASE_ORDER_ITEMS_TABLE=order_items`
 
 Notes:
 
 - The service role key is used server-side only for writes and internal reads.
-- Uploaded custom-order reference files are stored in the configured Supabase bucket.
-- The current bucket is public for simpler launch setup. If you need private uploads later, switch to signed URLs.
+- Supabase is currently the data layer for the store/order direction, not for custom email leads.
 
 ## Stripe setup
 
@@ -130,25 +178,23 @@ Notes:
 - After successful payment, the webhook stores the order in Supabase and creates related order items.
 - The success page can show a richer confirmation state when the webhook has already persisted the order.
 
-## Order data model
+## Store data direction
 
-Supabase stores:
+Supabase is prepared to support:
 
-- `custom_orders`
 - `orders`
 - `order_items`
+- `customer_profiles`
+- `products`
+- `product_media`
+- `order_status_events`
 
-Custom orders remain separate from paid product orders.
+This supports the next steps for:
 
-## Internal order view
-
-Once Supabase and the webhook are configured, you can view recent orders at:
-
-```text
-/internal/orders?token=YOUR_INTERNAL_ORDERS_TOKEN
-```
-
-This is intentionally lightweight and practical for a small launch.
+- admin order management
+- customer account history
+- customer-visible order status
+- product/media admin CRUD
 
 ## Product management right now
 
@@ -175,56 +221,22 @@ How to manage products in the current version:
 enabled: false
 ```
 
-5. For static brand/product visuals, place assets in `public/brand` or another `public/*` folder and update the component/path that renders them.
+5. For static visuals, place assets in `public/brand` or another `public/*` folder and update the component/path that renders them.
 
 There are also lightweight internal views:
 
 ```text
+/internal?token=YOUR_INTERNAL_ORDERS_TOKEN
+/internal/orders?token=YOUR_INTERNAL_ORDERS_TOKEN
 /internal/products?token=YOUR_INTERNAL_ORDERS_TOKEN
 /internal/media?token=YOUR_INTERNAL_ORDERS_TOKEN
-/internal?token=YOUR_INTERNAL_ORDERS_TOKEN
 ```
 
 This is not a full CMS yet. It is a practical internal admin direction plus a cleaner structure for hiding/showing products during launch.
 
-### Recommended next step for a minimal CMS
-
-For real non-technical product management, the next step should be:
-
-- a `products` table in Supabase
-- image storage in Supabase Storage
-- a small protected admin UI for add/edit/disable/image replace
-
-That would allow:
-
-- adding products without code edits
-- updating prices and descriptions from a form
-- enabling/disabling products
-- replacing images directly from an admin area
-
-### SQL prepared for the next admin step
-
-The repo now also includes:
-
-- `supabase/store-admin.sql`
-
-This prepares the next scalable layer for:
-
-- `products`
-- `product_media`
-- `customer_profiles`
-- `order_status_events`
-
-It is not wired live yet, but it gives a clean next-step schema for:
-
-- product CRUD
-- product media management
-- future customer accounts
-- future customer-visible order status updates
-
 ## Customer account direction
 
-The project now includes a prepared customer-account route structure:
+The project includes a prepared customer-account route structure:
 
 - `/account`
 - `/account/login`
@@ -258,29 +270,20 @@ Important:
 - Admin uploads should eventually save optimized variants, not originals straight from camera
 - This keeps storage costs, performance, and bandwidth under control
 
-## Analytics
-
-Current tracked events:
-
-- `add_to_cart`
-- `checkout_start`
-- `custom_order_submit`
-- `purchase`
-
-Tracking currently goes through the internal `/api/track` endpoint and is structured so GA4, Meta or TikTok integrations can be added later without rewriting the UI flow.
-
 ## Deployment on Vercel
 
 1. Push the repo to GitHub
 2. Import into Vercel
 3. Add all env vars from `.env.example`
-4. Configure Stripe webhook with your production domain
-5. Configure Supabase and run the SQL migration
-6. Deploy
+4. Configure SMTP for custom order emails
+5. Configure Stripe webhook with your production domain
+6. Configure Supabase and run the SQL migration
+7. Deploy
 
 ## Current launch notes
 
 - The store is structurally ready for a small premium ecommerce launch
+- Custom order requests are intentionally email-based and separate from the store order pipeline
 - Paid orders persist only after Stripe webhook delivery, which is the correct production path
 - Success page becomes most useful when webhook delivery is configured and reachable
 - Product catalog is still code-based, which is acceptable for launch but can later move to a CMS or database

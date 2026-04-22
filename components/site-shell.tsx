@@ -79,7 +79,7 @@ export function Footer() {
               <p className="text-xs font-semibold uppercase tracking-[0.35em] text-[#d7a12a]">ArteForma</p>
             </div>
           </div>
-          <h3 className="font-serif-display text-3xl leading-tight text-white">
+          <h3 className="font-serif-display text-[1.9rem] leading-tight text-white sm:text-[2.2rem]">
             Piese printate 3D pentru birou, decor și cadouri, realizate la comandă în Brașov.
           </h3>
           <p className="max-w-xl text-sm leading-8 text-white/65">

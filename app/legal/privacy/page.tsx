@@ -25,7 +25,7 @@ export default function PrivacyPage() {
         {
           title: "Stocare și furnizori tehnici",
           body:
-            "Datele pot fi procesate și stocate prin servicii tehnice folosite pentru operarea magazinului, inclusiv Stripe pentru checkout și Supabase pentru stocarea comenzilor și a solicitărilor custom.",
+            "Datele pot fi procesate și stocate prin servicii tehnice folosite pentru operarea magazinului, inclusiv SMTP/email pentru cererile personalizate și Stripe plus Supabase pentru comenzile din magazin.",
         },
         {
           title: "Solicitări legate de date",

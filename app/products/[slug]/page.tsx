@@ -95,10 +95,10 @@ export default async function ProductPage({
                 {product.badge}
               </p>
             ) : null}
-            <h1 className="font-serif-display text-4xl leading-tight text-white sm:text-5xl">
+            <h1 className="font-serif-display text-[2.25rem] leading-tight text-white sm:text-[2.9rem]">
               {product.name}
             </h1>
-            <p className="text-lg leading-8 text-white/70">{product.shortDescription}</p>
+            <p className="text-sm leading-8 text-white/70 sm:text-[15px]">{product.shortDescription}</p>
             <div className="flex flex-wrap items-end gap-4">
               <div className="text-3xl font-semibold text-[#f6d57a]">{formatPrice(product.price)}</div>
               <p className="text-sm uppercase tracking-[0.28em] text-white/32">Realizat la comandă în România</p>

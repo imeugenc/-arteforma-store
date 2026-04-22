@@ -47,10 +47,10 @@ export default function HomePage() {
           </div>
           <div className="space-y-4">
             <p className="text-sm uppercase tracking-[0.4em] text-white/34">ArteForma, Brașov</p>
-            <h1 className="max-w-2xl font-serif-display text-4xl leading-[1.02] text-white sm:text-5xl lg:text-[4.2rem]">
+            <h1 className="max-w-2xl font-serif-display text-[2.4rem] leading-[1.03] text-white sm:text-[3rem] lg:text-[3.45rem]">
               Obiecte premium printate 3D, create pentru spațiul tău.
             </h1>
-            <p className="max-w-xl text-base leading-7 text-white/70 sm:text-lg">
+            <p className="max-w-xl text-sm leading-7 text-white/70 sm:text-base">
               Cadouri, decor și piese custom realizate la comandă.
             </p>
           </div>
@@ -256,10 +256,10 @@ export default function HomePage() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.4em] text-[#d7a12a]">
               Comenzi custom
             </p>
-            <h2 className="font-serif-display text-4xl leading-tight text-white lg:text-5xl">
+            <h2 className="font-serif-display text-[2.15rem] leading-tight text-white lg:text-[2.9rem]">
               Trimite-ne ideea, referința sau contextul în care va fi folosită piesa.
             </h2>
-            <p className="max-w-2xl text-lg leading-8 text-white/68">
+            <p className="max-w-2xl text-sm leading-8 text-white/68 sm:text-[15px]">
               Revenim cu o variantă realistă și potrivită pentru produsul final, după ce verificăm dimensiunea, materialul și felul în care va fi folosită piesa.
             </p>
             <Link href="/custom-orders">
@@ -364,10 +364,10 @@ export default function HomePage() {
           <p className="text-[11px] font-semibold uppercase tracking-[0.4em] text-[#d7a12a]">
             Ultimul pas
           </p>
-          <h2 className="mx-auto mt-5 max-w-3xl font-serif-display text-4xl text-white lg:text-5xl">
+          <h2 className="mx-auto mt-5 max-w-3xl font-serif-display text-[2.15rem] text-white lg:text-[2.9rem]">
             Vezi colecția sau pornește de la ideea ta.
           </h2>
-          <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-white/68">
+          <p className="mx-auto mt-5 max-w-2xl text-sm leading-8 text-white/68 sm:text-[15px]">
             Fie din colecție, fie complet custom, fiecare obiect ArteForma este realizat la comandă în România și intră în producție doar după ce detaliile sunt clare.
           </p>
           <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
