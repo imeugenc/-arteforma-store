@@ -14,7 +14,7 @@ export default async function InternalDashboardPage({
   searchParams: Promise<{ token?: string }>;
 }) {
   const { token } = await searchParams;
-  requireInternalAccess(token);
+  await requireInternalAccess(token, "/internal");
 
   const accessHint =
     isProduction && env.INTERNAL_ORDERS_TOKEN

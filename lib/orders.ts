@@ -59,6 +59,17 @@ export async function persistStripeOrder({
   const customerName = session.customer_details?.name ?? session.metadata?.customer_name ?? "Client";
   const customerEmail = session.customer_details?.email ?? session.metadata?.customer_email ?? "";
   const customerPhone = session.customer_details?.phone ?? session.metadata?.customer_phone ?? null;
+  const giftPackaging = session.metadata?.gift_packaging === "true";
+  const personalization = lineItems.some((item) => {
+    const variantSummary =
+      item.price?.product &&
+      typeof item.price.product !== "string" &&
+      "metadata" in item.price.product
+        ? item.price.product.metadata?.variant_summary
+        : item.price?.nickname;
+
+    return Boolean(variantSummary?.toLowerCase().includes("personalizare"));
+  });
   const shippingCost = session.shipping_cost?.amount_total
     ? session.shipping_cost.amount_total / 100
     : Number(session.metadata?.shipping_cost ?? 0);
@@ -66,12 +77,17 @@ export async function persistStripeOrder({
   const orderId = crypto.randomUUID();
   const orderPayload = {
     id: orderId,
+    email: customerEmail,
+    total: (session.amount_total ?? 0) / 100,
     customer_name: customerName,
     customer_email: customerEmail,
     customer_phone: customerPhone,
     total_amount: (session.amount_total ?? 0) / 100,
     currency: (session.currency ?? "ron").toUpperCase(),
     status: "paid",
+    payment_status: session.payment_status ?? "paid",
+    gift_packaging: giftPackaging,
+    personalization,
     stripe_session_id: session.id,
     stripe_payment_intent_id:
       typeof session.payment_intent === "string" ? session.payment_intent : null,
@@ -86,11 +102,7 @@ export async function persistStripeOrder({
     },
   };
 
-  const orderInsert = await supabase
-    .from(env.SUPABASE_ORDERS_TABLE)
-    .insert(orderPayload)
-    .select("*")
-    .single<OrderRecord>();
+  const orderInsert = await insertOrderRecord(supabase, orderPayload);
 
   if (orderInsert.error) {
     throw orderInsert.error;
@@ -127,6 +139,12 @@ export async function persistStripeOrder({
     }
   }
 
+  await insertOrderStatusEvent(supabase, {
+    order_id: orderId,
+    status: "paid",
+    note: "Comandă confirmată automat după checkout.session.completed.",
+  });
+
   const confirmationPayload = buildOrderConfirmationPayload({
     order: orderInsert.data,
     items: orderItems,
@@ -140,6 +158,67 @@ export async function persistStripeOrder({
     order: orderInsert.data,
     items: orderItems,
   };
+}
+
+async function insertOrderRecord(
+  supabase: NonNullable<ReturnType<typeof getSupabaseAdminClient>>,
+  payload: Record<string, unknown>,
+) {
+  const insert = await supabase
+    .from(env.SUPABASE_ORDERS_TABLE)
+    .insert(payload)
+    .select("*")
+    .single<OrderRecord>();
+
+  if (!insert.error) {
+    return insert;
+  }
+
+  const fallbackPayload = {
+    id: payload.id,
+    customer_name: payload.customer_name,
+    customer_email: payload.customer_email,
+    customer_phone: payload.customer_phone,
+    total_amount: payload.total_amount,
+    currency: payload.currency,
+    status: payload.status,
+    stripe_session_id: payload.stripe_session_id,
+    stripe_payment_intent_id: payload.stripe_payment_intent_id,
+    shipping_method: payload.shipping_method,
+    shipping_cost: payload.shipping_cost,
+    notes: payload.notes,
+    source: payload.source,
+    metadata: payload.metadata,
+  };
+
+  return supabase
+    .from(env.SUPABASE_ORDERS_TABLE)
+    .insert(fallbackPayload)
+    .select("*")
+    .single<OrderRecord>();
+}
+
+async function insertOrderStatusEvent(
+  supabase: NonNullable<ReturnType<typeof getSupabaseAdminClient>>,
+  payload: {
+    order_id: string;
+    status: string;
+    note: string;
+  },
+) {
+  try {
+    const result = await supabase.from("order_status_events").insert({
+      id: crypto.randomUUID(),
+      ...payload,
+      visible_to_customer: true,
+    });
+
+    if (result.error) {
+      console.warn("[orders] Skipping order_status_events insert:", result.error.message);
+    }
+  } catch {
+    // Best effort only until every environment has the status-events table.
+  }
 }
 
 export async function getOrderBySessionId(sessionId: string) {

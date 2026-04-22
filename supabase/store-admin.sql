@@ -1,5 +1,40 @@
 create extension if not exists pgcrypto;
 
+create table if not exists orders (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  stripe_session_id text not null unique,
+  stripe_payment_intent_id text,
+  email text,
+  customer_email text not null,
+  customer_name text,
+  customer_phone text,
+  total numeric(10, 2),
+  total_amount numeric(10, 2) not null,
+  currency text not null default 'RON',
+  status text not null default 'paid',
+  payment_status text,
+  gift_packaging boolean not null default false,
+  personalization boolean not null default false,
+  shipping_method text not null default 'Livrare în România',
+  shipping_cost numeric(10, 2) not null default 0,
+  notes text,
+  source text,
+  metadata jsonb default '{}'::jsonb
+);
+
+create table if not exists order_items (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  order_id uuid not null references orders(id) on delete cascade,
+  product_slug text not null,
+  product_name text not null,
+  variant_summary text,
+  unit_price numeric(10, 2) not null,
+  quantity integer not null default 1,
+  line_total numeric(10, 2) not null
+);
+
 create table if not exists customer_profiles (
   id uuid primary key default gen_random_uuid(),
   auth_user_id uuid unique,

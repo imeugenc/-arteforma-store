@@ -14,7 +14,7 @@ export default async function InternalProductsPage({
   searchParams: Promise<{ token?: string }>;
 }) {
   const { token } = await searchParams;
-  requireInternalAccess(token);
+  await requireInternalAccess(token, "/internal/products");
 
   return (
     <div>

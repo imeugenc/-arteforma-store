@@ -98,12 +98,17 @@ export type OrderStatus = "paid" | "processing" | "fulfilled" | "cancelled";
 export type OrderRecord = {
   id: string;
   created_at: string;
+  email?: string | null;
+  total?: number | null;
   customer_name: string;
   customer_email: string;
   customer_phone?: string | null;
   total_amount: number;
   currency: string;
   status: OrderStatus;
+  payment_status?: string | null;
+  gift_packaging?: boolean | null;
+  personalization?: boolean | null;
   stripe_session_id?: string | null;
   stripe_payment_intent_id?: string | null;
   shipping_method: string;

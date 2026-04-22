@@ -28,11 +28,22 @@ export async function POST(request: Request) {
 
   try {
     const rawBody = await request.text();
-    const event = stripe.webhooks.constructEvent(
-      rawBody,
-      signature,
-      env.STRIPE_WEBHOOK_SECRET,
-    );
+    let event: Stripe.Event;
+
+    try {
+      event = stripe.webhooks.constructEvent(
+        rawBody,
+        signature,
+        env.STRIPE_WEBHOOK_SECRET,
+      );
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Invalid Stripe webhook signature.";
+
+      console.error("[stripe-webhook] Signature verification failed:", message);
+
+      return NextResponse.json({ ok: false, message }, { status: 400 });
+    }
 
     console.log("[stripe-webhook] Event received:", {
       id: event.id,
@@ -79,6 +90,6 @@ export async function POST(request: Request) {
 
     console.error("[stripe-webhook] Processing failed:", message);
 
-    return NextResponse.json({ ok: false, message }, { status: 400 });
+    return NextResponse.json({ ok: false, message }, { status: 500 });
   }
 }

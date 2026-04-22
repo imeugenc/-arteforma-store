@@ -14,7 +14,7 @@ export default async function InternalOrdersPage({
   searchParams: Promise<{ token?: string }>;
 }) {
   const { token } = await searchParams;
-  requireInternalAccess(token);
+  await requireInternalAccess(token, "/internal/orders");
 
   const bundle = await getRecentOrders(25);
 

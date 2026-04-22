@@ -30,7 +30,7 @@ export default async function InternalMediaPage({
   searchParams: Promise<{ token?: string }>;
 }) {
   const { token } = await searchParams;
-  requireInternalAccess(token);
+  await requireInternalAccess(token, "/internal/media");
 
   return (
     <div className="grid gap-6">
