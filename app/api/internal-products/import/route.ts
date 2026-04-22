@@ -1,14 +1,13 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { env } from "@/lib/env";
-import { INTERNAL_ACCESS_COOKIE } from "@/lib/internal";
+import { hasValidInternalSecret, INTERNAL_ACCESS_COOKIE } from "@/lib/internal";
 import { seedCatalogProductsFromCode } from "@/lib/admin-catalog";
 
 export async function POST(request: Request) {
   const cookieStore = await cookies();
   const token = cookieStore.get(INTERNAL_ACCESS_COOKIE)?.value;
 
-  if (env.INTERNAL_ORDERS_TOKEN && token !== env.INTERNAL_ORDERS_TOKEN) {
+  if (!hasValidInternalSecret(token)) {
     return NextResponse.json({ ok: false, message: "Acces neautorizat." }, { status: 401 });
   }
 

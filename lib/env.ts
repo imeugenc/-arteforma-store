@@ -28,6 +28,7 @@ const envSchema = z.object({
   SUPABASE_PRODUCT_MEDIA_BUCKET: z.string().default("product-media"),
   SUPABASE_ORDERS_TABLE: z.string().default("orders"),
   SUPABASE_ORDER_ITEMS_TABLE: z.string().default("order_items"),
+  ADMIN_PASSWORD: optionalString,
   INTERNAL_ORDERS_TOKEN: optionalString,
 });
 

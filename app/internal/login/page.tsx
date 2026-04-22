@@ -23,23 +23,23 @@ export default async function InternalLoginPage({
           Acces intern
         </h1>
         <p className="mt-4 text-sm leading-8 text-white/68 sm:text-[15px]">
-          Zona internă este protejată prin token-ul din environment. După autentificare, accesul rămâne activ în browser pentru operațiunile curente.
+          Zona internă este protejată prin parola de admin setată în Vercel. După autentificare, accesul rămâne activ în browser pentru operațiunile curente.
         </p>
 
         <form action="/api/internal-login" method="POST" className="mt-8 grid gap-4">
           <input type="hidden" name="next" value={redirectTo} />
           <label>
-            <span className="mb-2 block text-[13px] font-medium text-white">Token intern</span>
+            <span className="mb-2 block text-[13px] font-medium text-white">Parolă admin</span>
             <input
               type="password"
-              name="token"
+              name="password"
               required
               className="w-full rounded-[1.5rem] border border-white/10 bg-black/30 px-4 py-3 text-[14px] text-white outline-none transition placeholder:text-white/30 focus:border-[#d7a12a]/40"
-              placeholder="INTERNAL_ORDERS_TOKEN"
+              placeholder="Parola ta de admin"
             />
           </label>
 
-          {error ? <p className="text-sm text-red-300">Token invalid. Încearcă din nou.</p> : null}
+          {error ? <p className="text-sm text-red-300">Parolă invalidă. Încearcă din nou.</p> : null}
 
           <button
             type="submit"

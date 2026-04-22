@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { requireInternalAccess, buildInternalMetadata } from "@/lib/internal";
-import { env, isProduction } from "@/lib/env";
+import { buildInternalMetadata, isInternalProtectionEnabled, requireInternalAccess } from "@/lib/internal";
 
 export const metadata = buildInternalMetadata(
   "Dashboard intern",
@@ -16,10 +15,7 @@ export default async function InternalDashboardPage({
   const { token } = await searchParams;
   await requireInternalAccess(token, "/internal");
 
-  const accessHint =
-    isProduction && env.INTERNAL_ORDERS_TOKEN
-      ? `?token=${token ?? "INTERNAL_ORDERS_TOKEN"}`
-      : "";
+  const accessHint = isInternalProtectionEnabled() ? `?token=${token ?? "admin"}` : "";
 
   return (
     <div className="grid gap-6">
