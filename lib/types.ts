@@ -20,6 +20,7 @@ export type ProductUseCase =
   | "Birou de fondator";
 
 export type Product = {
+  id?: string;
   slug: string;
   name: string;
   category: ProductCategory;
@@ -49,6 +50,7 @@ export type Product = {
     glow: string;
     motif: string;
   };
+  media?: ProductMediaRecord[];
 };
 
 export type Category = {
@@ -142,4 +144,39 @@ export type OrderStatusEventRecord = {
   note?: string | null;
   visible_to_customer?: boolean;
   created_at: string;
+};
+
+export type ProductMediaRecord = {
+  id: string;
+  product_id: string;
+  storage_path: string;
+  alt_text?: string | null;
+  sort_order: number;
+  kind: string;
+  created_at?: string;
+  public_url?: string;
+};
+
+export type ProductAdminRecord = {
+  id: string;
+  slug: string;
+  name: string;
+  category: ProductCategory;
+  short_description: string;
+  long_description: string;
+  price: number;
+  badge?: string | null;
+  seo_title?: string | null;
+  seo_description?: string | null;
+  featured: boolean;
+  enabled: boolean;
+  sizes: string[];
+  colors: string[];
+  materials: string[];
+  customization: string[];
+  ideal_for: string[];
+  visual?: Product["visual"];
+  created_at: string;
+  updated_at: string;
+  media?: ProductMediaRecord[];
 };

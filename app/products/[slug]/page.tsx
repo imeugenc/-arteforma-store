@@ -1,8 +1,10 @@
 import Link from "next/link";
+import Image from "next/image";
 import Script from "next/script";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getProductBySlug, products } from "@/lib/catalog";
+import { products } from "@/lib/catalog";
+import { getCatalogProductBySlug } from "@/lib/admin-catalog";
 import { formatPrice } from "@/lib/utils";
 import { ProductVisual } from "@/components/ui/product-visual";
 import { AddToCartForm } from "@/components/catalog/add-to-cart-form";
@@ -21,7 +23,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getCatalogProductBySlug(slug);
 
   if (!product) {
     return {};
@@ -40,7 +42,7 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getCatalogProductBySlug(slug);
 
   if (!product) {
     notFound();
@@ -48,6 +50,9 @@ export default async function ProductPage({
 
   const materialDetails = getMaterialDetails(product.materials);
   const galleryLabels = ["Imagine principală", "Din apropiere", "În ambient"];
+  const galleryMedia = product.media?.length
+    ? [...product.media].sort((left, right) => left.sort_order - right.sort_order)
+    : [];
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
@@ -67,25 +72,59 @@ export default async function ProductPage({
       />
       <div className="grid gap-10 lg:grid-cols-[1.02fr_0.98fr]">
         <div className="space-y-5">
-          <ProductVisual
-            accent={product.visual.accent}
-            glow={product.visual.glow}
-            motif={product.visual.motif}
-            label={product.badge ?? "ArteForma"}
-            className="min-h-[560px]"
-          />
-          <div className="grid gap-5 sm:grid-cols-3">
-            {galleryLabels.map((tag, index) => (
+          {galleryMedia.length ? (
+            <>
+              <div className="overflow-hidden rounded-[2rem] border border-white/8 bg-black/20">
+                <Image
+                  src={galleryMedia[0]?.public_url ?? ""}
+                  alt={galleryMedia[0]?.alt_text ?? product.name}
+                  width={1400}
+                  height={1400}
+                  className="h-auto w-full object-cover"
+                />
+              </div>
+              {galleryMedia.length > 1 ? (
+                <div className="grid gap-5 sm:grid-cols-3">
+                  {galleryMedia.slice(1, 4).map((item, index) => (
+                    <div
+                      key={item.id}
+                      className="overflow-hidden rounded-[1.8rem] border border-white/8 bg-black/20"
+                    >
+                      <Image
+                        src={item.public_url ?? ""}
+                        alt={item.alt_text ?? galleryLabels[index] ?? product.name}
+                        width={800}
+                        height={800}
+                        className="aspect-[0.98/1] w-full object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <>
               <ProductVisual
-                key={tag}
                 accent={product.visual.accent}
                 glow={product.visual.glow}
-                motif={`${product.visual.motif}-${index + 1}`}
-                label={tag}
-                className="min-h-[170px]"
+                motif={product.visual.motif}
+                label={product.badge ?? "ArteForma"}
+                className="min-h-[560px]"
               />
-            ))}
-          </div>
+              <div className="grid gap-5 sm:grid-cols-3">
+                {galleryLabels.map((tag, index) => (
+                  <ProductVisual
+                    key={tag}
+                    accent={product.visual.accent}
+                    glow={product.visual.glow}
+                    motif={`${product.visual.motif}-${index + 1}`}
+                    label={tag}
+                    className="min-h-[170px]"
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
         <div className="space-y-6">

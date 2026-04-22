@@ -25,6 +25,7 @@ const envSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: optionalString,
   NEXT_PUBLIC_SUPABASE_URL: optionalUrl,
   NEXT_PUBLIC_SUPABASE_ANON_KEY: optionalString,
+  SUPABASE_PRODUCT_MEDIA_BUCKET: z.string().default("product-media"),
   SUPABASE_ORDERS_TABLE: z.string().default("orders"),
   SUPABASE_ORDER_ITEMS_TABLE: z.string().default("order_items"),
   INTERNAL_ORDERS_TOKEN: optionalString,

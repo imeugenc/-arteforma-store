@@ -2,7 +2,8 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ShieldCheck, Sparkles, Truck, WandSparkles } from "lucide-react";
-import { categories, getFeaturedProducts, getProductsByCategory } from "@/lib/catalog";
+import { categories } from "@/lib/catalog";
+import { getCatalogFeaturedProducts, getCatalogProductsByCategory } from "@/lib/admin-catalog";
 import { testimonials, trustPoints } from "@/lib/site";
 import { buildMetadata } from "@/lib/seo";
 import { SectionHeading } from "@/components/ui/section-heading";
@@ -16,12 +17,12 @@ export const metadata = buildMetadata({
   path: "/",
 });
 
-export default function HomePage() {
-  const featured = getFeaturedProducts();
-  const deskProducts = getProductsByCategory("desk-setup").slice(0, 3);
-  const autoProducts = getProductsByCategory("auto-moto").slice(0, 3);
-  const cryptoProducts = getProductsByCategory("crypto-trading").slice(0, 2);
-  const giftProducts = getProductsByCategory("gifts").slice(0, 2);
+export default async function HomePage() {
+  const featured = await getCatalogFeaturedProducts();
+  const deskProducts = (await getCatalogProductsByCategory("desk-setup")).slice(0, 3);
+  const autoProducts = (await getCatalogProductsByCategory("auto-moto")).slice(0, 3);
+  const cryptoProducts = (await getCatalogProductsByCategory("crypto-trading")).slice(0, 2);
+  const giftProducts = (await getCatalogProductsByCategory("gifts")).slice(0, 2);
   const collectionHighlights = [
     {
       title: "Lămpi",

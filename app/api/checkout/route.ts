@@ -2,7 +2,7 @@ import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { checkoutSchema } from "@/lib/schemas";
 import { env, isProduction } from "@/lib/env";
-import { getProductBySlug } from "@/lib/catalog";
+import { getCatalogProductBySlug } from "@/lib/admin-catalog";
 import { getShipping } from "@/lib/checkout";
 import { siteConfig } from "@/lib/site";
 
@@ -27,45 +27,47 @@ function buildVariantSummary(item: {
     .join(" · ");
 }
 
-function getValidatedCartItems(items: ReturnType<typeof checkoutSchema.parse>["items"]) {
-  return items.map((item) => {
-    const product = getProductBySlug(item.slug);
+async function getValidatedCartItems(items: ReturnType<typeof checkoutSchema.parse>["items"]) {
+  return Promise.all(
+    items.map(async (item) => {
+      const product = await getCatalogProductBySlug(item.slug);
 
-    if (!product) {
-      throw new Error(`Produs necunoscut: ${item.slug}`);
-    }
+      if (!product) {
+        throw new Error(`Produs necunoscut: ${item.slug}`);
+      }
 
-    if (item.size && !product.sizes.includes(item.size)) {
-      throw new Error(`Ai selectat o dimensiune invalidă pentru ${product.name}.`);
-    }
+      if (item.size && !product.sizes.includes(item.size)) {
+        throw new Error(`Ai selectat o dimensiune invalidă pentru ${product.name}.`);
+      }
 
-    if (item.color && !product.colors.includes(item.color)) {
-      throw new Error(`Ai selectat o culoare invalidă pentru ${product.name}.`);
-    }
+      if (item.color && !product.colors.includes(item.color)) {
+        throw new Error(`Ai selectat o culoare invalidă pentru ${product.name}.`);
+      }
 
-    if (item.material && !product.materials.includes(item.material)) {
-      throw new Error(`Ai selectat un material invalid pentru ${product.name}.`);
-    }
+      if (item.material && !product.materials.includes(item.material)) {
+        throw new Error(`Ai selectat un material invalid pentru ${product.name}.`);
+      }
 
-    return {
-      slug: product.slug,
-      name: product.name,
-      unitPrice: product.price,
-      quantity: item.quantity,
-      size: item.size,
-      color: item.color,
-      material: item.material,
-      personalizationSelected: item.personalizationSelected ?? false,
-      personalization: item.personalization,
-      variantSummary: buildVariantSummary(item),
-    };
-  });
+      return {
+        slug: product.slug,
+        name: product.name,
+        unitPrice: product.price,
+        quantity: item.quantity,
+        size: item.size,
+        color: item.color,
+        material: item.material,
+        personalizationSelected: item.personalizationSelected ?? false,
+        personalization: item.personalization,
+        variantSummary: buildVariantSummary(item),
+      };
+    }),
+  );
 }
 
 export async function POST(request: Request) {
   try {
     const parsed = checkoutSchema.parse(await request.json());
-    const validatedItems = getValidatedCartItems(parsed.items);
+    const validatedItems = await getValidatedCartItems(parsed.items);
     const giftPackaging = parsed.giftPackaging ?? false;
     const origin = request.headers.get("origin") ?? env.NEXT_PUBLIC_SITE_URL ?? siteConfig.url;
 

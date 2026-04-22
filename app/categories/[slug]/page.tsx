@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getCategoryBySlug, getProductsByCategory, categories } from "@/lib/catalog";
+import { getCategoryBySlug, categories } from "@/lib/catalog";
+import { getCatalogProductsByCategory } from "@/lib/admin-catalog";
 import { ProductCategory } from "@/lib/types";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { ProductCard } from "@/components/catalog/product-card";
@@ -40,7 +41,7 @@ export default async function CategoryPage({
     notFound();
   }
 
-  const filteredProducts = getProductsByCategory(category.slug as ProductCategory);
+  const filteredProducts = await getCatalogProductsByCategory(category.slug as ProductCategory);
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8">

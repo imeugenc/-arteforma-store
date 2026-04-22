@@ -39,12 +39,12 @@ export default async function InternalDashboardPage({
         />
         <DashboardCard
           title="Produse"
-          body="Vezi catalogul activ, statusul produselor și direcția de trecere de la administrare în cod la un admin real, cu produse și opțiuni editabile."
+          body="Adaugi produse noi, editezi prețuri, descrieri, opțiuni și activezi sau dezactivezi piese direct din adminul intern."
           href={`/internal/products${accessHint}`}
         />
         <DashboardCard
           title="Media"
-          body="Găsești aici direcția pentru imagini, optimizare, compresie, storage și felul în care ar trebui pregătit upload-ul pentru viitorul admin."
+          body="Încarci imagini pe produs, setezi ordinea din galerie, alt text și poți înlocui sau șterge rapid media deja salvată."
           href={`/internal/media${accessHint}`}
         />
       </div>

@@ -1,5 +1,6 @@
 import { Metadata } from "next";
-import { categories, products } from "@/lib/catalog";
+import { categories } from "@/lib/catalog";
+import { getCatalogProducts } from "@/lib/admin-catalog";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { ShopBrowser } from "@/components/catalog/shop-browser";
 import { buildMetadata } from "@/lib/seo";
@@ -11,7 +12,9 @@ export const metadata: Metadata = buildMetadata({
   path: "/shop",
 });
 
-export default function ShopPage() {
+export default async function ShopPage() {
+  const products = await getCatalogProducts();
+
   return (
     <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
       <div className="surface-panel-strong rounded-[2.4rem] p-8 lg:p-10">
