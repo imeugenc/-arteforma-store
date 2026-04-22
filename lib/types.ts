@@ -180,3 +180,15 @@ export type ProductAdminRecord = {
   updated_at: string;
   media?: ProductMediaRecord[];
 };
+
+export type ReviewRecord = {
+  id: string;
+  created_at: string;
+  customer_name: string;
+  rating: number;
+  review_text: string;
+  product_slug?: string | null;
+  visible: boolean;
+  featured?: boolean;
+  review_date?: string | null;
+};

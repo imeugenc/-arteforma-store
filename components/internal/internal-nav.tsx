@@ -7,6 +7,7 @@ const navItems = [
   { href: "/internal", label: "Dashboard" },
   { href: "/internal/orders", label: "Comenzi" },
   { href: "/internal/products", label: "Produse" },
+  { href: "/internal/reviews", label: "Recenzii" },
   { href: "/internal/media", label: "Media" },
 ];
 

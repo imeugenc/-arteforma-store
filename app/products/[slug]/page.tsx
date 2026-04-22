@@ -12,7 +12,7 @@ import { AddToCartForm } from "@/components/catalog/add-to-cart-form";
 import { Button } from "@/components/ui/button";
 import { buildMetadata, productStructuredData } from "@/lib/seo";
 import { getMaterialDetails } from "@/lib/materials";
-import { testimonials } from "@/lib/site";
+import { getVisibleReviewsForProduct } from "@/lib/reviews";
 
 export async function generateStaticParams() {
   return products.map((product) => ({ slug: product.slug }));
@@ -54,6 +54,7 @@ export default async function ProductPage({
 
   const materialDetails = getMaterialDetails(product.materials);
   const primaryMedia = getPrimaryProductMedia(product.media);
+  const reviews = await getVisibleReviewsForProduct(product.slug);
   const galleryLabels = ["Imagine principală", "Din apropiere", "În ambient"];
   const galleryMedia = product.media?.length
     ? [...product.media].sort((left, right) => {
@@ -218,15 +219,17 @@ export default async function ProductPage({
             <p className="text-sm uppercase tracking-[0.28em] text-[#d7a12a]">Recenzii</p>
             <h2 className="mt-3 font-serif-display text-3xl text-white">Cum sunt percepute piesele după livrare</h2>
             <div className="mt-6 grid gap-4 lg:grid-cols-2">
-              {testimonials.map((review) => (
+              {reviews.map((review) => (
                 <blockquote
-                  key={review.name}
+                  key={review.id}
                   className="rounded-[1.5rem] border border-white/8 bg-black/20 p-5"
                 >
-                  <p className="text-sm leading-7 text-white/74">„{review.quote}”</p>
+                  <p className="text-sm leading-7 text-white/74">„{review.review_text}”</p>
                   <footer className="mt-4">
-                    <p className="text-sm font-medium text-white">{review.name}</p>
-                    <p className="text-xs uppercase tracking-[0.24em] text-white/36">{review.role}</p>
+                    <p className="text-sm font-medium text-white">{review.customer_name}</p>
+                    <p className="text-xs uppercase tracking-[0.24em] text-white/36">
+                      {review.rating}/5
+                    </p>
                   </footer>
                 </blockquote>
               ))}

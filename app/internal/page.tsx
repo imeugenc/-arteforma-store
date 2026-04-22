@@ -43,6 +43,11 @@ export default async function InternalDashboardPage({
           body="Încarci imagini pe produs, setezi ordinea din galerie, alt text și poți înlocui sau șterge rapid media deja salvată."
           href={`/internal/media${accessHint}`}
         />
+        <DashboardCard
+          title="Recenzii"
+          body="Adaugi recenzii generale sau legate de produse, controlezi vizibilitatea lor și le pregătești pentru paginile de produs."
+          href={`/internal/reviews${accessHint}`}
+        />
       </div>
     </div>
   );
