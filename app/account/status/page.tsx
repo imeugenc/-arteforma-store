@@ -24,8 +24,8 @@ export default async function AccountStatusPage({
   return (
     <AccountShell
       eyebrow="Status comandă"
-      title="Verifică rapid unde se află comanda ta."
-      description="Introdu referința publică a comenzii și emailul folosit la checkout. Vei vedea statusul curent, produsele și istoricul actualizărilor disponibile."
+      title="Verifică în ce stadiu se află comanda ta."
+      description="Introdu referința publică a comenzii și emailul folosit la checkout. Vei vedea statusul curent, produsele din comandă și istoricul actualizărilor disponibile."
     >
       <div className="mt-8 surface-panel rounded-[2rem] p-6">
         <form className="grid gap-4 lg:grid-cols-[1fr_1fr_auto]">

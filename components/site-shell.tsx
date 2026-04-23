@@ -10,6 +10,7 @@ const navItems = [
   { href: "/custom-orders", label: "Comenzi custom" },
   { href: "/about", label: "Despre" },
   { href: "/faq", label: "FAQ" },
+  { href: "/account/status", label: "Status comandă" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -121,7 +122,7 @@ export function Footer() {
             <Link href="/about">Despre / Proces</Link>
             <Link href="/faq">FAQ</Link>
             <Link href="/contact">Contact</Link>
-            <Link href="/order-status">Status comandă</Link>
+            <Link href="/account/status">Status comandă</Link>
           </div>
         </div>
         <div className="space-y-4">
