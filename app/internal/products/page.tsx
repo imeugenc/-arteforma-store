@@ -7,7 +7,7 @@ import {
 } from "@/lib/admin-catalog";
 import { getPrimaryProductMedia } from "@/lib/product-media";
 import { formatPrice } from "@/lib/utils";
-import type { ProductCategory, ProductMediaRecord } from "@/lib/types";
+import type { ProductAdminRecord, ProductCategory, ProductMediaRecord } from "@/lib/types";
 
 export const metadata = buildInternalMetadata(
   "Catalog intern",
@@ -40,6 +40,15 @@ const colorOptions = [
   "Transparent Cristal",
 ];
 
+const materialOptions = [
+  "PLA",
+  "PLA Silk",
+  "PETG",
+  "TPU",
+  "ABS",
+  "Transparent / translucid",
+];
+
 export default async function InternalProductsPage({
   searchParams,
 }: {
@@ -55,6 +64,12 @@ export default async function InternalProductsPage({
 
   const adminAvailable = canUseAdminCatalog();
   const products = adminAvailable ? await getAdminProducts() : null;
+  const productGroups = categoryOptions
+    .map((category) => ({
+      ...category,
+      products: products?.filter((product) => product.category === category.value) ?? [],
+    }))
+    .filter((group) => group.products.length > 0);
 
   return (
     <div className="space-y-8">
@@ -118,69 +133,83 @@ export default async function InternalProductsPage({
               actual în Supabase și să poți gestiona apoi imaginile și editările din admin.
             </div>
           ) : (
-            <div className="space-y-6">
-              {products.map((product) => {
-                const primaryMedia = getPrimaryProductMedia(product.media);
-
-                return (
-                  <div
-                    key={product.id}
-                    id={`product-${product.id}`}
-                    className="surface-panel rounded-[2rem] p-6 scroll-mt-28"
-                  >
-                    <div className="grid gap-6 xl:grid-cols-[0.3fr_0.7fr]">
-                      <div className="space-y-5">
-                        <div className="overflow-hidden rounded-[1.6rem] border border-white/8 bg-black/20">
-                          {primaryMedia?.public_url ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={primaryMedia.public_url}
-                              alt={primaryMedia.alt_text ?? product.name}
-                              className="aspect-square h-full w-full object-cover"
-                            />
-                          ) : (
-                            <div className="flex aspect-square items-center justify-center text-sm text-white/45">
-                              Fără imagine de copertă
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="rounded-[1.5rem] border border-white/8 bg-black/20 p-5">
-                          <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#d7a12a]">
-                            Rezumat
-                          </p>
-                          <div className="mt-4 space-y-3 text-sm text-white/68">
-                            <InfoRow label="Produs" value={product.name} />
-                            <InfoRow label="Slug" value={product.slug} />
-                            <InfoRow label="Categorie" value={product.category} />
-                            <InfoRow label="Preț" value={formatPrice(product.price)} />
-                            <InfoRow label="Status" value={product.enabled ? "Activ" : "Inactiv"} />
-                            <InfoRow label="Featured" value={product.featured ? "Da" : "Nu"} />
-                            <InfoRow label="Media" value={`${product.media?.length ?? 0} imagini`} />
-                            <InfoRow
-                              label="Imagine principală"
-                              value={primaryMedia ? primaryMedia.kind : "Nesetată"}
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="space-y-6">
-                        <ProductEditor defaults={getProductFormDefaults(product)} />
-                        <ProductMediaSection
-                          productId={product.id}
-                          productName={product.name}
-                          media={product.media ?? []}
-                        />
-                      </div>
+            <div className="space-y-8">
+              {productGroups.map((group) => (
+                <section key={group.value} className="space-y-4">
+                  <div className="flex flex-col gap-2 rounded-[1.6rem] border border-[#d7a12a]/20 bg-[#d7a12a]/8 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[#d7a12a]">
+                        Categorie
+                      </p>
+                      <h2 className="mt-1 font-serif-display text-2xl text-white">{group.label}</h2>
                     </div>
+                    <p className="text-sm text-white/62">
+                      {group.products.length} produse, cele mai noi apar primele
+                    </p>
                   </div>
-                );
-              })}
+
+                  <div className="space-y-6">
+                    {group.products.map((product) => (
+                      <ProductAdminCard key={product.id} product={product} />
+                    ))}
+                  </div>
+                </section>
+              ))}
             </div>
           )}
         </>
       )}
+    </div>
+  );
+}
+
+function ProductAdminCard({ product }: { product: ProductAdminRecord }) {
+  const primaryMedia = getPrimaryProductMedia(product.media);
+
+  return (
+    <div id={`product-${product.id}`} className="surface-panel rounded-[2rem] p-6 scroll-mt-28">
+      <div className="grid gap-6 xl:grid-cols-[0.3fr_0.7fr]">
+        <div className="space-y-5">
+          <div className="overflow-hidden rounded-[1.6rem] border border-white/8 bg-black/20">
+            {primaryMedia?.public_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={primaryMedia.public_url}
+                alt={primaryMedia.alt_text ?? product.name}
+                className="aspect-square h-full w-full object-cover"
+              />
+            ) : (
+              <div className="flex aspect-square items-center justify-center text-sm text-white/45">
+                Fără imagine de copertă
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-[1.5rem] border border-white/8 bg-black/20 p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#d7a12a]">
+              Rezumat
+            </p>
+            <div className="mt-4 space-y-3 text-sm text-white/68">
+              <InfoRow label="Produs" value={product.name} />
+              <InfoRow label="Slug" value={product.slug} />
+              <InfoRow label="Preț" value={formatPrice(product.price)} />
+              <InfoRow label="Status" value={product.enabled ? "Activ" : "Inactiv"} />
+              <InfoRow label="Featured" value={product.featured ? "Da" : "Nu"} />
+              <InfoRow label="Media" value={`${product.media?.length ?? 0} imagini`} />
+              <InfoRow label="Imagine principală" value={primaryMedia ? primaryMedia.kind : "Nesetată"} />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <ProductEditor defaults={getProductFormDefaults(product)} />
+          <ProductMediaSection
+            productId={product.id}
+            productName={product.name}
+            media={product.media ?? []}
+          />
+        </div>
+      </div>
     </div>
   );
 }
@@ -191,6 +220,10 @@ function ProductEditor({
   defaults: ReturnType<typeof getProductFormDefaults>;
 }) {
   const selectedColors = defaults.colors
+    .split(/\r?\n/)
+    .map((value) => value.trim())
+    .filter(Boolean);
+  const selectedMaterials = defaults.materials
     .split(/\r?\n/)
     .map((value) => value.trim())
     .filter(Boolean);
@@ -273,8 +306,19 @@ function ProductEditor({
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <Field label="Materiale" hint="Un rând per opțiune. Exemplu: PLA Silk">
-          <textarea name="materials" defaultValue={defaults.materials} rows={5} className="textarea-field" />
+        <Field label="Materiale disponibile" hint="Selectezi materialele disponibile pentru produs.">
+          <select
+            name="materials"
+            multiple
+            defaultValue={selectedMaterials}
+            className="input-field min-h-[180px] py-3"
+          >
+            {materialOptions.map((material) => (
+              <option key={material} value={material}>
+                {material}
+              </option>
+            ))}
+          </select>
         </Field>
         <Field label="Personalizare" hint="Listează clar opțiunile sau adaptările posibile">
           <textarea

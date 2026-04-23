@@ -216,7 +216,7 @@ export async function getAdminProducts() {
   }
 
   const [productsResult, mediaResult] = await Promise.all([
-    supabase.from("products").select("*").order("created_at", { ascending: true }),
+    supabase.from("products").select("*").order("created_at", { ascending: false }),
     supabase.from("product_media").select("*").order("sort_order", { ascending: true }),
   ]);
 

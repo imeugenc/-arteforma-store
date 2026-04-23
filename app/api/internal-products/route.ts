@@ -25,7 +25,7 @@ const schema = z.object({
   enabled: z.boolean(),
   sizes: z.string().optional(),
   colors: z.union([z.string(), z.array(z.string())]).optional(),
-  materials: z.string().optional(),
+  materials: z.union([z.string(), z.array(z.string())]).optional(),
   customization: z.string().optional(),
   idealFor: z.string().optional(),
 });
@@ -44,6 +44,10 @@ export async function POST(request: Request) {
       .getAll("colors")
       .map((value) => value.toString().trim())
       .filter(Boolean);
+    const materialValues = formData
+      .getAll("materials")
+      .map((value) => value.toString().trim())
+      .filter(Boolean);
 
     const parsed = schema.parse({
       productId: formData.get("productId") || undefined,
@@ -58,7 +62,7 @@ export async function POST(request: Request) {
       enabled: formData.get("enabled") === "on",
       sizes: formData.get("sizes")?.toString(),
       colors: colorValues.length > 1 ? colorValues : colorValues[0] || "",
-      materials: formData.get("materials")?.toString(),
+      materials: materialValues.length > 1 ? materialValues : materialValues[0] || "",
       customization: formData.get("customization")?.toString(),
       idealFor: formData.get("idealFor")?.toString(),
     });
@@ -76,7 +80,7 @@ export async function POST(request: Request) {
       enabled: parsed.enabled,
       sizes: parseListInput(parsed.sizes ?? ""),
       colors: parseListInput(Array.isArray(parsed.colors) ? parsed.colors.join("\n") : parsed.colors ?? ""),
-      materials: parseListInput(parsed.materials ?? ""),
+      materials: parseListInput(Array.isArray(parsed.materials) ? parsed.materials.join("\n") : parsed.materials ?? ""),
       customization: parseListInput(parsed.customization ?? ""),
       idealFor: parseListInput(parsed.idealFor ?? ""),
     });

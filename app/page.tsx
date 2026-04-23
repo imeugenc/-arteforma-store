@@ -151,8 +151,8 @@ export default async function HomePage() {
         <div className="mb-10 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <SectionHeading
             eyebrow="Best sellers"
-            title="Produsele pe care oamenii le înțeleg și le comandă repede."
-            description="Cele mai clare piese pentru birou, cadouri, auto și setup. Preț vizibil, producție clară și opțiuni ușor de ales."
+            title="Piese alese din colecția ArteForma"
+            description="Ies în evidență fără să încarce spațiul. Design curat, ușor de integrat în orice setup."
           />
           <Link href="/shop">
             <Button variant="ghost">Vezi tot magazinul</Button>
