@@ -23,11 +23,11 @@ export default async function InternalReviewsPage({
   await requireInternalAccess(token, "/internal/reviews");
 
   let reviews: Awaited<ReturnType<typeof getAdminReviews>> = null;
-  let products: Awaited<ReturnType<typeof getReviewProductChoices>> = [];
+  let categories: Awaited<ReturnType<typeof getReviewProductChoices>> = [];
   let loadError = error;
 
   try {
-    [reviews, products] = await Promise.all([getAdminReviews(), getReviewProductChoices()]);
+    [reviews, categories] = await Promise.all([getAdminReviews(), getReviewProductChoices()]);
   } catch (loadFailure) {
     loadError = loadFailure instanceof Error ? loadFailure.message : "Pagina de recenzii nu a putut fi încărcată.";
   }
@@ -75,9 +75,9 @@ export default async function InternalReviewsPage({
               <span className="mb-2 block text-[13px] font-medium text-white">Filtru categorie</span>
               <select name="category" defaultValue={category ?? ""} className="input-field">
                 <option value="">Toate</option>
-                {products.map((product) => (
-                  <option key={product.slug} value={product.slug}>
-                    {product.name}
+                {categories.map((categoryOption) => (
+                  <option key={categoryOption.slug} value={categoryOption.slug}>
+                    {categoryOption.name}
                   </option>
                 ))}
               </select>
@@ -87,7 +87,7 @@ export default async function InternalReviewsPage({
         <div className="mt-6">
           <ReviewEditor
             defaults={getReviewFormDefaults()}
-            categoryOptions={products}
+            categoryOptions={categories}
           />
         </div>
       </div>
@@ -115,7 +115,7 @@ export default async function InternalReviewsPage({
                       value={
                         review.category_slug
                           ? review.category_label ?? review.category_slug
-                          : "General / magazin"
+                          : "Custom"
                       }
                     />
                     <Info label="Vizibilă" value={review.visible ? "Da" : "Nu"} />
@@ -129,7 +129,7 @@ export default async function InternalReviewsPage({
                 <div className="space-y-4">
                   <ReviewEditor
                     defaults={getReviewFormDefaults(review)}
-                    categoryOptions={products}
+                    categoryOptions={categories}
                   />
                   <form action="/api/internal-reviews/delete" method="POST">
                     <input type="hidden" name="reviewId" value={review.id} />
@@ -183,8 +183,7 @@ function ReviewEditor({
           </select>
         </Field>
         <Field label="Categorie">
-          <select name="categorySlug" defaultValue={defaults.categorySlug} className="input-field">
-            <option value="">General / magazin</option>
+          <select name="categorySlug" defaultValue={defaults.categorySlug || "custom"} className="input-field">
             {currentCategoryMissing ? (
               <option value={defaults.categorySlug}>{defaults.categorySlug}</option>
             ) : null}

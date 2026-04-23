@@ -1,6 +1,5 @@
 import { revalidatePath } from "next/cache";
 import { getAdminProducts, getCatalogProducts } from "@/lib/admin-catalog";
-import { categories } from "@/lib/catalog";
 import { getSupabaseAdminClient } from "@/lib/supabase";
 import type { ReviewRecord } from "@/lib/types";
 import { testimonials } from "@/lib/site";
@@ -38,25 +37,23 @@ export type ReviewFormValues = {
 };
 
 const REVIEW_CATEGORY_LABELS: Record<string, string> = {
-  "desk-setup": "Desk / Birou",
-  "crypto-trading": "Crypto",
   "auto-moto": "Auto / Moto",
+  "crypto-trading": "Crypto / Trading",
+  "desk-setup": "Birou / Setup",
   gifts: "Cadouri",
-  custom: "Custom",
   "funny-viral": "Funny / Viral",
+  custom: "Custom",
 };
 
 function getReviewCategoryChoicesBase() {
-  const derived: Array<{ slug: string; name: string }> = categories.map((category) => ({
-    slug: category.slug,
-    name: REVIEW_CATEGORY_LABELS[category.slug] ?? category.name,
-  }));
-
-  if (!derived.some((item) => item.slug === "custom")) {
-    derived.push({ slug: "custom", name: "Custom" });
-  }
-
-  return derived;
+  return [
+    { slug: "auto-moto", name: "Auto / Moto" },
+    { slug: "crypto-trading", name: "Crypto / Trading" },
+    { slug: "desk-setup", name: "Birou / Setup" },
+    { slug: "gifts", name: "Cadouri" },
+    { slug: "funny-viral", name: "Funny / Viral" },
+    { slug: "custom", name: "Custom" },
+  ];
 }
 
 function isKnownReviewCategory(value?: string | null) {
@@ -69,19 +66,42 @@ function isKnownReviewCategory(value?: string | null) {
 
 async function resolveReviewCategory(rawValue?: string | null) {
   if (!rawValue) {
-    return { categorySlug: null, categoryLabel: null };
+    return { categorySlug: "custom", categoryLabel: "Custom" };
   }
 
-  if (isKnownReviewCategory(rawValue)) {
+  const normalizedValue = rawValue.trim();
+
+  const legacyCategoryMap: Record<string, string> = {
+    "desk / birou": "desk-setup",
+    "desk-birou": "desk-setup",
+    desk: "desk-setup",
+    "crypto / trading": "crypto-trading",
+    crypto: "crypto-trading",
+    "general / magazin": "custom",
+    "general / store": "custom",
+    general: "custom",
+    magazin: "custom",
+  };
+
+  const mappedLegacyCategory = legacyCategoryMap[normalizedValue.toLowerCase()];
+
+  if (mappedLegacyCategory && isKnownReviewCategory(mappedLegacyCategory)) {
     return {
-      categorySlug: rawValue,
-      categoryLabel: REVIEW_CATEGORY_LABELS[rawValue] ?? rawValue,
+      categorySlug: mappedLegacyCategory,
+      categoryLabel: REVIEW_CATEGORY_LABELS[mappedLegacyCategory] ?? mappedLegacyCategory,
+    };
+  }
+
+  if (isKnownReviewCategory(normalizedValue)) {
+    return {
+      categorySlug: normalizedValue,
+      categoryLabel: REVIEW_CATEGORY_LABELS[normalizedValue] ?? normalizedValue,
     };
   }
 
   const [adminProducts, catalogProducts] = await Promise.all([getAdminProducts(), getCatalogProducts()]);
   const allProducts = [...(adminProducts ?? []), ...catalogProducts];
-  const matched = allProducts.find((product) => product.slug === rawValue);
+  const matched = allProducts.find((product) => product.slug === normalizedValue);
 
   if (matched) {
     return {
@@ -91,8 +111,8 @@ async function resolveReviewCategory(rawValue?: string | null) {
   }
 
   return {
-    categorySlug: null,
-    categoryLabel: "Categorie necunoscută / produs retras",
+    categorySlug: "custom",
+    categoryLabel: "Custom",
   };
 }
 
@@ -455,10 +475,5 @@ export async function deleteReview(reviewId: string) {
 }
 
 export async function getReviewProductChoices() {
-  const currentProducts = await getCatalogProducts();
-  const currentCategories = new Set<string>(currentProducts.map((product) => product.category));
-
-  return getReviewCategoryChoicesBase().filter(
-    (option) => option.slug === "custom" || currentCategories.has(option.slug),
-  );
+  return getReviewCategoryChoicesBase();
 }

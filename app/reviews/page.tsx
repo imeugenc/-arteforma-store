@@ -33,7 +33,7 @@ export default async function ReviewsPage({
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.34em] text-[#d7a12a]">
-                    {review.category_slug ? "Recenzie categorie" : "Recenzie magazin"}
+                    Recenzie categorie
                   </p>
                   <h2 className="mt-3 font-serif-display text-2xl text-white">
                     {review.customer_name}
@@ -48,11 +48,9 @@ export default async function ReviewsPage({
                   </p>
                 </div>
               </div>
-              {review.category_slug ? (
-                <p className="mt-4 text-sm text-white/48">
-                  Categorie: <span className="text-[#f2dfaf]">{review.category_label ?? review.category_slug}</span>
-                </p>
-              ) : null}
+              <p className="mt-4 text-sm text-white/48">
+                Categorie: <span className="text-[#f2dfaf]">{review.category_label ?? "Custom"}</span>
+              </p>
               <p className="mt-4 text-sm leading-8 text-white/72">{review.review_text}</p>
             </article>
           ))}
@@ -95,8 +93,7 @@ export default async function ReviewsPage({
                 <span className="mb-2 block text-[13px] font-medium text-white">
                   Categorie
                 </span>
-                <select name="categorySlug" defaultValue="" className="input-field">
-                  <option value="">General / magazin</option>
+                <select name="categorySlug" defaultValue="custom" className="input-field">
                   {categories.map((category) => (
                     <option key={category.slug} value={category.slug}>
                       {category.name}
