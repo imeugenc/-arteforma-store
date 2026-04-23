@@ -32,13 +32,30 @@ const mediaKindOptions = [
 ];
 
 const colorOptions = [
-  "Maro Nuc Satinat",
   "Alb Satinat",
-  "Auriu Silk Signature",
+  "Alb Ivory",
   "Negru Grafit",
+  "Negru Mat",
   "Gri Urban",
+  "Gri Stone",
+  "Maro Nuc Satinat",
+  "Maro Espresso",
+  "Auriu Silk Signature",
+  "Bronz Satinat",
+  "Cupru Burnished",
+  "Argintiu Metalic",
   "Roșu Neon Flux",
+  "Roșu Burgundy",
+  "Portocaliu Amber",
+  "Galben Solar",
+  "Verde Olive",
+  "Verde Neon",
+  "Albastru Midnight",
+  "Albastru Electric",
+  "Mov Deep",
+  "Roz Quartz",
   "Transparent Cristal",
+  "Transparent Smoke",
 ];
 
 const materialOptions = [
@@ -293,36 +310,62 @@ function ProductEditor({
         <Field label="Dimensiuni" hint="Un rând per opțiune. Exemplu: 20 cm standard">
           <textarea name="sizes" defaultValue={defaults.sizes} rows={5} className="textarea-field" />
         </Field>
-        <Field label="Culori disponibile" hint="Selectezi culorile vizibile în produs din lista predefinită.">
-          <select
-            name="colors"
-            multiple
-            defaultValue={selectedColors}
-            className="input-field min-h-[180px] py-3"
-          >
-            {colorOptions.map((color) => (
-              <option key={color} value={color}>
-                {color}
-              </option>
-            ))}
-          </select>
+        <Field label="Culori disponibile" hint="Poți bifa mai multe culori pentru același produs.">
+          <div className="grid gap-2 sm:grid-cols-2">
+            {colorOptions.map((color) => {
+              const checked = selectedColors.includes(color);
+
+              return (
+                <label
+                  key={color}
+                  className={`flex items-center gap-3 rounded-[1.1rem] border px-4 py-3 text-sm transition ${
+                    checked
+                      ? "border-[#d7a12a]/40 bg-[#d7a12a]/10 text-[#f2dfaf]"
+                      : "border-white/10 bg-black/20 text-white/72"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    name="colors"
+                    value={color}
+                    defaultChecked={checked}
+                    className="checkbox-field"
+                  />
+                  <span>{color}</span>
+                </label>
+              );
+            })}
+          </div>
         </Field>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <Field label="Materiale disponibile" hint="Selectezi materialele disponibile pentru produs.">
-          <select
-            name="materials"
-            multiple
-            defaultValue={selectedMaterials}
-            className="input-field min-h-[180px] py-3"
-          >
-            {materialOptions.map((material) => (
-              <option key={material} value={material}>
-                {material}
-              </option>
-            ))}
-          </select>
+        <Field label="Materiale disponibile" hint="Poți bifa mai multe materiale pentru același produs.">
+          <div className="grid gap-2">
+            {materialOptions.map((material) => {
+              const checked = selectedMaterials.includes(material);
+
+              return (
+                <label
+                  key={material}
+                  className={`flex items-center gap-3 rounded-[1.1rem] border px-4 py-3 text-sm transition ${
+                    checked
+                      ? "border-[#d7a12a]/40 bg-[#d7a12a]/10 text-[#f2dfaf]"
+                      : "border-white/10 bg-black/20 text-white/72"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    name="materials"
+                    value={material}
+                    defaultChecked={checked}
+                    className="checkbox-field"
+                  />
+                  <span>{material}</span>
+                </label>
+              );
+            })}
+          </div>
         </Field>
         <Field label="Personalizare" hint="Listează clar opțiunile sau adaptările posibile">
           <textarea
