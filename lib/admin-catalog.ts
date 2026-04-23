@@ -303,22 +303,14 @@ export async function getCatalogProducts() {
     return fallbackProducts.filter((product) => product.enabled !== false);
   }
 
-  const mapped = new Map<string, Product>(
-    adminProducts.map((record) => {
-      const base = fallbackProducts.find((product) => product.slug === record.slug);
-      return [record.slug, buildFallbackProduct(record, base)];
-    }),
-  );
+  const adminCatalogProducts = adminProducts.map((record) => {
+    const base = fallbackProducts.find((product) => product.slug === record.slug);
+    return buildFallbackProduct(record, base);
+  });
+  const adminSlugs = new Set(adminCatalogProducts.map((product) => product.slug));
+  const staticFallbacks = fallbackProducts.filter((product) => !adminSlugs.has(product.slug));
 
-  const merged = fallbackProducts.map((product) => mapped.get(product.slug) ?? product);
-
-  for (const product of mapped.values()) {
-    if (!merged.find((item) => item.slug === product.slug)) {
-      merged.push(product);
-    }
-  }
-
-  return merged.filter((product) => product.enabled !== false);
+  return [...adminCatalogProducts, ...staticFallbacks].filter((product) => product.enabled !== false);
 }
 
 export async function getCatalogProductBySlug(slug: string) {
