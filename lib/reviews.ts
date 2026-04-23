@@ -151,6 +151,67 @@ export async function getVisibleReviewsForProduct(productSlug: string) {
   }));
 }
 
+export async function getVisibleStoreReviews() {
+  const supabase = getSupabaseAdminClient();
+
+  if (!supabase) {
+    return testimonials.map((item, index) => ({
+      id: `fallback-store-${index}`,
+      customer_name: item.name,
+      rating: 5,
+      review_text: item.quote,
+      product_slug: null,
+      visible: true,
+      featured: index === 0,
+      review_date: null,
+      created_at: new Date().toISOString(),
+      role: item.role,
+    }));
+  }
+
+  const result = await supabase
+    .from("reviews")
+    .select("*")
+    .eq("visible", true)
+    .order("featured", { ascending: false })
+    .order("review_date", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: false });
+
+  if (result.error) {
+    return testimonials.map((item, index) => ({
+      id: `fallback-store-${index}`,
+      customer_name: item.name,
+      rating: 5,
+      review_text: item.quote,
+      product_slug: null,
+      visible: true,
+      featured: index === 0,
+      review_date: null,
+      created_at: new Date().toISOString(),
+      role: item.role,
+    }));
+  }
+
+  const reviews = ((result.data ?? []) as ReviewRow[]).map(normalizeReview);
+
+  if (reviews.length) {
+    return reviews;
+  }
+
+  return testimonials.map((item, index) => ({
+    id: `fallback-store-${index}`,
+    customer_name: item.name,
+    rating: 5,
+    review_text: item.quote,
+    product_slug: null,
+    visible: true,
+    featured: index === 0,
+    review_date: null,
+    created_at: new Date().toISOString(),
+    role: item.role,
+  }));
+}
+
 export function getReviewFormDefaults(review?: ReviewRecord) {
   return {
     reviewId: review?.id ?? "",
@@ -200,6 +261,49 @@ export async function saveReview(values: ReviewFormValues) {
     }
 
     throw new Error(result.error?.message ?? "Recenzia nu a putut fi salvată.");
+  }
+
+  revalidateReviewPaths(result.data.product_slug);
+  return result.data;
+}
+
+export async function submitPublicReview({
+  customerName,
+  rating,
+  reviewText,
+  productSlug,
+}: {
+  customerName: string;
+  rating: number;
+  reviewText: string;
+  productSlug?: string;
+}) {
+  const supabase = getSupabaseAdminClient();
+
+  if (!supabase) {
+    throw new Error("Supabase nu este configurat.");
+  }
+
+  const payload = {
+    customer_name: customerName.trim(),
+    rating,
+    review_text: reviewText.trim(),
+    product_slug: productSlug?.trim() || null,
+    visible: false,
+    featured: false,
+    review_date: new Date().toISOString().slice(0, 10),
+  };
+
+  const result = await supabase.from("reviews").insert(payload).select("id, product_slug").single();
+
+  if (result.error || !result.data) {
+    if (result.error && isMissingReviewsTable(result.error.message)) {
+      throw new Error(
+        "Tabela de recenzii nu există încă în Supabase. Rulează schema pentru reviews și reîncarcă pagina.",
+      );
+    }
+
+    throw new Error(result.error?.message ?? "Recenzia nu a putut fi trimisă.");
   }
 
   revalidateReviewPaths(result.data.product_slug);

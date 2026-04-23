@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ShieldCheck, Sparkles, Truck, WandSparkles } from "lucide-react";
 import { categories } from "@/lib/catalog";
-import { getCatalogFeaturedProducts, getCatalogProductsByCategory } from "@/lib/admin-catalog";
+import { getCatalogFeaturedProducts } from "@/lib/admin-catalog";
 import { testimonials, trustPoints } from "@/lib/site";
 import { buildMetadata } from "@/lib/seo";
 import { SectionHeading } from "@/components/ui/section-heading";
@@ -19,9 +19,6 @@ export const metadata = buildMetadata({
 
 export default async function HomePage() {
   const featured = await getCatalogFeaturedProducts();
-  const autoProducts = (await getCatalogProductsByCategory("auto-moto")).slice(0, 3);
-  const cryptoProducts = (await getCatalogProductsByCategory("crypto-trading")).slice(0, 2);
-  const giftProducts = (await getCatalogProductsByCategory("gifts")).slice(0, 2);
   const collectionHighlights = [
     {
       title: "Lămpi",
@@ -188,51 +185,6 @@ export default async function HomePage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
-        <div className="grid gap-6 lg:grid-cols-2">
-          <div className="surface-panel rounded-[2.5rem] p-7 lg:p-8">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.4em] text-[#d7a12a]">
-                  Auto / Moto
-                </p>
-                <h2 className="mt-4 font-serif-display text-3xl text-white">
-                  Siluete și obiecte pentru oameni care recunosc imediat forma potrivită.
-                </h2>
-              </div>
-              <Link href="/categories/auto-moto">
-                <Button variant="ghost">Vezi categoria</Button>
-              </Link>
-            </div>
-            <div className="mt-6 grid gap-6">
-              {autoProducts.map((product) => (
-                <ProductCard key={product.slug} product={product} />
-              ))}
-            </div>
-          </div>
-          <div className="surface-panel rounded-[2.5rem] p-7 lg:p-8">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.4em] text-[#d7a12a]">
-                  Crypto / Trading & Cadouri
-                </p>
-                <h2 className="mt-4 font-serif-display text-3xl text-white">
-                  Piese de birou și cadouri cu prezență clară, nu doar bune pentru o poză.
-                </h2>
-              </div>
-              <Link href="/categories/crypto-trading">
-                <Button variant="ghost">Vezi colecțiile</Button>
-              </Link>
-            </div>
-            <div className="mt-6 grid gap-6">
-              {[...cryptoProducts, ...giftProducts].map((product) => (
-                <ProductCard key={product.slug} product={product} />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
         <div className="surface-panel-strong grid gap-8 rounded-[2.5rem] p-8 lg:grid-cols-[1.15fr_0.85fr] lg:p-10">
           <div className="space-y-5">
             <p className="text-[11px] font-semibold uppercase tracking-[0.4em] text-[#d7a12a]">
@@ -326,6 +278,11 @@ export default async function HomePage() {
           description="Recenzii scurte, directe, despre felul în care produsul arată după livrare și cum se simte în spațiul clientului."
           align="center"
         />
+        <div className="mt-6 text-center">
+          <Link href="/reviews">
+            <Button variant="ghost">Vezi toate recenziile</Button>
+          </Link>
+        </div>
         <div className="mt-10 grid gap-6 lg:grid-cols-3">
           {testimonials.map((testimonial) => (
             <blockquote key={testimonial.name} className="surface-panel rounded-[2rem] p-6">
