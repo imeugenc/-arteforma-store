@@ -10,7 +10,6 @@ const navItems = [
   { href: "/custom-orders", label: "Comenzi custom" },
   { href: "/about", label: "Despre" },
   { href: "/faq", label: "FAQ" },
-  { href: "/account/status", label: "Status comandă" },
   { href: "/contact", label: "Contact" },
 ];
 

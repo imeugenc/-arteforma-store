@@ -46,6 +46,12 @@ export default function ContactPage() {
             {siteConfig.email}
           </Link>.
         </p>
+        <p className="mt-3">
+          Dacă ai deja o comandă plasată și vrei să vezi în ce stadiu se află, poți verifica direct în{" "}
+          <Link href="/account/status" className="text-[#f3dfae] transition hover:text-white">
+            pagina de status comandă
+          </Link>.
+        </p>
       </div>
     </div>
   );
