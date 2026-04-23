@@ -1,4 +1,5 @@
 import { revalidatePath } from "next/cache";
+import { getAdminProducts, getCatalogProducts } from "@/lib/admin-catalog";
 import { getSupabaseAdminClient } from "@/lib/supabase";
 import type { ReviewRecord } from "@/lib/types";
 import { testimonials } from "@/lib/site";
@@ -56,6 +57,22 @@ function revalidateReviewPaths(productSlug?: string | null) {
   if (productSlug) {
     revalidatePath(`/products/${productSlug}`);
   }
+}
+
+async function sanitizeReviewProductSlug(productSlug?: string) {
+  const normalized = productSlug?.trim();
+
+  if (!normalized) {
+    return null;
+  }
+
+  const products = await getAdminProducts();
+
+  if (products === null) {
+    return normalized;
+  }
+
+  return products.some((product) => product.slug === normalized) ? normalized : null;
 }
 
 export async function getAdminReviews() {
@@ -232,11 +249,13 @@ export async function saveReview(values: ReviewFormValues) {
     throw new Error("Supabase nu este configurat.");
   }
 
+  const safeProductSlug = await sanitizeReviewProductSlug(values.productSlug);
+
   const payload = {
     customer_name: values.customerName.trim(),
     rating: values.rating,
     review_text: values.reviewText.trim(),
-    product_slug: values.productSlug?.trim() || null,
+    product_slug: safeProductSlug,
     visible: values.visible,
     featured: values.featured,
     review_date: values.reviewDate?.trim() || null,
@@ -284,11 +303,13 @@ export async function submitPublicReview({
     throw new Error("Supabase nu este configurat.");
   }
 
+  const safeProductSlug = await sanitizeReviewProductSlug(productSlug);
+
   const payload = {
     customer_name: customerName.trim(),
     rating,
     review_text: reviewText.trim(),
-    product_slug: productSlug?.trim() || null,
+    product_slug: safeProductSlug,
     visible: false,
     featured: false,
     review_date: new Date().toISOString().slice(0, 10),
@@ -346,4 +367,13 @@ export async function deleteReview(reviewId: string) {
   }
 
   revalidateReviewPaths(existing.data.product_slug);
+}
+
+export async function getReviewProductChoices() {
+  const products = await getCatalogProducts();
+
+  return products.map((product) => ({
+    slug: product.slug,
+    name: product.name,
+  }));
 }

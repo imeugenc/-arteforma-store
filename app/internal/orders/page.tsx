@@ -1,8 +1,10 @@
+import { ConfirmSubmitButton } from "@/components/internal/confirm-submit-button";
 import { buildInternalMetadata, requireInternalAccess } from "@/lib/internal";
 import {
   ADMIN_ORDER_STATUSES,
   getOrderDisplayReference,
   getRecentOrdersFiltered,
+  isOrderArchived,
   translateOrderStatus,
 } from "@/lib/orders";
 import { formatPrice } from "@/lib/utils";
@@ -20,17 +22,22 @@ export default async function InternalOrdersPage({
     token?: string;
     status?: string;
     email?: string;
+    archived?: string;
     updated?: string;
     error?: string;
   }>;
 }) {
-  const { token, status, email, updated, error } = await searchParams;
+  const { token, status, email, archived, updated, error } = await searchParams;
   await requireInternalAccess(token, "/internal/orders");
 
   const bundle = await getRecentOrdersFiltered({
     limit: 40,
     status,
     email,
+    archived:
+      archived === "archived" || archived === "all"
+        ? archived
+        : "active",
   });
 
   return (
@@ -43,7 +50,7 @@ export default async function InternalOrdersPage({
           Vizualizare internă pentru comenzile plătite, statusul lor și istoricul de actualizări.
         </p>
 
-        <form className="mt-8 grid gap-4 lg:grid-cols-[1fr_220px_auto]">
+        <form className="mt-8 grid gap-4 lg:grid-cols-[1fr_220px_220px_auto]">
           <label>
             <span className="mb-2 block text-[13px] font-medium text-white">Filtru după email</span>
             <input
@@ -69,6 +76,18 @@ export default async function InternalOrdersPage({
               ))}
             </select>
           </label>
+          <label>
+            <span className="mb-2 block text-[13px] font-medium text-white">Vizualizare</span>
+            <select
+              name="archived"
+              defaultValue={archived ?? "active"}
+              className="w-full rounded-[1.3rem] border border-white/10 bg-black/30 px-4 py-3 text-[14px] text-white outline-none"
+            >
+              <option value="active">Active</option>
+              <option value="archived">Arhivate</option>
+              <option value="all">Toate</option>
+            </select>
+          </label>
           <div className="flex items-end gap-3">
             <button
               type="submit"
@@ -92,6 +111,7 @@ export default async function InternalOrdersPage({
           {bundle.orders.map((order) => {
             const items = bundle.items.filter((item) => item.order_id === order.id);
             const events = bundle.events.filter((event) => event.order_id === order.id);
+            const archivedState = isOrderArchived(order);
 
             return (
               <div key={order.id} className="surface-panel rounded-[2rem] p-6">
@@ -106,9 +126,10 @@ export default async function InternalOrdersPage({
                       <Info label="Email client" value={order.customer_email} />
                       <Info label="Total" value={formatPrice(order.total_amount)} />
                       <Info label="Monedă" value={order.currency} />
-                      <Info label="Status" value={translateOrderStatus(order.status)} />
+                      <StatusInfo label="Status" status={order.status} archived={archivedState} />
                       <Info label="Payment status" value={order.payment_status ?? "—"} />
                       <Info label="Stripe session" value={order.stripe_session_id ?? "—"} />
+                      <Info label="Arhivată" value={archivedState ? "Da" : "Nu"} />
                     </div>
 
                     <div className="rounded-[1.5rem] border border-white/8 bg-black/20 p-4">
@@ -174,6 +195,35 @@ export default async function InternalOrdersPage({
 
                     <div className="rounded-[1.5rem] border border-white/8 bg-black/20 p-4">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#d7a12a]">
+                        Acțiuni comandă
+                      </p>
+                      <div className="mt-4 flex flex-wrap gap-3">
+                        <form action="/api/internal-orders/archive" method="POST">
+                          <input type="hidden" name="orderId" value={order.id} />
+                          <input type="hidden" name="archived" value={archivedState ? "false" : "true"} />
+                          <ConfirmSubmitButton
+                            label={archivedState ? "Scoate din arhivă" : "Arhivează"}
+                            confirmMessage={
+                              archivedState
+                                ? `Sigur vrei să scoți comanda ${getOrderDisplayReference(order)} din arhivă?`
+                                : `Sigur vrei să arhivezi comanda ${getOrderDisplayReference(order)}?`
+                            }
+                            className="inline-flex items-center justify-center rounded-full border border-white/12 bg-white/[0.04] px-5 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white"
+                          />
+                        </form>
+                        <form action="/api/internal-orders/delete" method="POST">
+                          <input type="hidden" name="orderId" value={order.id} />
+                          <ConfirmSubmitButton
+                            label="Șterge comanda"
+                            confirmMessage={`Sigur vrei să ștergi comanda ${getOrderDisplayReference(order)}? Vor fi eliminate și liniile de comandă și istoricul statusurilor.`}
+                            className="inline-flex items-center justify-center rounded-full border border-red-400/30 bg-red-400/10 px-5 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-red-200"
+                          />
+                        </form>
+                      </div>
+                    </div>
+
+                    <div className="rounded-[1.5rem] border border-white/8 bg-black/20 p-4">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#d7a12a]">
                         Istoric status
                       </p>
                       <div className="mt-4 space-y-3">
@@ -213,6 +263,38 @@ function Info({ label, value }: { label: string; value: string }) {
     <div className="rounded-[1.2rem] border border-white/6 bg-black/20 px-4 py-3">
       <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/36">{label}</p>
       <p className="mt-2 break-all text-sm text-white/78">{value}</p>
+    </div>
+  );
+}
+
+function StatusInfo({
+  label,
+  status,
+  archived,
+}: {
+  label: string;
+  status: string;
+  archived?: boolean;
+}) {
+  const tone =
+    status === "completed"
+      ? "bg-emerald-400"
+      : status === "paid"
+        ? "bg-amber-400"
+        : status === "in_production"
+          ? "bg-sky-400"
+          : status === "shipped"
+            ? "bg-violet-400"
+            : "bg-rose-400";
+
+  return (
+    <div className="rounded-[1.2rem] border border-white/6 bg-black/20 px-4 py-3">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/36">{label}</p>
+      <div className="mt-2 flex items-center gap-2">
+        <span className={`h-2.5 w-2.5 rounded-full ${tone}`} />
+        <p className="text-sm text-white/78">{translateOrderStatus(status)}</p>
+        {archived ? <span className="text-xs uppercase tracking-[0.18em] text-white/35">Arhivată</span> : null}
+      </div>
     </div>
   );
 }

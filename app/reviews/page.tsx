@@ -19,6 +19,7 @@ export default async function ReviewsPage({
 }) {
   const { submitted, error } = await searchParams;
   const [reviews, products] = await Promise.all([getVisibleStoreReviews(), getCatalogProducts()]);
+  const productMap = new Map(products.map((product) => [product.slug, product.name]));
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
@@ -53,12 +54,16 @@ export default async function ReviewsPage({
               {review.product_slug ? (
                 <p className="mt-4 text-sm text-white/48">
                   Legată de produsul:{" "}
-                  <Link
-                    href={`/products/${review.product_slug}`}
-                    className="text-[#f2dfaf] transition hover:text-white"
-                  >
-                    {review.product_slug}
-                  </Link>
+                  {productMap.has(review.product_slug) ? (
+                    <Link
+                      href={`/products/${review.product_slug}`}
+                      className="text-[#f2dfaf] transition hover:text-white"
+                    >
+                      {productMap.get(review.product_slug)}
+                    </Link>
+                  ) : (
+                    <span className="text-white/56">Produs retras din catalog</span>
+                  )}
                 </p>
               ) : null}
               <p className="mt-4 text-sm leading-8 text-white/72">{review.review_text}</p>

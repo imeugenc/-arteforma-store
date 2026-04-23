@@ -86,6 +86,29 @@ export function translateOrderStatus(status: string) {
   }
 }
 
+export function isOrderArchived(order: Pick<OrderRecord, "metadata">) {
+  const metadata = order.metadata;
+
+  if (!metadata || typeof metadata !== "object") {
+    return false;
+  }
+
+  return Boolean(
+    "archived" in metadata
+      ? metadata.archived
+      : "archived_at" in metadata
+        ? metadata.archived_at
+        : false,
+  );
+}
+
+function withOrderMetadata(order: OrderRecord, patch: Record<string, unknown>) {
+  return {
+    ...(order.metadata && typeof order.metadata === "object" ? order.metadata : {}),
+    ...patch,
+  };
+}
+
 export async function persistStripeOrder({
   session,
   lineItems,
@@ -509,10 +532,12 @@ export async function getRecentOrdersFiltered({
   limit = 25,
   status,
   email,
+  archived = "active",
 }: {
   limit?: number;
   status?: string;
   email?: string;
+  archived?: "active" | "archived" | "all";
 }) {
   const supabase = getSupabaseAdminClient();
   if (!supabase) {
@@ -540,7 +565,20 @@ export async function getRecentOrdersFiltered({
   }
 
   const normalizedOrders = await ensurePublicOrderRefs(supabase, ordersResult.data ?? []);
-  const orderIds = normalizedOrders.map((order) => order.id);
+  const filteredOrders = normalizedOrders.filter((order) => {
+    const archivedState = isOrderArchived(order);
+
+    if (archived === "archived") {
+      return archivedState;
+    }
+
+    if (archived === "all") {
+      return true;
+    }
+
+    return !archivedState;
+  });
+  const orderIds = filteredOrders.map((order) => order.id);
   const itemsResult = orderIds.length
     ? await supabase
         .from(env.SUPABASE_ORDER_ITEMS_TABLE)
@@ -567,7 +605,7 @@ export async function getRecentOrdersFiltered({
   }
 
   return {
-    orders: normalizedOrders,
+    orders: filteredOrders,
     items: itemsResult.data ?? [],
     events: eventsResult.data ?? [],
   };
@@ -619,6 +657,88 @@ export async function updateOrderStatus({
   });
 
   return updatedOrder;
+}
+
+export async function archiveOrder({
+  orderId,
+  archived,
+}: {
+  orderId: string;
+  archived: boolean;
+}) {
+  const supabase = getSupabaseAdminClient();
+  if (!supabase) {
+    throw new Error("Supabase nu este configurat.");
+  }
+
+  const existing = await supabase
+    .from(env.SUPABASE_ORDERS_TABLE)
+    .select("*")
+    .eq("id", orderId)
+    .single<OrderRecord>();
+
+  if (existing.error || !existing.data) {
+    throw existing.error ?? new Error("Comanda nu a fost găsită.");
+  }
+
+  const nextMetadata = archived
+    ? withOrderMetadata(existing.data, {
+        archived: true,
+        archived_at: new Date().toISOString(),
+      })
+    : withOrderMetadata(existing.data, {
+        archived: false,
+        archived_at: null,
+      });
+
+  const update = await supabase
+    .from(env.SUPABASE_ORDERS_TABLE)
+    .update({ metadata: nextMetadata })
+    .eq("id", orderId)
+    .select("*")
+    .single<OrderRecord>();
+
+  if (update.error) {
+    throw update.error;
+  }
+
+  return update.data;
+}
+
+export async function deleteOrder(orderId: string) {
+  const supabase = getSupabaseAdminClient();
+  if (!supabase) {
+    throw new Error("Supabase nu este configurat.");
+  }
+
+  const existing = await supabase
+    .from(env.SUPABASE_ORDERS_TABLE)
+    .select("id")
+    .eq("id", orderId)
+    .single();
+
+  if (existing.error || !existing.data) {
+    throw existing.error ?? new Error("Comanda nu a fost găsită.");
+  }
+
+  const [eventsDelete, itemsDelete] = await Promise.all([
+    supabase.from("order_status_events").delete().eq("order_id", orderId),
+    supabase.from(env.SUPABASE_ORDER_ITEMS_TABLE).delete().eq("order_id", orderId),
+  ]);
+
+  if (eventsDelete.error) {
+    throw eventsDelete.error;
+  }
+
+  if (itemsDelete.error) {
+    throw itemsDelete.error;
+  }
+
+  const orderDelete = await supabase.from(env.SUPABASE_ORDERS_TABLE).delete().eq("id", orderId);
+
+  if (orderDelete.error) {
+    throw orderDelete.error;
+  }
 }
 
 export async function getCustomerOrderStatus({

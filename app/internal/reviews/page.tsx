@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { buildInternalMetadata, requireInternalAccess } from "@/lib/internal";
-import { getAdminProducts } from "@/lib/admin-catalog";
-import { getAdminReviews, getReviewFormDefaults } from "@/lib/reviews";
+import { getAdminReviews, getReviewFormDefaults, getReviewProductChoices } from "@/lib/reviews";
 
 export const metadata = buildInternalMetadata(
   "Recenzii interne",
@@ -23,14 +22,16 @@ export default async function InternalReviewsPage({
   await requireInternalAccess(token, "/internal/reviews");
 
   let reviews: Awaited<ReturnType<typeof getAdminReviews>> = null;
-  let products: Awaited<ReturnType<typeof getAdminProducts>> = null;
+  let products: Awaited<ReturnType<typeof getReviewProductChoices>> = [];
   let loadError = error;
 
   try {
-    [reviews, products] = await Promise.all([getAdminReviews(), getAdminProducts()]);
+    [reviews, products] = await Promise.all([getAdminReviews(), getReviewProductChoices()]);
   } catch (loadFailure) {
     loadError = loadFailure instanceof Error ? loadFailure.message : "Pagina de recenzii nu a putut fi încărcată.";
   }
+
+  const productMap = new Map(products.map((product) => [product.slug, product.name]));
 
   return (
     <div className="space-y-8">
@@ -61,10 +62,7 @@ export default async function InternalReviewsPage({
         <div className="mt-6">
           <ReviewEditor
             defaults={getReviewFormDefaults()}
-            productOptions={products?.map((product) => ({
-              slug: product.slug,
-              name: product.name,
-            })) ?? []}
+            productOptions={products}
           />
         </div>
       </div>
@@ -87,7 +85,14 @@ export default async function InternalReviewsPage({
                   <div className="mt-4 space-y-3 text-sm text-white/68">
                     <Info label="Client" value={review.customer_name} />
                     <Info label="Rating" value={`${review.rating}/5`} />
-                    <Info label="Produs" value={review.product_slug ?? "General / magazin"} />
+                    <Info
+                      label="Produs"
+                      value={
+                        review.product_slug
+                          ? productMap.get(review.product_slug) ?? `Produs retras (${review.product_slug})`
+                          : "General / magazin"
+                      }
+                    />
                     <Info label="Vizibilă" value={review.visible ? "Da" : "Nu"} />
                     <Info label="Featured" value={review.featured ? "Da" : "Nu"} />
                     <Info
@@ -99,10 +104,7 @@ export default async function InternalReviewsPage({
                 <div className="space-y-4">
                   <ReviewEditor
                     defaults={getReviewFormDefaults(review)}
-                    productOptions={products?.map((product) => ({
-                      slug: product.slug,
-                      name: product.name,
-                    })) ?? []}
+                    productOptions={products}
                   />
                   <form action="/api/internal-reviews/delete" method="POST">
                     <input type="hidden" name="reviewId" value={review.id} />
@@ -130,6 +132,9 @@ function ReviewEditor({
   defaults: ReturnType<typeof getReviewFormDefaults>;
   productOptions: Array<{ slug: string; name: string }>;
 }) {
+  const currentProductMissing =
+    defaults.productSlug && !productOptions.some((product) => product.slug === defaults.productSlug);
+
   return (
     <form action="/api/internal-reviews" method="POST" className="grid gap-4">
       <input type="hidden" name="reviewId" value={defaults.reviewId} />
@@ -155,6 +160,9 @@ function ReviewEditor({
         <Field label="Produs">
           <select name="productSlug" defaultValue={defaults.productSlug} className="input-field">
             <option value="">General / magazin</option>
+            {currentProductMissing ? (
+              <option value={defaults.productSlug}>{`Produs retras (${defaults.productSlug})`}</option>
+            ) : null}
             {productOptions.map((product) => (
               <option key={product.slug} value={product.slug}>
                 {product.name}

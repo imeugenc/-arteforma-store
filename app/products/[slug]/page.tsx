@@ -3,8 +3,7 @@ import Image from "next/image";
 import Script from "next/script";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { products } from "@/lib/catalog";
-import { getCatalogProductBySlug } from "@/lib/admin-catalog";
+import { getCatalogProductBySlug, getCatalogProducts } from "@/lib/admin-catalog";
 import { getPrimaryProductMedia } from "@/lib/product-media";
 import { formatPrice } from "@/lib/utils";
 import { ProductVisual } from "@/components/ui/product-visual";
@@ -15,6 +14,7 @@ import { getMaterialDetails } from "@/lib/materials";
 import { getVisibleReviewsForProduct } from "@/lib/reviews";
 
 export async function generateStaticParams() {
+  const products = await getCatalogProducts();
   return products.map((product) => ({ slug: product.slug }));
 }
 

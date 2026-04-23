@@ -299,7 +299,7 @@ export function getProductFormDefaults(product?: ProductAdminRecord) {
 export async function getCatalogProducts() {
   const adminProducts = await getAdminProducts();
 
-  if (!adminProducts?.length) {
+  if (adminProducts === null) {
     return fallbackProducts.filter((product) => product.enabled !== false);
   }
 
@@ -322,18 +322,15 @@ export async function getCatalogProductsByCategory(category: ProductCategory) {
 export async function getCatalogFeaturedProducts() {
   const adminProducts = await getAdminProducts();
 
-  if (adminProducts?.length) {
-    const adminFeatured = adminProducts
+  if (adminProducts !== null) {
+    return adminProducts
       .filter((product) => product.featured && product.enabled !== false)
       .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
       .map((record) => {
         const base = fallbackProducts.find((product) => product.slug === record.slug);
         return buildFallbackProduct(record, base);
-      });
-
-    if (adminFeatured.length) {
-      return adminFeatured.slice(0, 6);
-    }
+      })
+      .slice(0, 6);
   }
 
   const products = await getCatalogProducts();
