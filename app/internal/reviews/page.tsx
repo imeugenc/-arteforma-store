@@ -16,9 +16,10 @@ export default async function InternalReviewsPage({
     saved?: string;
     deleted?: string;
     error?: string;
+    category?: string;
   }>;
 }) {
-  const { token, saved, deleted, error } = await searchParams;
+  const { token, saved, deleted, error, category } = await searchParams;
   await requireInternalAccess(token, "/internal/reviews");
 
   let reviews: Awaited<ReturnType<typeof getAdminReviews>> = null;
@@ -31,17 +32,24 @@ export default async function InternalReviewsPage({
     loadError = loadFailure instanceof Error ? loadFailure.message : "Pagina de recenzii nu a putut fi încărcată.";
   }
 
-  const productMap = new Map(products.map((product) => [product.slug, product.name]));
+  const filteredReviews =
+    reviews?.filter((review) => {
+      if (!category) {
+        return true;
+      }
+
+      return review.category_slug === category;
+    }) ?? [];
 
   return (
     <div className="space-y-8">
       <div className="surface-panel-strong rounded-[2.4rem] p-8 lg:p-10">
         <p className="text-xs font-semibold uppercase tracking-[0.35em] text-[#d7a12a]">Recenzii interne</p>
         <h1 className="mt-5 font-serif-display text-[2rem] text-white lg:text-[2.6rem]">
-          Recenzii generale și recenzii legate de produse
+          Recenzii generale și recenzii legate de categorii
         </h1>
         <p className="mt-4 max-w-3xl text-sm leading-8 text-white/68 sm:text-[15px]">
-          Poți gestiona recenzii pentru produse specifice sau testimoniale generale de magazin, cu control pe
+          Poți gestiona recenzii pentru categorii specifice sau testimoniale generale de magazin, cu control pe
           vizibilitate și evidențiere în storefront.
         </p>
         {saved ? <p className="mt-4 text-sm text-[#f2dfaf]">Recenzie salvată.</p> : null}
@@ -55,14 +63,31 @@ export default async function InternalReviewsPage({
       </div>
 
       <div className="surface-panel rounded-[2rem] p-6 lg:p-7">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[#d7a12a]">
-          Recenzie nouă
-        </p>
-        <h2 className="mt-3 font-serif-display text-2xl text-white">Adaugă o recenzie</h2>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[#d7a12a]">
+              Recenzie nouă
+            </p>
+            <h2 className="mt-3 font-serif-display text-2xl text-white">Adaugă o recenzie</h2>
+          </div>
+          <form className="w-full max-w-sm">
+            <label className="block">
+              <span className="mb-2 block text-[13px] font-medium text-white">Filtru categorie</span>
+              <select name="category" defaultValue={category ?? ""} className="input-field">
+                <option value="">Toate</option>
+                {products.map((product) => (
+                  <option key={product.slug} value={product.slug}>
+                    {product.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </form>
+        </div>
         <div className="mt-6">
           <ReviewEditor
             defaults={getReviewFormDefaults()}
-            productOptions={products}
+            categoryOptions={products}
           />
         </div>
       </div>
@@ -71,13 +96,13 @@ export default async function InternalReviewsPage({
         <div className="surface-panel rounded-[2rem] p-6 text-white/65">
           Supabase nu este configurat, deci recenziile nu pot fi administrate încă.
         </div>
-      ) : !reviews.length ? (
+      ) : !filteredReviews.length ? (
         <div className="surface-panel rounded-[2rem] p-6 text-white/65">
           Nu există încă recenzii salvate. Poți adăuga prima recenzie din formularul de mai sus.
         </div>
       ) : (
         <div className="space-y-6">
-          {reviews.map((review) => (
+          {filteredReviews.map((review) => (
             <div key={review.id} className="surface-panel rounded-[2rem] p-6">
               <div className="grid gap-6 xl:grid-cols-[0.32fr_0.68fr]">
                 <div className="rounded-[1.5rem] border border-white/8 bg-black/20 p-5">
@@ -86,10 +111,10 @@ export default async function InternalReviewsPage({
                     <Info label="Client" value={review.customer_name} />
                     <Info label="Rating" value={`${review.rating}/5`} />
                     <Info
-                      label="Produs"
+                      label="Categorie"
                       value={
-                        review.product_slug
-                          ? productMap.get(review.product_slug) ?? `Produs retras (${review.product_slug})`
+                        review.category_slug
+                          ? review.category_label ?? review.category_slug
                           : "General / magazin"
                       }
                     />
@@ -104,7 +129,7 @@ export default async function InternalReviewsPage({
                 <div className="space-y-4">
                   <ReviewEditor
                     defaults={getReviewFormDefaults(review)}
-                    productOptions={products}
+                    categoryOptions={products}
                   />
                   <form action="/api/internal-reviews/delete" method="POST">
                     <input type="hidden" name="reviewId" value={review.id} />
@@ -127,13 +152,13 @@ export default async function InternalReviewsPage({
 
 function ReviewEditor({
   defaults,
-  productOptions,
+  categoryOptions,
 }: {
   defaults: ReturnType<typeof getReviewFormDefaults>;
-  productOptions: Array<{ slug: string; name: string }>;
+  categoryOptions: Array<{ slug: string; name: string }>;
 }) {
-  const currentProductMissing =
-    defaults.productSlug && !productOptions.some((product) => product.slug === defaults.productSlug);
+  const currentCategoryMissing =
+    defaults.categorySlug && !categoryOptions.some((category) => category.slug === defaults.categorySlug);
 
   return (
     <form action="/api/internal-reviews" method="POST" className="grid gap-4">
@@ -157,15 +182,15 @@ function ReviewEditor({
             ))}
           </select>
         </Field>
-        <Field label="Produs">
-          <select name="productSlug" defaultValue={defaults.productSlug} className="input-field">
+        <Field label="Categorie">
+          <select name="categorySlug" defaultValue={defaults.categorySlug} className="input-field">
             <option value="">General / magazin</option>
-            {currentProductMissing ? (
-              <option value={defaults.productSlug}>{`Produs retras (${defaults.productSlug})`}</option>
+            {currentCategoryMissing ? (
+              <option value={defaults.categorySlug}>{defaults.categorySlug}</option>
             ) : null}
-            {productOptions.map((product) => (
-              <option key={product.slug} value={product.slug}>
-                {product.name}
+            {categoryOptions.map((category) => (
+              <option key={category.slug} value={category.slug}>
+                {category.name}
               </option>
             ))}
           </select>

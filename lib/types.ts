@@ -188,7 +188,9 @@ export type ReviewRecord = {
   customer_name: string;
   rating: number;
   review_text: string;
-  product_slug?: string | null;
+  category_slug?: string | null;
+  category_label?: string | null;
+  legacy_reference?: string | null;
   visible: boolean;
   featured?: boolean;
   review_date?: string | null;

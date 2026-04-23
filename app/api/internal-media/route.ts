@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { hasValidInternalSecret, INTERNAL_ACCESS_COOKIE } from "@/lib/internal";
-import { uploadProductMedia } from "@/lib/admin-catalog";
+import { uploadProductMediaBatch } from "@/lib/admin-catalog";
 
 const schema = z.object({
   productId: z.string().uuid("Produs invalid."),
@@ -22,9 +22,12 @@ export async function POST(request: Request) {
 
   try {
     const formData = await request.formData();
-    const file = formData.get("file");
+    const rawReturnTo = formData.get("returnTo")?.toString();
+    const files = formData
+      .getAll("files")
+      .filter((entry): entry is File => entry instanceof File && entry.size > 0);
 
-    if (!(file instanceof File) || file.size === 0) {
+    if (!files.length) {
       throw new Error("Alege o imagine înainte să trimiți formularul.");
     }
 
@@ -33,12 +36,12 @@ export async function POST(request: Request) {
       altText: formData.get("altText")?.toString(),
       sortOrder: formData.get("sortOrder"),
       kind: formData.get("kind")?.toString(),
-      returnTo: formData.get("returnTo")?.toString(),
+      returnTo: rawReturnTo,
     });
 
-    await uploadProductMedia({
+    await uploadProductMediaBatch({
       productId: parsed.productId,
-      file,
+      files,
       altText: parsed.altText,
       sortOrder: parsed.sortOrder,
       kind: parsed.kind,

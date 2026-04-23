@@ -6,7 +6,7 @@ const schema = z.object({
   customerName: z.string().min(2, "Numele este obligatoriu."),
   rating: z.coerce.number().int().min(1).max(5),
   reviewText: z.string().min(12, "Textul recenziei este prea scurt."),
-  productSlug: z.string().optional(),
+  categorySlug: z.string().optional(),
 });
 
 export async function POST(request: Request) {
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
       customerName: formData.get("customerName"),
       rating: formData.get("rating"),
       reviewText: formData.get("reviewText"),
-      productSlug: formData.get("productSlug")?.toString() || undefined,
+      categorySlug: formData.get("categorySlug")?.toString() || undefined,
     });
 
     await submitPublicReview(parsed);

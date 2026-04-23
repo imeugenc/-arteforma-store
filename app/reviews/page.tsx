@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { getCatalogProducts } from "@/lib/admin-catalog";
-import { getVisibleStoreReviews } from "@/lib/reviews";
+import { getVisibleStoreReviews, getReviewProductChoices } from "@/lib/reviews";
 import { buildMetadata } from "@/lib/seo";
 import { SectionHeading } from "@/components/ui/section-heading";
 
@@ -18,8 +16,7 @@ export default async function ReviewsPage({
   searchParams: Promise<{ submitted?: string; error?: string }>;
 }) {
   const { submitted, error } = await searchParams;
-  const [reviews, products] = await Promise.all([getVisibleStoreReviews(), getCatalogProducts()]);
-  const productMap = new Map(products.map((product) => [product.slug, product.name]));
+  const [reviews, categories] = await Promise.all([getVisibleStoreReviews(), getReviewProductChoices()]);
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
@@ -36,7 +33,7 @@ export default async function ReviewsPage({
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.34em] text-[#d7a12a]">
-                    {review.product_slug ? "Recenzie produs" : "Recenzie magazin"}
+                    {review.category_slug ? "Recenzie categorie" : "Recenzie magazin"}
                   </p>
                   <h2 className="mt-3 font-serif-display text-2xl text-white">
                     {review.customer_name}
@@ -51,19 +48,9 @@ export default async function ReviewsPage({
                   </p>
                 </div>
               </div>
-              {review.product_slug ? (
+              {review.category_slug ? (
                 <p className="mt-4 text-sm text-white/48">
-                  Legată de produsul:{" "}
-                  {productMap.has(review.product_slug) ? (
-                    <Link
-                      href={`/products/${review.product_slug}`}
-                      className="text-[#f2dfaf] transition hover:text-white"
-                    >
-                      {productMap.get(review.product_slug)}
-                    </Link>
-                  ) : (
-                    <span className="text-white/56">Produs retras din catalog</span>
-                  )}
+                  Categorie: <span className="text-[#f2dfaf]">{review.category_label ?? review.category_slug}</span>
                 </p>
               ) : null}
               <p className="mt-4 text-sm leading-8 text-white/72">{review.review_text}</p>
@@ -106,13 +93,13 @@ export default async function ReviewsPage({
               </label>
               <label className="block">
                 <span className="mb-2 block text-[13px] font-medium text-white">
-                  Produs
+                  Categorie
                 </span>
-                <select name="productSlug" defaultValue="" className="input-field">
+                <select name="categorySlug" defaultValue="" className="input-field">
                   <option value="">General / magazin</option>
-                  {products.map((product) => (
-                    <option key={product.slug} value={product.slug}>
-                      {product.name}
+                  {categories.map((category) => (
+                    <option key={category.slug} value={category.slug}>
+                      {category.name}
                     </option>
                   ))}
                 </select>

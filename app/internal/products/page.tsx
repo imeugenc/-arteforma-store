@@ -409,8 +409,8 @@ function ProductMediaSection({
         <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[#d7a12a]">Imagini</p>
         <h3 className="font-serif-display text-2xl text-white">Media pentru {productName}</h3>
         <p className="text-sm leading-7 text-white/62">
-          Poți urca poze direct aici, poți seta imaginea de copertă și ajusta ordinea în care apar în
-          galerie.
+          Poți selecta mai multe imagini dintr-o singură dată, apoi poți seta imaginea de copertă și ajusta
+          ordinea în care apar în galerie.
         </p>
       </div>
 
@@ -440,8 +440,9 @@ function ProductMediaSection({
         <Field label="Fișier imagine">
           <input
             type="file"
-            name="file"
+            name="files"
             accept="image/*"
+            multiple
             required
             className="block w-full text-sm text-white/68 file:mr-4 file:rounded-full file:border-0 file:bg-[#d7a12a] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-black"
           />
@@ -451,7 +452,7 @@ function ProductMediaSection({
             type="submit"
             className="inline-flex items-center justify-center rounded-full bg-[#d7a12a] px-5 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-black"
           >
-            Adaugă imaginea
+            Adaugă imaginile
           </button>
         </div>
       </form>

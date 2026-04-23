@@ -294,7 +294,7 @@ export default async function HomePage() {
                   {review.customer_name}
                 </p>
                 <p className="text-sm text-white/45">
-                  {review.product_slug ? `Produs: ${review.product_slug}` : "Recenzie magazin"}
+                  {review.category_slug ? `Categorie: ${review.category_label ?? review.category_slug}` : "Recenzie magazin"}
                 </p>
               </footer>
             </blockquote>

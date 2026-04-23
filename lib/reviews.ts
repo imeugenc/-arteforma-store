@@ -1,5 +1,6 @@
 import { revalidatePath } from "next/cache";
 import { getAdminProducts, getCatalogProducts } from "@/lib/admin-catalog";
+import { categories } from "@/lib/catalog";
 import { getSupabaseAdminClient } from "@/lib/supabase";
 import type { ReviewRecord } from "@/lib/types";
 import { testimonials } from "@/lib/site";
@@ -30,49 +31,113 @@ export type ReviewFormValues = {
   customerName: string;
   rating: number;
   reviewText: string;
-  productSlug?: string;
+  categorySlug?: string;
   visible: boolean;
   featured: boolean;
   reviewDate?: string;
 };
 
-function normalizeReview(row: ReviewRow): ReviewRecord {
+const REVIEW_CATEGORY_LABELS: Record<string, string> = {
+  "desk-setup": "Desk / Birou",
+  "crypto-trading": "Crypto",
+  "auto-moto": "Auto / Moto",
+  gifts: "Cadouri",
+  custom: "Custom",
+  "funny-viral": "Funny / Viral",
+};
+
+function getReviewCategoryChoicesBase() {
+  const derived: Array<{ slug: string; name: string }> = categories.map((category) => ({
+    slug: category.slug,
+    name: REVIEW_CATEGORY_LABELS[category.slug] ?? category.name,
+  }));
+
+  if (!derived.some((item) => item.slug === "custom")) {
+    derived.push({ slug: "custom", name: "Custom" });
+  }
+
+  return derived;
+}
+
+function isKnownReviewCategory(value?: string | null) {
+  if (!value) {
+    return false;
+  }
+
+  return getReviewCategoryChoicesBase().some((option) => option.slug === value);
+}
+
+async function resolveReviewCategory(rawValue?: string | null) {
+  if (!rawValue) {
+    return { categorySlug: null, categoryLabel: null };
+  }
+
+  if (isKnownReviewCategory(rawValue)) {
+    return {
+      categorySlug: rawValue,
+      categoryLabel: REVIEW_CATEGORY_LABELS[rawValue] ?? rawValue,
+    };
+  }
+
+  const [adminProducts, catalogProducts] = await Promise.all([getAdminProducts(), getCatalogProducts()]);
+  const allProducts = [...(adminProducts ?? []), ...catalogProducts];
+  const matched = allProducts.find((product) => product.slug === rawValue);
+
+  if (matched) {
+    return {
+      categorySlug: matched.category,
+      categoryLabel: REVIEW_CATEGORY_LABELS[matched.category] ?? matched.category,
+    };
+  }
+
+  return {
+    categorySlug: null,
+    categoryLabel: "Categorie necunoscută / produs retras",
+  };
+}
+
+async function normalizeReview(row: ReviewRow): Promise<ReviewRecord> {
+  const category = await resolveReviewCategory(row.product_slug);
+
   return {
     id: row.id,
     created_at: row.created_at,
     customer_name: row.customer_name,
     rating: row.rating,
     review_text: row.review_text,
-    product_slug: row.product_slug,
+    category_slug: category.categorySlug,
+    category_label: category.categoryLabel,
+    legacy_reference: row.product_slug,
     visible: row.visible,
     featured: row.featured,
     review_date: row.review_date,
   };
 }
 
-function revalidateReviewPaths(productSlug?: string | null) {
+async function revalidateReviewPaths(target?: string | null) {
   revalidatePath("/");
+  revalidatePath("/reviews");
+  revalidatePath("/shop");
   revalidatePath("/internal/reviews");
 
-  if (productSlug) {
-    revalidatePath(`/products/${productSlug}`);
-  }
-}
-
-async function sanitizeReviewProductSlug(productSlug?: string) {
-  const normalized = productSlug?.trim();
-
-  if (!normalized) {
-    return null;
+  if (!target) {
+    return;
   }
 
-  const products = await getAdminProducts();
+  if (isKnownReviewCategory(target)) {
+    revalidatePath(`/categories/${target}`);
+    const products = await getCatalogProducts();
 
-  if (products === null) {
-    return normalized;
+    products
+      .filter((product) => product.category === target)
+      .forEach((product) => {
+        revalidatePath(`/products/${product.slug}`);
+      });
+
+    return;
   }
 
-  return products.some((product) => product.slug === normalized) ? normalized : null;
+  revalidatePath(`/products/${target}`);
 }
 
 export async function getAdminReviews() {
@@ -92,11 +157,14 @@ export async function getAdminReviews() {
     throw new Error(result.error.message);
   }
 
-  return ((result.data ?? []) as ReviewRow[]).map(normalizeReview);
+  return Promise.all(((result.data ?? []) as ReviewRow[]).map(normalizeReview));
 }
 
 export async function getVisibleReviewsForProduct(productSlug: string) {
   const supabase = getSupabaseAdminClient();
+  const catalogProducts = await getCatalogProducts();
+  const matchedProduct = catalogProducts.find((product) => product.slug === productSlug);
+  const categorySlug = matchedProduct?.category ?? null;
 
   if (!supabase) {
     return testimonials.map((item, index) => ({
@@ -104,7 +172,9 @@ export async function getVisibleReviewsForProduct(productSlug: string) {
       customer_name: item.name,
       rating: 5,
       review_text: item.quote,
-      role: item.role,
+      category_slug: null,
+      category_label: null,
+      legacy_reference: null,
     }));
   }
 
@@ -112,7 +182,7 @@ export async function getVisibleReviewsForProduct(productSlug: string) {
     .from("reviews")
     .select("*")
     .eq("visible", true)
-    .eq("product_slug", productSlug)
+    .eq("product_slug", categorySlug)
     .order("featured", { ascending: false })
     .order("review_date", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false });
@@ -123,11 +193,13 @@ export async function getVisibleReviewsForProduct(productSlug: string) {
       customer_name: item.name,
       rating: 5,
       review_text: item.quote,
-      role: item.role,
+      category_slug: null,
+      category_label: null,
+      legacy_reference: null,
     }));
   }
 
-  const specific = ((specificResult.data ?? []) as ReviewRow[]).map(normalizeReview);
+  const specific = await Promise.all(((specificResult.data ?? []) as ReviewRow[]).map(normalizeReview));
 
   if (specific.length) {
     return specific;
@@ -149,11 +221,13 @@ export async function getVisibleReviewsForProduct(productSlug: string) {
       customer_name: item.name,
       rating: 5,
       review_text: item.quote,
-      role: item.role,
+      category_slug: null,
+      category_label: null,
+      legacy_reference: null,
     }));
   }
 
-  const general = ((generalResult.data ?? []) as ReviewRow[]).map(normalizeReview);
+  const general = await Promise.all(((generalResult.data ?? []) as ReviewRow[]).map(normalizeReview));
 
   if (general.length) {
     return general;
@@ -164,7 +238,9 @@ export async function getVisibleReviewsForProduct(productSlug: string) {
     customer_name: item.name,
     rating: 5,
     review_text: item.quote,
-    role: item.role,
+    category_slug: null,
+    category_label: null,
+    legacy_reference: null,
   }));
 }
 
@@ -177,12 +253,13 @@ export async function getVisibleStoreReviews() {
       customer_name: item.name,
       rating: 5,
       review_text: item.quote,
-      product_slug: null,
+      category_slug: null,
+      category_label: null,
+      legacy_reference: null,
       visible: true,
       featured: index === 0,
       review_date: null,
       created_at: new Date().toISOString(),
-      role: item.role,
     }));
   }
 
@@ -200,16 +277,17 @@ export async function getVisibleStoreReviews() {
       customer_name: item.name,
       rating: 5,
       review_text: item.quote,
-      product_slug: null,
+      category_slug: null,
+      category_label: null,
+      legacy_reference: null,
       visible: true,
       featured: index === 0,
       review_date: null,
       created_at: new Date().toISOString(),
-      role: item.role,
     }));
   }
 
-  const reviews = ((result.data ?? []) as ReviewRow[]).map(normalizeReview);
+  const reviews = await Promise.all(((result.data ?? []) as ReviewRow[]).map(normalizeReview));
 
   if (reviews.length) {
     return reviews;
@@ -220,12 +298,13 @@ export async function getVisibleStoreReviews() {
     customer_name: item.name,
     rating: 5,
     review_text: item.quote,
-    product_slug: null,
+    category_slug: null,
+    category_label: null,
+    legacy_reference: null,
     visible: true,
     featured: index === 0,
     review_date: null,
     created_at: new Date().toISOString(),
-    role: item.role,
   }));
 }
 
@@ -235,7 +314,7 @@ export function getReviewFormDefaults(review?: ReviewRecord) {
     customerName: review?.customer_name ?? "",
     rating: review?.rating ?? 5,
     reviewText: review?.review_text ?? "",
-    productSlug: review?.product_slug ?? "",
+    categorySlug: review?.category_slug ?? "",
     visible: review?.visible ?? true,
     featured: review?.featured ?? false,
     reviewDate: review?.review_date ?? "",
@@ -249,13 +328,16 @@ export async function saveReview(values: ReviewFormValues) {
     throw new Error("Supabase nu este configurat.");
   }
 
-  const safeProductSlug = await sanitizeReviewProductSlug(values.productSlug);
+  const safeCategorySlug =
+    values.categorySlug?.trim() && isKnownReviewCategory(values.categorySlug)
+      ? values.categorySlug.trim()
+      : null;
 
   const payload = {
     customer_name: values.customerName.trim(),
     rating: values.rating,
     review_text: values.reviewText.trim(),
-    product_slug: safeProductSlug,
+    product_slug: safeCategorySlug,
     visible: values.visible,
     featured: values.featured,
     review_date: values.reviewDate?.trim() || null,
@@ -282,7 +364,7 @@ export async function saveReview(values: ReviewFormValues) {
     throw new Error(result.error?.message ?? "Recenzia nu a putut fi salvată.");
   }
 
-  revalidateReviewPaths(result.data.product_slug);
+  await revalidateReviewPaths(result.data.product_slug);
   return result.data;
 }
 
@@ -290,12 +372,12 @@ export async function submitPublicReview({
   customerName,
   rating,
   reviewText,
-  productSlug,
+  categorySlug,
 }: {
   customerName: string;
   rating: number;
   reviewText: string;
-  productSlug?: string;
+  categorySlug?: string;
 }) {
   const supabase = getSupabaseAdminClient();
 
@@ -303,13 +385,16 @@ export async function submitPublicReview({
     throw new Error("Supabase nu este configurat.");
   }
 
-  const safeProductSlug = await sanitizeReviewProductSlug(productSlug);
+  const safeCategorySlug =
+    categorySlug?.trim() && isKnownReviewCategory(categorySlug)
+      ? categorySlug.trim()
+      : null;
 
   const payload = {
     customer_name: customerName.trim(),
     rating,
     review_text: reviewText.trim(),
-    product_slug: safeProductSlug,
+    product_slug: safeCategorySlug,
     visible: false,
     featured: false,
     review_date: new Date().toISOString().slice(0, 10),
@@ -327,7 +412,7 @@ export async function submitPublicReview({
     throw new Error(result.error?.message ?? "Recenzia nu a putut fi trimisă.");
   }
 
-  revalidateReviewPaths(result.data.product_slug);
+  await revalidateReviewPaths(result.data.product_slug);
   return result.data;
 }
 
@@ -366,14 +451,14 @@ export async function deleteReview(reviewId: string) {
     throw new Error(deleted.error.message);
   }
 
-  revalidateReviewPaths(existing.data.product_slug);
+  await revalidateReviewPaths(existing.data.product_slug);
 }
 
 export async function getReviewProductChoices() {
-  const products = await getCatalogProducts();
+  const currentProducts = await getCatalogProducts();
+  const currentCategories = new Set<string>(currentProducts.map((product) => product.category));
 
-  return products.map((product) => ({
-    slug: product.slug,
-    name: product.name,
-  }));
+  return getReviewCategoryChoicesBase().filter(
+    (option) => option.slug === "custom" || currentCategories.has(option.slug),
+  );
 }

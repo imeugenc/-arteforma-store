@@ -586,6 +586,34 @@ export async function uploadProductMedia(values: {
   );
 }
 
+export async function uploadProductMediaBatch(values: {
+  productId: string;
+  files: File[];
+  altText?: string;
+  sortOrder?: number;
+  kind?: string;
+}) {
+  const validFiles = values.files.filter((file) => file.size > 0);
+
+  if (!validFiles.length) {
+    throw new Error("Alege cel puțin o imagine înainte să trimiți formularul.");
+  }
+
+  for (const [index, file] of validFiles.entries()) {
+    await uploadProductMedia({
+      productId: values.productId,
+      file,
+      altText: values.altText?.trim()
+        ? validFiles.length === 1
+          ? values.altText.trim()
+          : `${values.altText.trim()} - ${index + 1}`
+        : undefined,
+      sortOrder: (values.sortOrder ?? 0) + index,
+      kind: values.kind,
+    });
+  }
+}
+
 export async function updateProductMedia(values: {
   mediaId: string;
   altText?: string;
