@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAdminProducts } from "@/lib/admin-catalog";
+import { getCatalogProducts } from "@/lib/admin-catalog";
 import { getVisibleStoreReviews } from "@/lib/reviews";
 import { buildMetadata } from "@/lib/seo";
 import { SectionHeading } from "@/components/ui/section-heading";
@@ -18,7 +18,7 @@ export default async function ReviewsPage({
   searchParams: Promise<{ submitted?: string; error?: string }>;
 }) {
   const { submitted, error } = await searchParams;
-  const [reviews, products] = await Promise.all([getVisibleStoreReviews(), getAdminProducts()]);
+  const [reviews, products] = await Promise.all([getVisibleStoreReviews(), getCatalogProducts()]);
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
@@ -105,7 +105,7 @@ export default async function ReviewsPage({
                 </span>
                 <select name="productSlug" defaultValue="" className="input-field">
                   <option value="">General / magazin</option>
-                  {(products ?? []).map((product) => (
+                  {products.map((product) => (
                     <option key={product.slug} value={product.slug}>
                       {product.name}
                     </option>

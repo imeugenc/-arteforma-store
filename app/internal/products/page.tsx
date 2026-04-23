@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { DeleteProductButton } from "@/components/internal/delete-product-button";
 import { buildInternalMetadata, requireInternalAccess } from "@/lib/internal";
 import {
   canUseAdminCatalog,
@@ -55,11 +56,12 @@ export default async function InternalProductsPage({
   searchParams: Promise<{
     token?: string;
     saved?: string;
+    deleted?: string;
     imported?: string;
     error?: string;
   }>;
 }) {
-  const { token, saved, imported, error } = await searchParams;
+  const { token, saved, deleted, imported, error } = await searchParams;
   await requireInternalAccess(token, "/internal/products");
 
   const adminAvailable = canUseAdminCatalog();
@@ -99,6 +101,7 @@ export default async function InternalProductsPage({
         </div>
 
         {saved ? <p className="mt-4 text-sm text-[#f2dfaf]">Produs salvat.</p> : null}
+        {deleted ? <p className="mt-4 text-sm text-[#f2dfaf]">Produs șters.</p> : null}
         {typeof imported !== "undefined" ? (
           <p className="mt-4 text-sm text-[#f2dfaf]">Import finalizat. Produse adăugate: {imported}.</p>
         ) : null}
@@ -203,6 +206,7 @@ function ProductAdminCard({ product }: { product: ProductAdminRecord }) {
 
         <div className="space-y-6">
           <ProductEditor defaults={getProductFormDefaults(product)} />
+          <ProductDeleteSection productId={product.id} productName={product.name} />
           <ProductMediaSection
             productId={product.id}
             productName={product.name}
@@ -505,6 +509,36 @@ function ProductMediaSection({
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function ProductDeleteSection({
+  productId,
+  productName,
+}: {
+  productId: string;
+  productName: string;
+}) {
+  return (
+    <div className="rounded-[1.8rem] border border-red-400/18 bg-red-400/[0.05] p-5">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-red-200">Ștergere manuală</p>
+          <h3 className="mt-2 font-serif-display text-2xl text-white">Șterge produsul din catalog</h3>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-white/62">
+            Acțiunea șterge produsul „{productName}” din tabelul de produse și elimină și imaginile lui din
+            `product_media` și storage. Se face doar manual, după confirmare.
+          </p>
+        </div>
+        <form
+          action="/api/internal-products/delete"
+          method="POST"
+        >
+          <input type="hidden" name="productId" value={productId} />
+          <DeleteProductButton productName={productName} />
+        </form>
+      </div>
     </div>
   );
 }

@@ -303,14 +303,10 @@ export async function getCatalogProducts() {
     return fallbackProducts.filter((product) => product.enabled !== false);
   }
 
-  const adminCatalogProducts = adminProducts.map((record) => {
+  return adminProducts.map((record) => {
     const base = fallbackProducts.find((product) => product.slug === record.slug);
     return buildFallbackProduct(record, base);
-  });
-  const adminSlugs = new Set(adminCatalogProducts.map((product) => product.slug));
-  const staticFallbacks = fallbackProducts.filter((product) => !adminSlugs.has(product.slug));
-
-  return [...adminCatalogProducts, ...staticFallbacks].filter((product) => product.enabled !== false);
+  }).filter((product) => product.enabled !== false);
 }
 
 export async function getCatalogProductBySlug(slug: string) {
@@ -341,9 +337,7 @@ export async function getCatalogFeaturedProducts() {
   }
 
   const products = await getCatalogProducts();
-  const fallbackFeatured = products.filter((product) => product.featured && product.enabled !== false);
-
-  return (fallbackFeatured.length ? fallbackFeatured : products.filter((product) => product.enabled !== false)).slice(0, 6);
+  return products.filter((product) => product.featured && product.enabled !== false).slice(0, 6);
 }
 
 function toSeoTitle(name: string) {
@@ -695,6 +689,59 @@ export async function deleteProductMedia(mediaId: string) {
   if (!product.error && product.data) {
     await revalidateCatalogPaths(product.data.slug, product.data.category as ProductCategory);
   }
+}
+
+export async function deleteAdminProduct(productId: string) {
+  const supabase = await ensureMediaBucket();
+
+  const productResult = await supabase
+    .from("products")
+    .select("id, slug, category")
+    .eq("id", productId)
+    .single();
+
+  if (productResult.error || !productResult.data) {
+    throw new Error(productResult.error?.message ?? "Produsul nu a fost găsit.");
+  }
+
+  const mediaResult = await supabase
+    .from("product_media")
+    .select("id, storage_path")
+    .eq("product_id", productId);
+
+  if (mediaResult.error) {
+    throw new Error(mediaResult.error.message);
+  }
+
+  const mediaRows = (mediaResult.data ?? []) as Array<{ id: string; storage_path: string }>;
+  const storagePaths = mediaRows.map((item) => item.storage_path).filter(Boolean);
+
+  if (storagePaths.length) {
+    const storageDelete = await supabase.storage.from(env.SUPABASE_PRODUCT_MEDIA_BUCKET).remove(storagePaths);
+
+    if (storageDelete.error) {
+      throw new Error(storageDelete.error.message);
+    }
+  }
+
+  if (mediaRows.length) {
+    const deleteMedia = await supabase.from("product_media").delete().eq("product_id", productId);
+
+    if (deleteMedia.error) {
+      throw new Error(deleteMedia.error.message);
+    }
+  }
+
+  const deleteProduct = await supabase.from("products").delete().eq("id", productId);
+
+  if (deleteProduct.error) {
+    throw new Error(deleteProduct.error.message);
+  }
+
+  await revalidateCatalogPaths(
+    productResult.data.slug,
+    productResult.data.category as ProductCategory,
+  );
 }
 
 export function canUseAdminCatalog() {

@@ -2,12 +2,41 @@ import type { Metadata } from "next";
 import { AccountShell } from "@/components/account/account-shell";
 import { StatusTimeline } from "@/components/orders/status-timeline";
 import { getCustomerOrderStatus, getOrderDisplayReference, translateOrderStatus } from "@/lib/orders";
+import { siteConfig } from "@/lib/site";
 import { formatPrice } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Status comandă în cont | ArteForma",
-  description: "Urmărește statusul unei comenzi ArteForma după referința publică și email.",
+  metadataBase: new URL(siteConfig.url),
+  title: "Status comandă | ArteForma",
+  description: "Verifică statusul unei comenzi ArteForma folosind referința publică și emailul folosit la checkout.",
+  alternates: {
+    canonical: `${siteConfig.url}/account/status`,
+  },
   robots: { index: false, follow: false },
+  openGraph: {
+    title: "Status comandă | ArteForma",
+    description:
+      "Pagină privată pentru verificarea statusului unei comenzi ArteForma pe baza referinței publice și a emailului.",
+    url: `${siteConfig.url}/account/status`,
+    siteName: siteConfig.name,
+    locale: siteConfig.locale,
+    type: "website",
+    images: [
+      {
+        url: siteConfig.defaultOgImage,
+        width: 1200,
+        height: 1200,
+        alt: "ArteForma",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Status comandă | ArteForma",
+    description:
+      "Pagină privată pentru verificarea statusului unei comenzi ArteForma pe baza referinței publice și a emailului.",
+    images: [siteConfig.defaultOgImage],
+  },
 };
 
 export default async function AccountStatusPage({
