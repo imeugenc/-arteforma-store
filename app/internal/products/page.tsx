@@ -30,6 +30,16 @@ const mediaKindOptions = [
   { value: "lifestyle", label: "Context / ambient" },
 ];
 
+const colorOptions = [
+  "Maro Nuc Satinat",
+  "Alb Satinat",
+  "Auriu Silk Signature",
+  "Negru Grafit",
+  "Gri Urban",
+  "Roșu Neon Flux",
+  "Transparent Cristal",
+];
+
 export default async function InternalProductsPage({
   searchParams,
 }: {
@@ -180,6 +190,11 @@ function ProductEditor({
 }: {
   defaults: ReturnType<typeof getProductFormDefaults>;
 }) {
+  const selectedColors = defaults.colors
+    .split(/\r?\n/)
+    .map((value) => value.trim())
+    .filter(Boolean);
+
   return (
     <form action="/api/internal-products" method="POST" className="grid gap-4">
       <input type="hidden" name="productId" value={defaults.productId} />
@@ -187,8 +202,8 @@ function ProductEditor({
         <Field label="Nume">
           <input type="text" name="name" defaultValue={defaults.name} required className="input-field" />
         </Field>
-        <Field label="Slug">
-          <input type="text" name="slug" defaultValue={defaults.slug} required className="input-field" />
+        <Field label="Slug" hint="Poți lăsa gol la produs nou. Se generează automat din nume.">
+          <input type="text" name="slug" defaultValue={defaults.slug} className="input-field" />
         </Field>
       </div>
 
@@ -241,8 +256,19 @@ function ProductEditor({
         <Field label="Dimensiuni" hint="Un rând per opțiune. Exemplu: 20 cm standard">
           <textarea name="sizes" defaultValue={defaults.sizes} rows={5} className="textarea-field" />
         </Field>
-        <Field label="Culori" hint="Un rând per opțiune. Exemplu: Negru Grafit">
-          <textarea name="colors" defaultValue={defaults.colors} rows={5} className="textarea-field" />
+        <Field label="Culori disponibile" hint="Selectezi culorile vizibile în produs din lista predefinită.">
+          <select
+            name="colors"
+            multiple
+            defaultValue={selectedColors}
+            className="input-field min-h-[180px] py-3"
+          >
+            {colorOptions.map((color) => (
+              <option key={color} value={color}>
+                {color}
+              </option>
+            ))}
+          </select>
         </Field>
       </div>
 

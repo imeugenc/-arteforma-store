@@ -15,7 +15,7 @@ const categorySchema = z.enum([
 const schema = z.object({
   productId: z.string().uuid().optional(),
   name: z.string().min(3, "Numele produsului este obligatoriu."),
-  slug: z.string().min(3, "Slug-ul este obligatoriu."),
+  slug: z.string().optional(),
   category: categorySchema,
   shortDescription: z.string().min(12, "Descrierea scurtă este prea scurtă."),
   longDescription: z.string().min(24, "Descrierea lungă este prea scurtă."),
@@ -24,7 +24,7 @@ const schema = z.object({
   featured: z.boolean(),
   enabled: z.boolean(),
   sizes: z.string().optional(),
-  colors: z.string().optional(),
+  colors: z.union([z.string(), z.array(z.string())]).optional(),
   materials: z.string().optional(),
   customization: z.string().optional(),
   idealFor: z.string().optional(),
@@ -40,6 +40,11 @@ export async function POST(request: Request) {
 
   try {
     const formData = await request.formData();
+    const colorValues = formData
+      .getAll("colors")
+      .map((value) => value.toString().trim())
+      .filter(Boolean);
+
     const parsed = schema.parse({
       productId: formData.get("productId") || undefined,
       name: formData.get("name"),
@@ -52,7 +57,7 @@ export async function POST(request: Request) {
       featured: formData.get("featured") === "on",
       enabled: formData.get("enabled") === "on",
       sizes: formData.get("sizes")?.toString(),
-      colors: formData.get("colors")?.toString(),
+      colors: colorValues.length > 1 ? colorValues : colorValues[0] || "",
       materials: formData.get("materials")?.toString(),
       customization: formData.get("customization")?.toString(),
       idealFor: formData.get("idealFor")?.toString(),
@@ -61,7 +66,7 @@ export async function POST(request: Request) {
     const saved = await saveAdminProduct({
       productId: parsed.productId,
       name: parsed.name,
-      slug: parsed.slug,
+      slug: parsed.slug ?? "",
       category: parsed.category,
       shortDescription: parsed.shortDescription,
       longDescription: parsed.longDescription,
@@ -70,7 +75,7 @@ export async function POST(request: Request) {
       featured: parsed.featured,
       enabled: parsed.enabled,
       sizes: parseListInput(parsed.sizes ?? ""),
-      colors: parseListInput(parsed.colors ?? ""),
+      colors: parseListInput(Array.isArray(parsed.colors) ? parsed.colors.join("\n") : parsed.colors ?? ""),
       materials: parseListInput(parsed.materials ?? ""),
       customization: parseListInput(parsed.customization ?? ""),
       idealFor: parseListInput(parsed.idealFor ?? ""),

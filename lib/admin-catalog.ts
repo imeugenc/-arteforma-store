@@ -332,8 +332,26 @@ export async function getCatalogProductsByCategory(category: ProductCategory) {
 }
 
 export async function getCatalogFeaturedProducts() {
+  const adminProducts = await getAdminProducts();
+
+  if (adminProducts?.length) {
+    const adminFeatured = adminProducts
+      .filter((product) => product.featured && product.enabled !== false)
+      .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+      .map((record) => {
+        const base = fallbackProducts.find((product) => product.slug === record.slug);
+        return buildFallbackProduct(record, base);
+      });
+
+    if (adminFeatured.length) {
+      return adminFeatured.slice(0, 6);
+    }
+  }
+
   const products = await getCatalogProducts();
-  return products.filter((product) => product.featured && product.enabled !== false).slice(0, 6);
+  const fallbackFeatured = products.filter((product) => product.featured && product.enabled !== false);
+
+  return (fallbackFeatured.length ? fallbackFeatured : products.filter((product) => product.enabled !== false)).slice(0, 6);
 }
 
 function toSeoTitle(name: string) {
@@ -357,8 +375,14 @@ export async function saveAdminProduct(values: ProductFormValues) {
     throw new Error("Supabase nu este configurat.");
   }
 
+  const slug = await resolveProductSlug({
+    productId: values.productId,
+    requestedSlug: values.slug,
+    name: values.name,
+  });
+
   const payload = {
-    slug: slugify(values.slug || values.name),
+    slug,
     name: values.name.trim(),
     category: values.category,
     short_description: values.shortDescription.trim(),
@@ -394,6 +418,54 @@ export async function saveAdminProduct(values: ProductFormValues) {
 
   await revalidateCatalogPaths(result.data.slug, result.data.category as ProductCategory);
   return result.data;
+}
+
+async function resolveProductSlug({
+  productId,
+  requestedSlug,
+  name,
+}: {
+  productId?: string;
+  requestedSlug?: string;
+  name: string;
+}) {
+  const supabase = getSupabaseAdminClient();
+
+  if (!supabase) {
+    throw new Error("Supabase nu este configurat.");
+  }
+
+  const base = slugify(requestedSlug || name) || "produs";
+  const existingResult = await supabase.from("products").select("id, slug");
+
+  if (existingResult.error) {
+    throw new Error(existingResult.error.message);
+  }
+
+  const rows = (existingResult.data ?? []) as Array<{ id: string; slug: string }>;
+  const staticSlugs = new Set(fallbackProducts.map((product) => product.slug));
+  const slugTakenByAnotherProduct = (candidate: string) =>
+    rows.some((row) => row.slug === candidate && row.id !== productId);
+  const currentProductOwnsSlug = (candidate: string) =>
+    Boolean(productId && rows.some((row) => row.id === productId && row.slug === candidate));
+
+  if (productId) {
+    if (slugTakenByAnotherProduct(base) || (staticSlugs.has(base) && !currentProductOwnsSlug(base))) {
+      throw new Error("Slug-ul este deja folosit de alt produs. Alege un slug diferit.");
+    }
+
+    return base;
+  }
+
+  let candidate = base;
+  let suffix = 2;
+
+  while (slugTakenByAnotherProduct(candidate) || staticSlugs.has(candidate)) {
+    candidate = `${base}-${suffix}`;
+    suffix += 1;
+  }
+
+  return candidate;
 }
 
 export async function seedCatalogProductsFromCode() {
