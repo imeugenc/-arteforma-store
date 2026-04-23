@@ -4,8 +4,9 @@ import Image from "next/image";
 import { ShieldCheck, Sparkles, Truck, WandSparkles } from "lucide-react";
 import { categories } from "@/lib/catalog";
 import { getCatalogFeaturedProducts } from "@/lib/admin-catalog";
-import { testimonials, trustPoints } from "@/lib/site";
+import { trustPoints } from "@/lib/site";
 import { buildMetadata } from "@/lib/seo";
+import { getVisibleStoreReviews } from "@/lib/reviews";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Button } from "@/components/ui/button";
 import { CategoryCard } from "@/components/catalog/category-card";
@@ -19,6 +20,7 @@ export const metadata = buildMetadata({
 
 export default async function HomePage() {
   const featured = await getCatalogFeaturedProducts();
+  const reviews = await getVisibleStoreReviews();
   const collectionHighlights = [
     {
       title: "Lămpi",
@@ -284,14 +286,16 @@ export default async function HomePage() {
           </Link>
         </div>
         <div className="mt-10 grid gap-6 lg:grid-cols-3">
-          {testimonials.map((testimonial) => (
-            <blockquote key={testimonial.name} className="surface-panel rounded-[2rem] p-6">
-              <p className="text-lg leading-8 text-white/84">„{testimonial.quote}”</p>
+          {reviews.slice(0, 3).map((review) => (
+            <blockquote key={review.id} className="surface-panel rounded-[2rem] p-6">
+              <p className="text-lg leading-8 text-white/84">„{review.review_text}”</p>
               <footer className="mt-6 space-y-1">
                 <p className="text-xs font-semibold uppercase tracking-[0.35em] text-[#d7a12a]">
-                  {testimonial.name}
+                  {review.customer_name}
                 </p>
-                <p className="text-sm text-white/45">{testimonial.role}</p>
+                <p className="text-sm text-white/45">
+                  {review.product_slug ? `Produs: ${review.product_slug}` : "Recenzie magazin"}
+                </p>
               </footer>
             </blockquote>
           ))}
