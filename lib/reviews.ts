@@ -15,6 +15,15 @@ type ReviewRow = {
   review_date: string | null;
 };
 
+function isMissingReviewsTable(message?: string) {
+  if (!message) {
+    return false;
+  }
+
+  const normalized = message.toLowerCase();
+  return normalized.includes("reviews") && (normalized.includes("schema cache") || normalized.includes("could not find the table"));
+}
+
 export type ReviewFormValues = {
   reviewId?: string;
   customerName: string;
@@ -59,6 +68,10 @@ export async function getAdminReviews() {
   const result = await supabase.from("reviews").select("*").order("created_at", { ascending: false });
 
   if (result.error) {
+    if (isMissingReviewsTable(result.error.message)) {
+      return [];
+    }
+
     throw new Error(result.error.message);
   }
 
@@ -180,6 +193,12 @@ export async function saveReview(values: ReviewFormValues) {
   const result = await query;
 
   if (result.error || !result.data) {
+    if (result.error && isMissingReviewsTable(result.error.message)) {
+      throw new Error(
+        "Tabela de recenzii nu există încă în Supabase. Rulează schema pentru reviews și reîncarcă pagina.",
+      );
+    }
+
     throw new Error(result.error?.message ?? "Recenzia nu a putut fi salvată.");
   }
 
@@ -201,12 +220,24 @@ export async function deleteReview(reviewId: string) {
     .single();
 
   if (existing.error || !existing.data) {
+    if (existing.error && isMissingReviewsTable(existing.error.message)) {
+      throw new Error(
+        "Tabela de recenzii nu există încă în Supabase. Rulează schema pentru reviews și reîncarcă pagina.",
+      );
+    }
+
     throw new Error(existing.error?.message ?? "Recenzia nu a fost găsită.");
   }
 
   const deleted = await supabase.from("reviews").delete().eq("id", reviewId);
 
   if (deleted.error) {
+    if (isMissingReviewsTable(deleted.error.message)) {
+      throw new Error(
+        "Tabela de recenzii nu există încă în Supabase. Rulează schema pentru reviews și reîncarcă pagina.",
+      );
+    }
+
     throw new Error(deleted.error.message);
   }
 

@@ -46,6 +46,11 @@ export default async function InternalReviewsPage({
         {saved ? <p className="mt-4 text-sm text-[#f2dfaf]">Recenzie salvată.</p> : null}
         {deleted ? <p className="mt-4 text-sm text-[#f2dfaf]">Recenzie ștearsă.</p> : null}
         {loadError ? <p className="mt-4 text-sm text-red-300">{loadError}</p> : null}
+        {!loadError && reviews && !reviews.length ? (
+          <p className="mt-4 text-sm text-white/58">
+            Dacă nu vezi încă recenzii aici, verifică să fie aplicată schema `reviews` în Supabase.
+          </p>
+        ) : null}
       </div>
 
       <div className="surface-panel rounded-[2rem] p-6 lg:p-7">

@@ -122,6 +122,7 @@ export function Footer() {
             <Link href="/faq">FAQ</Link>
             <Link href="/contact">Contact</Link>
             <Link href="/account/status">Status comandă</Link>
+            <Link href="/#recenzii">Recenzii</Link>
           </div>
         </div>
         <div className="space-y-4">

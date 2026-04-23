@@ -19,7 +19,6 @@ export const metadata = buildMetadata({
 
 export default async function HomePage() {
   const featured = await getCatalogFeaturedProducts();
-  const deskProducts = (await getCatalogProductsByCategory("desk-setup")).slice(0, 3);
   const autoProducts = (await getCatalogProductsByCategory("auto-moto")).slice(0, 3);
   const cryptoProducts = (await getCatalogProductsByCategory("crypto-trading")).slice(0, 2);
   const giftProducts = (await getCatalogProductsByCategory("gifts")).slice(0, 2);
@@ -189,24 +188,6 @@ export default async function HomePage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
-        <div className="mb-10 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-          <SectionHeading
-            eyebrow="Piese pentru birou"
-            title="Piese pentru birou, trading și branding fizic care se cumpără ușor."
-            description="Pentru birouri curate, rafturi bine controlate vizual și spații în care fiecare detaliu trebuie să pară intenționat."
-          />
-          <Link href="/shop">
-            <Button variant="ghost">Vezi toate piesele de birou</Button>
-          </Link>
-        </div>
-        <div className="grid gap-6 lg:grid-cols-3">
-          {deskProducts.map((product) => (
-            <ProductCard key={product.slug} product={product} />
-          ))}
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="surface-panel rounded-[2.5rem] p-7 lg:p-8">
             <div className="flex items-center justify-between gap-4">
@@ -338,7 +319,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-18 sm:px-8">
+      <section id="recenzii" className="mx-auto max-w-7xl px-5 py-18 sm:px-8">
         <SectionHeading
           eyebrow="Ce spun clienții"
           title="Contează ca produsul să confirme ce promite pagina."
