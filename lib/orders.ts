@@ -1,5 +1,7 @@
 import Stripe from "stripe";
 import { env } from "@/lib/env";
+import { sendOrderStatusEmail } from "@/lib/order-emails";
+import { siteConfig } from "@/lib/site";
 import { getSupabaseAdminClient } from "@/lib/supabase";
 import type {
   OrderItemRecord,
@@ -23,7 +25,7 @@ export const ADMIN_ORDER_STATUSES: OrderStatus[] = [
 ];
 
 export type OrderConfirmationPayload = {
-  orderId: string;
+  orderReference: string;
   customerName: string;
   customerEmail: string;
   totalAmount: number;
@@ -38,6 +40,51 @@ export type OrderConfirmationPayload = {
     variantSummary?: string | null;
   }>;
 };
+
+const PUBLIC_ORDER_PREFIX = "AF";
+const PUBLIC_ORDER_START = 1049;
+
+function buildPublicOrderRef(value: number) {
+  return `${PUBLIC_ORDER_PREFIX}-${value}`;
+}
+
+function parsePublicOrderRef(value?: string | null) {
+  if (!value) {
+    return null;
+  }
+
+  const match = value.trim().toUpperCase().match(/^AF-(\d+)$/);
+  return match ? Number(match[1]) : null;
+}
+
+function isPublicOrderRefSchemaMissing(message?: string) {
+  if (!message) {
+    return false;
+  }
+
+  return message.includes("public_order_ref") && (message.includes("column") || message.includes("schema cache"));
+}
+
+export function getOrderDisplayReference(order: Pick<OrderRecord, "id" | "public_order_ref">) {
+  return order.public_order_ref ?? `AF-${order.id.slice(0, 8).toUpperCase()}`;
+}
+
+export function translateOrderStatus(status: string) {
+  switch (status) {
+    case "paid":
+      return "Plătită";
+    case "in_production":
+      return "În producție";
+    case "shipped":
+      return "Expediată";
+    case "completed":
+      return "Finalizată";
+    case "cancelled":
+      return "Anulată";
+    default:
+      return status;
+  }
+}
 
 export async function persistStripeOrder({
   session,
@@ -58,14 +105,15 @@ export async function persistStripeOrder({
     .maybeSingle<OrderRecord>();
 
   if (existing.data) {
+    const existingOrder = await ensurePublicOrderRefForOrder(supabase, existing.data);
     const existingItems = await supabase
       .from(env.SUPABASE_ORDER_ITEMS_TABLE)
       .select("*")
-      .eq("order_id", existing.data.id)
+      .eq("order_id", existingOrder.id)
       .returns<OrderItemRecord[]>();
 
     return {
-      order: existing.data,
+      order: existingOrder,
       items: existingItems.data ?? [],
       isNew: false,
     };
@@ -160,8 +208,10 @@ export async function persistStripeOrder({
     note: "Comandă confirmată automat după checkout.session.completed.",
   });
 
+  const orderWithPublicRef = await ensurePublicOrderRefForOrder(supabase, orderInsert.data);
+
   const confirmationPayload = buildOrderConfirmationPayload({
-    order: orderInsert.data,
+    order: orderWithPublicRef,
     items: orderItems,
   });
 
@@ -170,10 +220,123 @@ export async function persistStripeOrder({
   void confirmationPayload;
 
   return {
-    order: orderInsert.data,
+    order: orderWithPublicRef,
     items: orderItems,
     isNew: true,
   };
+}
+
+async function ensurePublicOrderRefForOrder(
+  supabase: NonNullable<ReturnType<typeof getSupabaseAdminClient>>,
+  order: OrderRecord,
+) {
+  if (order.public_order_ref) {
+    return order;
+  }
+
+  const publicOrderRef = await claimNextPublicOrderRef(supabase, order.id);
+
+  if (!publicOrderRef) {
+    return order;
+  }
+
+  return {
+    ...order,
+    public_order_ref: publicOrderRef,
+  };
+}
+
+async function ensurePublicOrderRefs(
+  supabase: NonNullable<ReturnType<typeof getSupabaseAdminClient>>,
+  orders: OrderRecord[],
+) {
+  const normalized: OrderRecord[] = [];
+
+  for (const order of orders) {
+    normalized.push(await ensurePublicOrderRefForOrder(supabase, order));
+  }
+
+  return normalized;
+}
+
+async function claimNextPublicOrderRef(
+  supabase: NonNullable<ReturnType<typeof getSupabaseAdminClient>>,
+  orderId: string,
+) {
+  const currentResult = await supabase
+    .from(env.SUPABASE_ORDERS_TABLE)
+    .select("public_order_ref")
+    .eq("id", orderId)
+    .maybeSingle<{ public_order_ref?: string | null }>();
+
+  if (currentResult.error) {
+    if (isPublicOrderRefSchemaMissing(currentResult.error.message)) {
+      return null;
+    }
+
+    throw currentResult.error;
+  }
+
+  if (currentResult.data?.public_order_ref) {
+    return currentResult.data.public_order_ref;
+  }
+
+  const refsResult = await supabase
+    .from(env.SUPABASE_ORDERS_TABLE)
+    .select("public_order_ref")
+    .not("public_order_ref", "is", null)
+    .returns<Array<{ public_order_ref?: string | null }>>();
+
+  if (refsResult.error) {
+    if (isPublicOrderRefSchemaMissing(refsResult.error.message)) {
+      return null;
+    }
+
+    throw refsResult.error;
+  }
+
+  const nextBase =
+    Math.max(
+      PUBLIC_ORDER_START - 1,
+      ...(refsResult.data ?? [])
+        .map((row) => parsePublicOrderRef(row.public_order_ref))
+        .filter((value): value is number => typeof value === "number"),
+    ) + 1;
+
+  for (let offset = 0; offset < 8; offset += 1) {
+    const candidate = buildPublicOrderRef(nextBase + offset);
+    const updateResult = await supabase
+      .from(env.SUPABASE_ORDERS_TABLE)
+      .update({ public_order_ref: candidate })
+      .eq("id", orderId)
+      .is("public_order_ref", null)
+      .select("public_order_ref")
+      .maybeSingle<{ public_order_ref?: string | null }>();
+
+    if (!updateResult.error && updateResult.data?.public_order_ref) {
+      return updateResult.data.public_order_ref;
+    }
+
+    if (updateResult.error && !isPublicOrderRefSchemaMissing(updateResult.error.message)) {
+      const lower = updateResult.error.message.toLowerCase();
+
+      if (!lower.includes("duplicate")) {
+        throw updateResult.error;
+      }
+    }
+
+    const refreshed = await supabase
+      .from(env.SUPABASE_ORDERS_TABLE)
+      .select("public_order_ref")
+      .eq("id", orderId)
+      .maybeSingle<{ public_order_ref?: string | null }>();
+
+    if (refreshed.data?.public_order_ref) {
+      return refreshed.data.public_order_ref;
+    }
+  }
+
+  throw new Error("Nu am putut genera o referință publică pentru comandă.");
 }
 
 async function insertOrderRecord(
@@ -253,14 +416,16 @@ export async function getOrderBySessionId(sessionId: string) {
     return null;
   }
 
+  const normalizedOrder = await ensurePublicOrderRefForOrder(supabase, orderResult.data);
+
   const itemsResult = await supabase
     .from(env.SUPABASE_ORDER_ITEMS_TABLE)
     .select("*")
-    .eq("order_id", orderResult.data.id)
+    .eq("order_id", normalizedOrder.id)
     .returns<OrderItemRecord[]>();
 
   return {
-    order: orderResult.data,
+    order: normalizedOrder,
     items: itemsResult.data ?? [],
   };
 }
@@ -284,6 +449,7 @@ export async function getCheckoutSessionSnapshot(sessionId: string) {
   return {
     order: {
       id: session.id,
+      public_order_ref: null,
       customer_name: session.customer_details?.name ?? "Client",
       customer_email: session.customer_details?.email ?? "",
       total_amount: (session.amount_total ?? 0) / 100,
@@ -318,7 +484,8 @@ export async function getRecentOrders(limit = 20) {
     throw ordersResult.error;
   }
 
-  const orderIds = (ordersResult.data ?? []).map((order) => order.id);
+  const normalizedOrders = await ensurePublicOrderRefs(supabase, ordersResult.data ?? []);
+  const orderIds = normalizedOrders.map((order) => order.id);
 
   const itemsResult = orderIds.length
     ? await supabase
@@ -333,7 +500,7 @@ export async function getRecentOrders(limit = 20) {
   }
 
   return {
-    orders: ordersResult.data ?? [],
+    orders: normalizedOrders,
     items: itemsResult.data ?? [],
   };
 }
@@ -372,7 +539,8 @@ export async function getRecentOrdersFiltered({
     throw ordersResult.error;
   }
 
-  const orderIds = (ordersResult.data ?? []).map((order) => order.id);
+  const normalizedOrders = await ensurePublicOrderRefs(supabase, ordersResult.data ?? []);
+  const orderIds = normalizedOrders.map((order) => order.id);
   const itemsResult = orderIds.length
     ? await supabase
         .from(env.SUPABASE_ORDER_ITEMS_TABLE)
@@ -399,7 +567,7 @@ export async function getRecentOrdersFiltered({
   }
 
   return {
-    orders: ordersResult.data ?? [],
+    orders: normalizedOrders,
     items: itemsResult.data ?? [],
     events: eventsResult.data ?? [],
   };
@@ -430,13 +598,27 @@ export async function updateOrderStatus({
     throw updateResult.error;
   }
 
+  const updatedOrder = await ensurePublicOrderRefForOrder(supabase, updateResult.data);
+
   await insertOrderStatusEvent(supabase, {
     order_id: orderId,
     status,
     note: note?.trim() || `Status actualizat la ${status}.`,
   });
 
-  return updateResult.data;
+  const statusLookupUrl = `${siteConfig.url}/account/status?identifier=${encodeURIComponent(
+    getOrderDisplayReference(updatedOrder),
+  )}&email=${encodeURIComponent(updatedOrder.customer_email)}`;
+
+  await sendOrderStatusEmail({
+    customerEmail: updatedOrder.customer_email,
+    customerName: updatedOrder.customer_name,
+    orderReference: getOrderDisplayReference(updatedOrder),
+    status,
+    statusLookupUrl,
+  });
+
+  return updatedOrder;
 }
 
 export async function getCustomerOrderStatus({
@@ -459,28 +641,43 @@ export async function getCustomerOrderStatus({
   }
 
   const candidates: OrderRecord[] = [];
+  const normalizedPublicRef = normalizedIdentifier.toUpperCase();
 
-  const byId = await supabase
+  const byPublicRef = await supabase
     .from(env.SUPABASE_ORDERS_TABLE)
     .select("*")
-    .eq("id", normalizedIdentifier)
+    .eq("public_order_ref", normalizedPublicRef)
     .returns<OrderRecord[]>();
 
-  if (!byId.error && byId.data?.length) {
-    candidates.push(...byId.data);
+  if (!byPublicRef.error && byPublicRef.data?.length) {
+    candidates.push(...byPublicRef.data);
   }
 
-  const bySession = await supabase
-    .from(env.SUPABASE_ORDERS_TABLE)
-    .select("*")
-    .eq("stripe_session_id", normalizedIdentifier)
-    .returns<OrderRecord[]>();
+  if (!candidates.length) {
+    const byId = await supabase
+      .from(env.SUPABASE_ORDERS_TABLE)
+      .select("*")
+      .eq("id", normalizedIdentifier)
+      .returns<OrderRecord[]>();
 
-  if (!bySession.error && bySession.data?.length) {
-    candidates.push(...bySession.data);
+    if (!byId.error && byId.data?.length) {
+      candidates.push(...byId.data);
+    }
   }
 
-  const order = candidates.find((candidate) => {
+  if (!candidates.length) {
+    const bySession = await supabase
+      .from(env.SUPABASE_ORDERS_TABLE)
+      .select("*")
+      .eq("stripe_session_id", normalizedIdentifier)
+      .returns<OrderRecord[]>();
+
+    if (!bySession.error && bySession.data?.length) {
+      candidates.push(...bySession.data);
+    }
+  }
+
+  const matchedOrder = candidates.find((candidate) => {
     const emailCandidates = [candidate.customer_email, candidate.email]
       .filter(Boolean)
       .map((value) => String(value).toLowerCase());
@@ -488,9 +685,11 @@ export async function getCustomerOrderStatus({
     return emailCandidates.includes(normalizedEmail);
   });
 
-  if (!order) {
+  if (!matchedOrder) {
     return null;
   }
+
+  const order = await ensurePublicOrderRefForOrder(supabase, matchedOrder);
 
   const itemsResult = await supabase
     .from(env.SUPABASE_ORDER_ITEMS_TABLE)
@@ -529,7 +728,7 @@ export function buildOrderConfirmationPayload({
   items: OrderItemRecord[];
 }): OrderConfirmationPayload {
   return {
-    orderId: order.id,
+    orderReference: getOrderDisplayReference(order),
     customerName: order.customer_name,
     customerEmail: order.customer_email,
     totalAmount: order.total_amount,

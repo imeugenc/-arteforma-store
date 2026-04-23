@@ -3,7 +3,12 @@ import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { SuccessEffects } from "@/components/checkout/success-effects";
 import { StatusTimeline } from "@/components/orders/status-timeline";
-import { getCheckoutSessionSnapshot, getOrderBySessionId } from "@/lib/orders";
+import {
+  getCheckoutSessionSnapshot,
+  getOrderBySessionId,
+  getOrderDisplayReference,
+  translateOrderStatus,
+} from "@/lib/orders";
 import { formatPrice } from "@/lib/utils";
 import { siteConfig } from "@/lib/site";
 import { buildMetadata } from "@/lib/seo";
@@ -65,7 +70,10 @@ export default async function SuccessPage({
             <div className="surface-panel rounded-[2rem] p-6">
               <h2 className="font-serif-display text-2xl text-white">Rezumat comandă</h2>
               <div className="mt-5 space-y-3 text-sm text-white/68">
-                <Row label="ID comandă" value={orderBundle.order.id.slice(0, 8).toUpperCase()} />
+                <Row
+                  label="Referință comandă"
+                  value={getOrderDisplayReference(orderBundle.order)}
+                />
                 <Row label="Client" value={orderBundle.order.customer_name} />
                 <Row label="Email" value={orderBundle.order.customer_email} />
                 <Row label="Total" value={formatPrice(orderBundle.order.total_amount)} />
@@ -79,6 +87,11 @@ export default async function SuccessPage({
                 <li>{freeShippingApplied ? "Livrare gratuită activă pentru această comandă." : "Livrare în toată România."}</li>
                 {hasGiftPackaging ? <li>Ambalarea premium a fost inclusă în comandă.</li> : null}
                 {hasPersonalization ? <li>Opțiunea de personalizare a fost inclusă în detaliile comenzii.</li> : null}
+                {orderBundle.order.customer_email ? (
+                  <li>
+                    Poți verifica oricând statusul folosind referința {getOrderDisplayReference(orderBundle.order)} și emailul folosit la checkout.
+                  </li>
+                ) : null}
                 <li>
                   Dacă vrei să adaugi un detaliu important comenzii, scrie-ne la {siteConfig.email}.
                 </li>
@@ -111,7 +124,7 @@ export default async function SuccessPage({
                 Etapele următoare sunt deja pregătite în fluxul nostru
               </h2>
               <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-white/62">
-                Următorul pas este să legăm aceste actualizări și de zona de cont client. Până atunci, poți cere actualizări direct pe email.
+                Poți verifica statusul comenzii oricând din pagina dedicată, folosind referința publică și emailul comenzii.
               </p>
             </div>
             <StatusTimeline activeStep="paid" compact />
@@ -119,6 +132,17 @@ export default async function SuccessPage({
         ) : null}
 
         <div className="mt-8 flex justify-center gap-4">
+          <Link
+            href={
+              orderBundle?.order.customer_email
+                ? `/account/status?identifier=${encodeURIComponent(
+                    getOrderDisplayReference(orderBundle.order),
+                  )}&email=${encodeURIComponent(orderBundle.order.customer_email)}`
+                : "/account/status"
+            }
+          >
+            <Button variant="secondary">Verifică statusul</Button>
+          </Link>
           <Link href="/shop">
             <Button>Înapoi în magazin</Button>
           </Link>
@@ -129,23 +153,6 @@ export default async function SuccessPage({
       </div>
     </div>
   );
-}
-
-function translateOrderStatus(status: string) {
-  switch (status) {
-    case "paid":
-      return "Plătită";
-    case "in_production":
-      return "În producție";
-    case "shipped":
-      return "Expediată";
-    case "completed":
-      return "Finalizată";
-    case "cancelled":
-      return "Anulată";
-    default:
-      return status;
-  }
 }
 
 function Row({ label, value }: { label: string; value: string }) {

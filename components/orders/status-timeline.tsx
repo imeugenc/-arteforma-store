@@ -1,4 +1,5 @@
 import { orderStatusSteps } from "@/lib/order-status";
+import { translateOrderStatus } from "@/lib/orders";
 import type { OrderStatusEventRecord } from "@/lib/types";
 
 export function StatusTimeline({
@@ -54,7 +55,7 @@ export function StatusTimeline({
                 className="flex flex-col gap-1 rounded-[1.2rem] border border-white/6 bg-white/[0.02] px-4 py-3 text-sm text-white/68"
               >
                 <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                  <p className="font-medium text-white">{event.status}</p>
+                  <p className="font-medium text-white">{translateOrderStatus(event.status)}</p>
                   <p className="text-white/40">
                     {new Date(event.created_at).toLocaleString("ro-RO")}
                   </p>

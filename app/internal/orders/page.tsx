@@ -1,5 +1,10 @@
 import { buildInternalMetadata, requireInternalAccess } from "@/lib/internal";
-import { ADMIN_ORDER_STATUSES, getRecentOrdersFiltered } from "@/lib/orders";
+import {
+  ADMIN_ORDER_STATUSES,
+  getOrderDisplayReference,
+  getRecentOrdersFiltered,
+  translateOrderStatus,
+} from "@/lib/orders";
 import { formatPrice } from "@/lib/utils";
 
 export const metadata = buildInternalMetadata(
@@ -93,7 +98,7 @@ export default async function InternalOrdersPage({
                 <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
                   <div className="space-y-5">
                     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                      <Info label="ID comandă" value={order.id} />
+                      <Info label="Referință comandă" value={getOrderDisplayReference(order)} />
                       <Info
                         label="Creată la"
                         value={new Date(order.created_at).toLocaleString("ro-RO")}
@@ -101,7 +106,7 @@ export default async function InternalOrdersPage({
                       <Info label="Email client" value={order.customer_email} />
                       <Info label="Total" value={formatPrice(order.total_amount)} />
                       <Info label="Monedă" value={order.currency} />
-                      <Info label="Status" value={order.status} />
+                      <Info label="Status" value={translateOrderStatus(order.status)} />
                       <Info label="Payment status" value={order.payment_status ?? "—"} />
                       <Info label="Stripe session" value={order.stripe_session_id ?? "—"} />
                     </div>
@@ -179,7 +184,7 @@ export default async function InternalOrdersPage({
                               className="rounded-[1.2rem] border border-white/6 bg-white/[0.02] px-4 py-3 text-sm text-white/68"
                             >
                               <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                                <p className="font-medium text-white">{event.status}</p>
+                                <p className="font-medium text-white">{translateOrderStatus(event.status)}</p>
                                 <p className="text-white/40">
                                   {new Date(event.created_at).toLocaleString("ro-RO")}
                                 </p>

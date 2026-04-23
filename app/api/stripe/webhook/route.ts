@@ -1,7 +1,7 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { env } from "@/lib/env";
-import { persistStripeOrder } from "@/lib/orders";
+import { getOrderDisplayReference, persistStripeOrder } from "@/lib/orders";
 import { sendPaidOrderEmails } from "@/lib/order-emails";
 
 export const runtime = "nodejs";
@@ -83,7 +83,7 @@ export async function POST(request: Request) {
 
       if (persisted?.isNew) {
         await sendPaidOrderEmails({
-          orderId: persisted.order.id,
+          orderReference: getOrderDisplayReference(persisted.order),
           customerName: persisted.order.customer_name,
           customerEmail: persisted.order.customer_email,
           totalAmount: persisted.order.total_amount,

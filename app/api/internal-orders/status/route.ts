@@ -28,13 +28,16 @@ export async function POST(request: Request) {
 
     await updateOrderStatus(parsed);
 
-    return NextResponse.redirect(new URL("/internal/orders?updated=1", request.url));
+    return NextResponse.redirect(new URL("/internal/orders?updated=1", request.url), {
+      status: 303,
+    });
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Statusul nu a putut fi actualizat.";
 
     return NextResponse.redirect(
       new URL(`/internal/orders?error=${encodeURIComponent(message)}`, request.url),
+      { status: 303 },
     );
   }
 }

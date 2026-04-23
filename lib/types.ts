@@ -105,6 +105,7 @@ export type OrderStatus =
 export type OrderRecord = {
   id: string;
   created_at: string;
+  public_order_ref?: string | null;
   email?: string | null;
   total?: number | null;
   customer_name: string;

@@ -3,6 +3,7 @@ create extension if not exists pgcrypto;
 create table if not exists orders (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
+  public_order_ref text unique,
   stripe_session_id text not null unique,
   stripe_payment_intent_id text,
   email text,
@@ -92,3 +93,6 @@ create index if not exists idx_products_featured on products(featured);
 create index if not exists idx_products_enabled on products(enabled);
 create index if not exists idx_product_media_product on product_media(product_id);
 create index if not exists idx_order_status_events_order on order_status_events(order_id);
+create unique index if not exists idx_orders_public_order_ref
+  on orders(public_order_ref)
+  where public_order_ref is not null;

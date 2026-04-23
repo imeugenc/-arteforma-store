@@ -17,7 +17,7 @@ export default function AccountOrdersPage() {
       <div className="mt-8 surface-panel rounded-[2rem] p-6">
         <h2 className="font-serif-display text-2xl text-white">Ce va conține această zonă</h2>
         <ul className="mt-4 space-y-3 text-sm leading-7 text-white/68">
-          <li>ID comandă și data plasării</li>
+          <li>Referință comandă și data plasării</li>
           <li>Produsele comandate și opțiunile selectate</li>
           <li>Statusul comenzii și actualizările relevante</li>
           <li>Datele de contact și detaliile de livrare de bază</li>
