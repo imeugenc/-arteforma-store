@@ -8,6 +8,7 @@ import {
   getGiftPackagingTotal,
   getPersonalizationTotal,
   getShipping,
+  getShippingQuote,
   getSubtotal,
   getTotal,
 } from "@/lib/checkout";
@@ -23,9 +24,10 @@ export default function CheckoutPage() {
   const subtotal = getSubtotal(items);
   const personalizationTotal = getPersonalizationTotal(items);
   const shipping = getShipping(items);
+  const shippingQuote = getShippingQuote(items);
   const giftPackagingTotal = getGiftPackagingTotal(items, giftPackaging);
   const total = getTotal(items, giftPackaging);
-  const freeShippingReached = subtotal >= siteConfig.freeShippingThreshold;
+  const freeShippingReached = shippingQuote.freeShippingReached;
 
   async function handleCheckout() {
     try {
@@ -71,7 +73,7 @@ export default function CheckoutPage() {
         </p>
         <div className="mt-5 rounded-[1.5rem] border border-[#d7a12a]/16 bg-[#d7a12a]/6 p-4 text-sm leading-7 text-white/68">
           <p>
-            Livrare gratuită pentru comenzile peste {siteConfig.freeShippingThreshold} RON.
+            Livrare gratuită peste {siteConfig.freeShippingThreshold} RON.
             {freeShippingReached ? " Pragul este activ pentru această comandă." : ""}
           </p>
         </div>
@@ -83,12 +85,20 @@ export default function CheckoutPage() {
           <Row label="Subtotal produse" value={formatPrice(subtotal)} />
           <Row label="Personalizare" value={personalizationTotal ? formatPrice(personalizationTotal) : "Nu"} />
           <Row label="Livrare" value={shipping ? formatPrice(shipping) : "Gratuit"} />
+          <Row label="Metodă livrare" value={shippingQuote.method} />
           <Row
             label="Ambalare premium"
             value={giftPackaging ? formatPrice(giftPackagingTotal) : "Nu"}
           />
           <Row label="Total" value={formatPrice(total)} strong />
         </div>
+        {shippingQuote.notes.length ? (
+          <div className="mt-6 rounded-[1.5rem] border border-[#d7a12a]/16 bg-[#d7a12a]/6 p-4 text-sm leading-7 text-white/62">
+            {shippingQuote.notes.map((note) => (
+              <p key={note}>{note}</p>
+            ))}
+          </div>
+        ) : null}
         <Button className="mt-8" disabled={!items.length || loading} onClick={handleCheckout}>
           {loading ? "Redirecționăm..." : "Plătește"}
         </Button>

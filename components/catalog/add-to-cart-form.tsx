@@ -109,6 +109,8 @@ export function AddToCartForm({ product }: { product: Product }) {
               personalizationSelected,
               personalization: personalizationSelected ? personalization : "",
               accent: product.visual.accent,
+              shippingSettings: product.shippingSettings,
+              shippingNote: product.shippingNote,
             });
             setToastOpen(true);
             void trackEvent("add_to_cart", {

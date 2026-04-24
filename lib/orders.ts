@@ -185,6 +185,8 @@ export async function persistStripeOrder({
       channel: session.metadata?.channel ?? "arteforma-web",
       customer_name: customerName,
       customer_email: customerEmail,
+      shipping_notes: session.metadata?.shipping_notes ?? "",
+      special_shipping: session.metadata?.special_shipping === "true",
     },
   };
 

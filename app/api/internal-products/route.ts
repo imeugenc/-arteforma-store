@@ -28,6 +28,11 @@ const schema = z.object({
   materials: z.union([z.string(), z.array(z.string())]).optional(),
   customization: z.string().optional(),
   idealFor: z.string().optional(),
+  standardShippingEnabled: z.boolean(),
+  freeShippingEligible: z.boolean(),
+  pickupOnly: z.boolean(),
+  oversizedOrSpecialShipping: z.boolean(),
+  shippingNote: z.string().optional(),
 });
 
 export async function POST(request: Request) {
@@ -65,6 +70,11 @@ export async function POST(request: Request) {
       materials: materialValues.length > 1 ? materialValues : materialValues[0] || "",
       customization: formData.get("customization")?.toString(),
       idealFor: formData.get("idealFor")?.toString(),
+      standardShippingEnabled: formData.get("standardShippingEnabled") === "on",
+      freeShippingEligible: formData.get("freeShippingEligible") === "on",
+      pickupOnly: formData.get("pickupOnly") === "on",
+      oversizedOrSpecialShipping: formData.get("oversizedOrSpecialShipping") === "on",
+      shippingNote: formData.get("shippingNote")?.toString(),
     });
 
     const saved = await saveAdminProduct({
@@ -83,6 +93,11 @@ export async function POST(request: Request) {
       materials: parseListInput(Array.isArray(parsed.materials) ? parsed.materials.join("\n") : parsed.materials ?? ""),
       customization: parseListInput(parsed.customization ?? ""),
       idealFor: parseListInput(parsed.idealFor ?? ""),
+      standardShippingEnabled: parsed.standardShippingEnabled,
+      freeShippingEligible: parsed.freeShippingEligible,
+      pickupOnly: parsed.pickupOnly,
+      oversizedOrSpecialShipping: parsed.oversizedOrSpecialShipping,
+      shippingNote: parsed.shippingNote,
     });
 
     return NextResponse.redirect(

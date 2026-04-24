@@ -380,6 +380,56 @@ function ProductEditor({
         </Field>
       </div>
 
+      <div className="rounded-[1.5rem] border border-white/8 bg-black/20 p-5">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[#d7a12a]">
+          Livrare produs
+        </p>
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
+          <CheckboxField label="Livrare standard activă">
+            <input
+              type="checkbox"
+              name="standardShippingEnabled"
+              defaultChecked={defaults.standardShippingEnabled}
+              className="checkbox-field"
+            />
+          </CheckboxField>
+          <CheckboxField label="Eligibil pentru livrare gratuită peste prag">
+            <input
+              type="checkbox"
+              name="freeShippingEligible"
+              defaultChecked={defaults.freeShippingEligible}
+              className="checkbox-field"
+            />
+          </CheckboxField>
+          <CheckboxField label="Doar ridicare / gestionare manuală">
+            <input
+              type="checkbox"
+              name="pickupOnly"
+              defaultChecked={defaults.pickupOnly}
+              className="checkbox-field"
+            />
+          </CheckboxField>
+          <CheckboxField label="Livrare specială / produs agabaritic">
+            <input
+              type="checkbox"
+              name="oversizedOrSpecialShipping"
+              defaultChecked={defaults.oversizedOrSpecialShipping}
+              className="checkbox-field"
+            />
+          </CheckboxField>
+        </div>
+        <div className="mt-4">
+          <Field label="Notă de livrare" hint="Apare în coș și checkout pentru produse cu livrare specială.">
+            <textarea
+              name="shippingNote"
+              defaultValue={defaults.shippingNote}
+              rows={3}
+              className="textarea-field"
+            />
+          </Field>
+        </div>
+      </div>
+
       <div className="flex justify-end">
         <button
           type="submit"

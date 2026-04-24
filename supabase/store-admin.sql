@@ -65,9 +65,21 @@ create table if not exists products (
   customization jsonb not null default '[]'::jsonb,
   ideal_for jsonb not null default '[]'::jsonb,
   visual jsonb not null default '{}'::jsonb,
+  standard_shipping_enabled boolean not null default true,
+  free_shipping_eligible boolean not null default true,
+  pickup_only boolean not null default false,
+  oversized_or_special_shipping boolean not null default false,
+  shipping_note text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table products
+  add column if not exists standard_shipping_enabled boolean not null default true,
+  add column if not exists free_shipping_eligible boolean not null default true,
+  add column if not exists pickup_only boolean not null default false,
+  add column if not exists oversized_or_special_shipping boolean not null default false,
+  add column if not exists shipping_note text;
 
 create table if not exists product_media (
   id uuid primary key default gen_random_uuid(),
@@ -91,6 +103,8 @@ create table if not exists order_status_events (
 create index if not exists idx_products_category on products(category);
 create index if not exists idx_products_featured on products(featured);
 create index if not exists idx_products_enabled on products(enabled);
+create index if not exists idx_products_shipping_flags
+  on products(standard_shipping_enabled, free_shipping_eligible, pickup_only, oversized_or_special_shipping);
 create index if not exists idx_product_media_product on product_media(product_id);
 create index if not exists idx_order_status_events_order on order_status_events(order_id);
 create unique index if not exists idx_orders_public_order_ref

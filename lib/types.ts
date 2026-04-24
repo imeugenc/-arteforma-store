@@ -40,6 +40,7 @@ export type Product = {
   idealFor: ProductUseCase[];
   customization: string[];
   shippingNote: string;
+  shippingSettings?: ProductShippingSettings;
   packagingNote: string;
   seoTitle: string;
   seoDescription: string;
@@ -72,6 +73,8 @@ export type CartItem = {
   personalizationSelected?: boolean;
   personalization?: string;
   accent: string;
+  shippingSettings?: ProductShippingSettings;
+  shippingNote?: string;
 };
 
 export type CartStorage = {
@@ -136,6 +139,7 @@ export type OrderItemRecord = {
   unit_price: number;
   quantity: number;
   line_total: number;
+  metadata?: Record<string, unknown> | null;
 };
 
 export type OrderStatusEventRecord = {
@@ -177,9 +181,22 @@ export type ProductAdminRecord = {
   customization: string[];
   ideal_for: string[];
   visual?: Product["visual"];
+  standard_shipping_enabled?: boolean;
+  free_shipping_eligible?: boolean;
+  pickup_only?: boolean;
+  oversized_or_special_shipping?: boolean;
+  shipping_note?: string | null;
   created_at: string;
   updated_at: string;
   media?: ProductMediaRecord[];
+};
+
+export type ProductShippingSettings = {
+  standardShippingEnabled: boolean;
+  freeShippingEligible: boolean;
+  pickupOnly: boolean;
+  oversizedOrSpecialShipping: boolean;
+  shippingNote?: string | null;
 };
 
 export type ReviewRecord = {

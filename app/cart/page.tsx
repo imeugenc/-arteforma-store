@@ -9,6 +9,7 @@ import {
   getGiftPackagingTotal,
   getPersonalizationTotal,
   getShipping,
+  getShippingQuote,
   getSubtotal,
   getTotal,
 } from "@/lib/checkout";
@@ -19,10 +20,11 @@ export default function CartPage() {
   const subtotal = getSubtotal(items);
   const personalizationTotal = getPersonalizationTotal(items);
   const shipping = getShipping(items);
+  const shippingQuote = getShippingQuote(items);
   const giftPackagingTotal = getGiftPackagingTotal(items, giftPackaging);
   const total = getTotal(items, giftPackaging);
-  const freeShippingReached = subtotal >= siteConfig.freeShippingThreshold;
-  const remainingForFreeShipping = Math.max(siteConfig.freeShippingThreshold - subtotal, 0);
+  const freeShippingReached = shippingQuote.freeShippingReached;
+  const remainingForFreeShipping = shippingQuote.remainingForFreeShipping;
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-14">
@@ -34,8 +36,8 @@ export default function CartPage() {
           </p>
           <div className="rounded-[1.5rem] border border-[#d7a12a]/16 bg-[#d7a12a]/6 px-4 py-3 text-sm text-white/70">
             {freeShippingReached
-              ? "Livrare gratuită activă pentru această comandă."
-              : `Livrare gratuită pentru comenzile peste ${siteConfig.freeShippingThreshold} RON. Mai ai ${formatPrice(remainingForFreeShipping)} până la prag.`}
+              ? "Livrare gratuită peste 250 RON activă pentru această comandă."
+              : `Livrare gratuită peste ${siteConfig.freeShippingThreshold} RON. Mai ai ${formatPrice(remainingForFreeShipping)} până la prag.`}
           </div>
           <div className="space-y-4">
             {items.length ? (
@@ -51,6 +53,21 @@ export default function CartPage() {
                       {item.personalizationSelected ? (
                         <p className="mt-1 text-sm text-[#e7ce91]">
                           Personalizare activă: +{formatPrice(siteConfig.personalizationPrice)}
+                        </p>
+                      ) : null}
+                      {item.shippingNote || item.shippingSettings?.shippingNote ? (
+                        <p className="mt-2 text-sm leading-6 text-[#e7ce91]">
+                          {item.shippingNote ?? item.shippingSettings?.shippingNote}
+                        </p>
+                      ) : null}
+                      {item.shippingSettings?.pickupOnly ? (
+                        <p className="mt-2 text-sm leading-6 text-[#e7ce91]">
+                          Ridicare sau gestionare manuală. Confirmăm detaliile după comandă.
+                        </p>
+                      ) : null}
+                      {item.shippingSettings?.oversizedOrSpecialShipping ? (
+                        <p className="mt-2 text-sm leading-6 text-[#e7ce91]">
+                          Livrarea se confirmă manual în funcție de dimensiune și ambalare.
                         </p>
                       ) : null}
                     </div>
@@ -117,6 +134,7 @@ export default function CartPage() {
               value={personalizationTotal ? formatPrice(personalizationTotal) : "Nu"}
             />
             <SummaryRow label="Livrare" value={shipping ? formatPrice(shipping) : "Gratuit"} />
+            <SummaryRow label="Metodă livrare" value={shippingQuote.method} />
             <SummaryRow
               label="Ambalare premium"
               value={giftPackagingTotal ? formatPrice(giftPackagingTotal) : "Nu"}
@@ -126,6 +144,13 @@ export default function CartPage() {
           <p className="mt-6 text-sm leading-7 text-white/55">
             Realizat la comandă în România. Timp de producție: 2–5 zile lucrătoare.
           </p>
+          {shippingQuote.notes.length ? (
+            <div className="mt-4 rounded-[1.3rem] border border-[#d7a12a]/18 bg-[#d7a12a]/7 p-4 text-sm leading-7 text-white/62">
+              {shippingQuote.notes.map((note) => (
+                <p key={note}>{note}</p>
+              ))}
+            </div>
+          ) : null}
           <p className="mt-2 text-sm leading-7 text-white/45">
             Pentru piese dintr-o singură bucată, dimensiunea maximă este {siteConfig.maxPrintVolume}.
           </p>

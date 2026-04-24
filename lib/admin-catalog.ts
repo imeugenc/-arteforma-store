@@ -25,6 +25,11 @@ type ProductRow = {
   customization: unknown;
   ideal_for: unknown;
   visual: unknown;
+  standard_shipping_enabled?: boolean | null;
+  free_shipping_eligible?: boolean | null;
+  pickup_only?: boolean | null;
+  oversized_or_special_shipping?: boolean | null;
+  shipping_note?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -55,6 +60,11 @@ export type ProductFormValues = {
   materials: string[];
   customization: string[];
   idealFor: string[];
+  standardShippingEnabled: boolean;
+  freeShippingEligible: boolean;
+  pickupOnly: boolean;
+  oversizedOrSpecialShipping: boolean;
+  shippingNote?: string;
 };
 
 const defaultVisuals: Record<ProductCategory, Product["visual"]> = {
@@ -138,6 +148,11 @@ function normalizeProductRow(row: ProductRow, media: ProductMediaRecord[]): Prod
     customization: toStringArray(row.customization),
     ideal_for: toStringArray(row.ideal_for),
     visual: toVisual(row.visual, row.category as ProductCategory, row.slug),
+    standard_shipping_enabled: row.standard_shipping_enabled ?? true,
+    free_shipping_eligible: row.free_shipping_eligible ?? true,
+    pickup_only: row.pickup_only ?? false,
+    oversized_or_special_shipping: row.oversized_or_special_shipping ?? false,
+    shipping_note: row.shipping_note,
     created_at: row.created_at,
     updated_at: row.updated_at,
     media,
@@ -175,6 +190,13 @@ function buildFallbackProduct(record: ProductAdminRecord, base?: Product): Produ
     idealFor: (record.ideal_for.length ? record.ideal_for : ["Birou / setup"]) as Product["idealFor"],
     customization: record.customization,
     shippingNote: "Livrare în România",
+    shippingSettings: {
+      standardShippingEnabled: record.standard_shipping_enabled ?? true,
+      freeShippingEligible: record.free_shipping_eligible ?? true,
+      pickupOnly: record.pickup_only ?? false,
+      oversizedOrSpecialShipping: record.oversized_or_special_shipping ?? false,
+      shippingNote: record.shipping_note ?? undefined,
+    },
     packagingNote: "Fiecare comandă este pregătită atent pentru transport și livrare în siguranță.",
     seoTitle: `${record.name} | ArteForma`,
     seoDescription: record.short_description,
@@ -204,6 +226,14 @@ function buildFallbackProduct(record: ProductAdminRecord, base?: Product): Produ
     seoTitle: record.seo_title ?? productBase.seoTitle,
     seoDescription: record.seo_description ?? productBase.seoDescription,
     visual: record.visual ?? productBase.visual,
+    shippingNote: record.shipping_note ?? productBase.shippingNote,
+    shippingSettings: {
+      standardShippingEnabled: record.standard_shipping_enabled ?? true,
+      freeShippingEligible: record.free_shipping_eligible ?? true,
+      pickupOnly: record.pickup_only ?? false,
+      oversizedOrSpecialShipping: record.oversized_or_special_shipping ?? false,
+      shippingNote: record.shipping_note ?? productBase.shippingSettings?.shippingNote,
+    },
     media: record.media,
   };
 }
@@ -274,6 +304,11 @@ export function getProductFormDefaults(product?: ProductAdminRecord) {
       materials: "",
       customization: "",
       idealFor: "",
+      standardShippingEnabled: true,
+      freeShippingEligible: true,
+      pickupOnly: false,
+      oversizedOrSpecialShipping: false,
+      shippingNote: "",
     };
   }
 
@@ -293,6 +328,11 @@ export function getProductFormDefaults(product?: ProductAdminRecord) {
     materials: listToText(product.materials),
     customization: listToText(product.customization),
     idealFor: listToText(product.ideal_for),
+    standardShippingEnabled: product.standard_shipping_enabled ?? true,
+    freeShippingEligible: product.free_shipping_eligible ?? true,
+    pickupOnly: product.pickup_only ?? false,
+    oversizedOrSpecialShipping: product.oversized_or_special_shipping ?? false,
+    shippingNote: product.shipping_note ?? "",
   };
 }
 
@@ -381,6 +421,11 @@ export async function saveAdminProduct(values: ProductFormValues) {
     materials: values.materials,
     customization: values.customization,
     ideal_for: values.idealFor,
+    standard_shipping_enabled: values.standardShippingEnabled,
+    free_shipping_eligible: values.freeShippingEligible,
+    pickup_only: values.pickupOnly,
+    oversized_or_special_shipping: values.oversizedOrSpecialShipping,
+    shipping_note: values.shippingNote?.trim() || null,
     updated_at: new Date().toISOString(),
   };
 

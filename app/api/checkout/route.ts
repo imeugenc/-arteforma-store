@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { checkoutSchema } from "@/lib/schemas";
 import { env, isProduction } from "@/lib/env";
 import { getCatalogProductBySlug } from "@/lib/admin-catalog";
-import { getShipping } from "@/lib/checkout";
+import { getShippingQuote } from "@/lib/checkout";
 import { siteConfig } from "@/lib/site";
 
 function isLocalOrigin(origin: string) {
@@ -59,6 +59,8 @@ async function getValidatedCartItems(items: ReturnType<typeof checkoutSchema.par
         personalizationSelected: item.personalizationSelected ?? false,
         personalization: item.personalization,
         variantSummary: buildVariantSummary(item),
+        shippingSettings: product.shippingSettings,
+        shippingNote: product.shippingNote,
       };
     }),
   );
@@ -102,21 +104,23 @@ export async function POST(request: Request) {
           item.quantity,
       0,
     );
-    const shippingCost = getShipping(
-      validatedItems.map((item) => ({
-        id: item.slug,
-        slug: item.slug,
-        name: item.name,
-        price: item.unitPrice,
-        quantity: item.quantity,
-        size: item.size,
-        color: item.color,
-        material: item.material,
-        personalizationSelected: item.personalizationSelected,
-        personalization: item.personalization,
-        accent: "#d7a12a",
-      })),
-    );
+    const cartItemsForShipping = validatedItems.map((item) => ({
+      id: item.slug,
+      slug: item.slug,
+      name: item.name,
+      price: item.unitPrice,
+      quantity: item.quantity,
+      size: item.size,
+      color: item.color,
+      material: item.material,
+      personalizationSelected: item.personalizationSelected,
+      personalization: item.personalization,
+      accent: "#d7a12a",
+      shippingSettings: item.shippingSettings,
+      shippingNote: item.shippingNote,
+    }));
+    const shippingQuote = getShippingQuote(cartItemsForShipping);
+    const shippingCost = shippingQuote.cost;
 
     const lineItems = [
       ...validatedItems.map((item) => ({
@@ -198,8 +202,10 @@ export async function POST(request: Request) {
       metadata: {
         channel: "arteforma-web",
         source: "website",
-        shipping_method: shippingCost ? "Livrare standard România" : "Livrare gratuită România",
+        shipping_method: shippingQuote.method,
         shipping_cost: String(shippingCost),
+        shipping_notes: shippingQuote.notes.join(" | "),
+        special_shipping: shippingQuote.hasSpecialShipping || shippingQuote.hasPickupOnly ? "true" : "false",
         gift_packaging: giftPackaging ? "true" : "false",
         items_total: String(itemsTotal),
       },
