@@ -1,12 +1,11 @@
 import Link from "next/link";
-import Image from "next/image";
 import Script from "next/script";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getCatalogProductBySlug, getCatalogProducts } from "@/lib/admin-catalog";
 import { getPrimaryProductMedia } from "@/lib/product-media";
 import { formatPrice } from "@/lib/utils";
-import { ProductVisual } from "@/components/ui/product-visual";
+import { ProductGallery } from "@/components/catalog/product-gallery";
 import { AddToCartForm } from "@/components/catalog/add-to-cart-form";
 import { Button } from "@/components/ui/button";
 import { buildMetadata, productStructuredData } from "@/lib/seo";
@@ -55,7 +54,6 @@ export default async function ProductPage({
   const materialDetails = getMaterialDetails(product.materials);
   const primaryMedia = getPrimaryProductMedia(product.media);
   const reviews = await getVisibleReviewsForProduct(product.slug);
-  const galleryLabels = ["Imagine principală", "Din apropiere", "În ambient"];
   const galleryMedia = product.media?.length
     ? [...product.media].sort((left, right) => {
         if (left.kind === "cover" && right.kind !== "cover") {
@@ -88,61 +86,12 @@ export default async function ProductPage({
         }}
       />
       <div className="grid gap-10 lg:grid-cols-[1.02fr_0.98fr]">
-        <div className="space-y-5">
-          {galleryMedia.length ? (
-            <>
-              <div className="overflow-hidden rounded-[2rem] border border-white/8 bg-black/20">
-                <Image
-                  src={galleryMedia[0]?.public_url ?? ""}
-                  alt={galleryMedia[0]?.alt_text ?? product.name}
-                  width={1400}
-                  height={1400}
-                  className="h-auto w-full object-cover"
-                />
-              </div>
-              {galleryMedia.length > 1 ? (
-                <div className="grid gap-5 sm:grid-cols-3">
-                  {galleryMedia.slice(1, 4).map((item, index) => (
-                    <div
-                      key={item.id}
-                      className="overflow-hidden rounded-[1.8rem] border border-white/8 bg-black/20"
-                    >
-                      <Image
-                        src={item.public_url ?? ""}
-                        alt={item.alt_text ?? galleryLabels[index] ?? product.name}
-                        width={800}
-                        height={800}
-                        className="aspect-[0.98/1] w-full object-cover"
-                      />
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-            </>
-          ) : (
-            <>
-              <ProductVisual
-                accent={product.visual.accent}
-                glow={product.visual.glow}
-                motif={product.visual.motif}
-                label={product.badge ?? "ArteForma"}
-                className="min-h-[560px]"
-              />
-              <div className="grid gap-5 sm:grid-cols-3">
-                {galleryLabels.map((tag, index) => (
-                  <ProductVisual
-                    key={tag}
-                    accent={product.visual.accent}
-                    glow={product.visual.glow}
-                    motif={`${product.visual.motif}-${index + 1}`}
-                    label={tag}
-                    className="min-h-[170px]"
-                  />
-                ))}
-              </div>
-            </>
-          )}
-        </div>
+        <ProductGallery
+          productName={product.name}
+          media={galleryMedia}
+          visual={product.visual}
+          badge={product.badge}
+        />
 
         <div className="space-y-6">
           <div className="space-y-5">
