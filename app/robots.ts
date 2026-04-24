@@ -9,6 +9,18 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
         disallow: ["/internal", "/account/status", "/account/orders", "/account/login"],
       },
+      {
+        userAgent: "facebookexternalhit",
+        allow: "/",
+      },
+      {
+        userAgent: "Facebot",
+        allow: "/",
+      },
+      {
+        userAgent: "Twitterbot",
+        allow: "/",
+      },
     ],
     sitemap: `${siteConfig.url}/sitemap.xml`,
     host: siteConfig.url,
