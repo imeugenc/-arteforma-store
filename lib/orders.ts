@@ -6,6 +6,7 @@ import { getSupabaseAdminClient } from "@/lib/supabase";
 import type {
   OrderItemRecord,
   OrderRecord,
+  OrderShippingAddress,
   OrderStatus,
   OrderStatusEventRecord,
 } from "@/lib/types";
@@ -32,6 +33,8 @@ export type OrderConfirmationPayload = {
   currency: string;
   leadTime: string;
   shippingMethod: string;
+  shippingCost?: number;
+  shippingAddress?: OrderShippingAddress | null;
   items: Array<{
     name: string;
     quantity: number;
@@ -66,7 +69,74 @@ function isPublicOrderRefSchemaMissing(message?: string) {
 }
 
 export function getOrderDisplayReference(order: Pick<OrderRecord, "id" | "public_order_ref">) {
-  return order.public_order_ref ?? `AF-${order.id.slice(0, 8).toUpperCase()}`;
+  return order.public_order_ref ?? "În curs de generare";
+}
+
+export function normalizeStripeAddress(
+  session: Stripe.Checkout.Session,
+): OrderShippingAddress | null {
+  const shippingDetails = (
+    session as Stripe.Checkout.Session & {
+      shipping_details?: {
+        name?: string | null;
+        address?: Stripe.Address | null;
+      } | null;
+      collected_shipping_details?: {
+        name?: string | null;
+        address?: Stripe.Address | null;
+      } | null;
+    }
+  ).shipping_details ?? (
+    session as Stripe.Checkout.Session & {
+      collected_shipping_details?: {
+        name?: string | null;
+        address?: Stripe.Address | null;
+      } | null;
+    }
+  ).collected_shipping_details ?? null;
+  const address =
+    shippingDetails?.address ?? session.customer_details?.address ?? null;
+
+  if (!address) {
+    return null;
+  }
+
+  return {
+    name: shippingDetails?.name ?? session.customer_details?.name ?? null,
+    phone: session.customer_details?.phone ?? null,
+    line1: address.line1 ?? null,
+    line2: address.line2 ?? null,
+    city: address.city ?? null,
+    state: address.state ?? null,
+    postalCode: address.postal_code ?? null,
+    country: address.country ?? null,
+  };
+}
+
+export function getOrderShippingAddress(order: Pick<OrderRecord, "metadata">) {
+  const candidate = order.metadata?.shipping_address;
+
+  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) {
+    return null;
+  }
+
+  return candidate as OrderShippingAddress;
+}
+
+export function formatOrderShippingAddress(address?: OrderShippingAddress | null) {
+  if (!address) {
+    return "";
+  }
+
+  return [
+    address.name,
+    address.phone,
+    [address.line1, address.line2].filter(Boolean).join(", "),
+    [address.postalCode, address.city, address.state].filter(Boolean).join(" "),
+    address.country,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 }
 
 export function translateOrderStatus(status: string) {
@@ -118,6 +188,9 @@ export async function persistStripeOrder({
 }): Promise<PersistedOrder | null> {
   const supabase = getSupabaseAdminClient();
   if (!supabase) {
+    console.error("[orders] Supabase admin client is not configured. Cannot persist Stripe order.", {
+      sessionId: session.id,
+    });
     return null;
   }
 
@@ -128,6 +201,11 @@ export async function persistStripeOrder({
     .maybeSingle<OrderRecord>();
 
   if (existing.data) {
+    console.log("[orders] Existing order found for Stripe session.", {
+      sessionId: session.id,
+      orderId: existing.data.id,
+      publicOrderRef: existing.data.public_order_ref,
+    });
     const existingOrder = await ensurePublicOrderRefForOrder(supabase, existing.data);
     const existingItems = await supabase
       .from(env.SUPABASE_ORDER_ITEMS_TABLE)
@@ -146,6 +224,7 @@ export async function persistStripeOrder({
   const customerEmail = session.customer_details?.email ?? session.metadata?.customer_email ?? "";
   const customerPhone = session.customer_details?.phone ?? session.metadata?.customer_phone ?? null;
   const giftPackaging = session.metadata?.gift_packaging === "true";
+  const shippingAddress = normalizeStripeAddress(session);
   const personalization = lineItems.some((item) => {
     const variantSummary =
       item.price?.product &&
@@ -187,14 +266,29 @@ export async function persistStripeOrder({
       customer_email: customerEmail,
       shipping_notes: session.metadata?.shipping_notes ?? "",
       special_shipping: session.metadata?.special_shipping === "true",
+      shipping_address: shippingAddress,
     },
   };
 
   const orderInsert = await insertOrderRecord(supabase, orderPayload);
 
   if (orderInsert.error) {
+    console.error("[orders] Supabase order insert failed.", {
+      sessionId: session.id,
+      message: orderInsert.error.message,
+      details: orderInsert.error.details,
+      hint: orderInsert.error.hint,
+      code: orderInsert.error.code,
+    });
     throw orderInsert.error;
   }
+
+  console.log("[orders] Supabase order inserted.", {
+    sessionId: session.id,
+    orderId,
+    customerEmail,
+    totalAmount: orderPayload.total_amount,
+  });
 
   const orderItems = lineItems
     .filter((item) => item.amount_total !== null && item.quantity)
@@ -223,8 +317,19 @@ export async function persistStripeOrder({
       .insert(orderItems);
 
     if (itemsInsert.error) {
+      console.error("[orders] Supabase order_items insert failed.", {
+        sessionId: session.id,
+        orderId,
+        message: itemsInsert.error.message,
+      });
       throw itemsInsert.error;
     }
+
+    console.log("[orders] Supabase order_items inserted.", {
+      sessionId: session.id,
+      orderId,
+      count: orderItems.length,
+    });
   }
 
   await insertOrderStatusEvent(supabase, {
@@ -234,6 +339,12 @@ export async function persistStripeOrder({
   });
 
   const orderWithPublicRef = await ensurePublicOrderRefForOrder(supabase, orderInsert.data);
+
+  console.log("[orders] Public order reference ensured.", {
+    sessionId: session.id,
+    orderId,
+    publicOrderRef: orderWithPublicRef.public_order_ref,
+  });
 
   const confirmationPayload = buildOrderConfirmationPayload({
     order: orderWithPublicRef,
@@ -480,7 +591,11 @@ export async function getCheckoutSessionSnapshot(sessionId: string) {
       total_amount: (session.amount_total ?? 0) / 100,
       status: "paid" as const,
       shipping_method: session.metadata?.shipping_method ?? "Tarif fix România",
+      shipping_cost: Number(session.metadata?.shipping_cost ?? 0),
       currency: (session.currency ?? "ron").toUpperCase(),
+      metadata: {
+        shipping_address: normalizeStripeAddress(session),
+      },
     },
     items: lineItems.data
       .filter((item) => item.quantity && item.description !== "Livrare cu tarif fix")
@@ -490,6 +605,37 @@ export async function getCheckoutSessionSnapshot(sessionId: string) {
         quantity: item.quantity ?? 1,
       })),
   };
+}
+
+export async function getOrPersistOrderBySessionId(sessionId: string) {
+  const existing = await getOrderBySessionId(sessionId);
+
+  if (existing) {
+    return {
+      ...existing,
+      isNew: false,
+    };
+  }
+
+  if (!env.STRIPE_SECRET_KEY) {
+    return null;
+  }
+
+  const stripe = new Stripe(env.STRIPE_SECRET_KEY);
+  const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+  if (session.status !== "complete") {
+    return null;
+  }
+
+  const lineItems = await stripe.checkout.sessions.listLineItems(sessionId, {
+    expand: ["data.price.product"],
+  });
+
+  return persistStripeOrder({
+    session,
+    lineItems: lineItems.data,
+  });
 }
 
 export async function getRecentOrders(limit = 20) {
@@ -857,6 +1003,8 @@ export function buildOrderConfirmationPayload({
     currency: order.currency,
     leadTime: "2–5 zile lucrătoare",
     shippingMethod: order.shipping_method,
+    shippingCost: order.shipping_cost,
+    shippingAddress: getOrderShippingAddress(order),
     items: items.map((item) => ({
       name: item.product_name,
       quantity: item.quantity,

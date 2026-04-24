@@ -2,7 +2,9 @@ import { ConfirmSubmitButton } from "@/components/internal/confirm-submit-button
 import { buildInternalMetadata, requireInternalAccess } from "@/lib/internal";
 import {
   ADMIN_ORDER_STATUSES,
+  formatOrderShippingAddress,
   getOrderDisplayReference,
+  getOrderShippingAddress,
   getRecentOrdersFiltered,
   isOrderArchived,
   translateOrderStatus,
@@ -112,6 +114,7 @@ export default async function InternalOrdersPage({
             const items = bundle.items.filter((item) => item.order_id === order.id);
             const events = bundle.events.filter((event) => event.order_id === order.id);
             const archivedState = isOrderArchived(order);
+            const shippingAddress = formatOrderShippingAddress(getOrderShippingAddress(order));
 
             return (
               <div key={order.id} className="surface-panel rounded-[2rem] p-6">
@@ -129,6 +132,8 @@ export default async function InternalOrdersPage({
                       <StatusInfo label="Status" status={order.status} archived={archivedState} />
                       <Info label="Payment status" value={order.payment_status ?? "—"} />
                       <Info label="Stripe session" value={order.stripe_session_id ?? "—"} />
+                      <Info label="Livrare" value={`${order.shipping_method} · ${formatPrice(order.shipping_cost)}`} />
+                      <Info label="Adresă livrare" value={shippingAddress || "—"} />
                       <Info label="Arhivată" value={archivedState ? "Da" : "Nu"} />
                     </div>
 

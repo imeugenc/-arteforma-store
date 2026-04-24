@@ -6,6 +6,8 @@ const supabaseHostname = process.env.SUPABASE_URL
   : undefined;
 
 const nextConfig: NextConfig = {
+  skipTrailingSlashRedirect: true,
+  skipProxyUrlNormalize: true,
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: supabaseHostname

@@ -1,14 +1,38 @@
 import { Resend } from "resend";
 import { siteConfig } from "@/lib/site";
 import type { OrderConfirmationPayload } from "@/lib/orders";
+import type { OrderShippingAddress } from "@/lib/types";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const resendFrom = process.env.RESEND_FROM_EMAIL || "ArteForma <onboarding@resend.dev>";
 
+function formatEmailShippingAddress(address?: OrderShippingAddress | null) {
+  if (!address) {
+    return "";
+  }
+
+  return [
+    address.name,
+    address.phone,
+    [address.line1, address.line2].filter(Boolean).join(", "),
+    [address.postalCode, address.city, address.state].filter(Boolean).join(" "),
+    address.country,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
+
 export async function sendPaidOrderEmails(payload: OrderConfirmationPayload) {
   if (!resend || !payload.customerEmail) {
+    console.warn("[order-emails] Skipping paid order emails. Resend or customer email missing.", {
+      hasResend: Boolean(resend),
+      hasCustomerEmail: Boolean(payload.customerEmail),
+      orderReference: payload.orderReference,
+    });
     return;
   }
+
+  const shippingAddress = formatEmailShippingAddress(payload.shippingAddress);
 
   const customerHtml = `
     <div style="font-family:Arial,sans-serif;background:#0a0a0a;color:#f3f0e8;padding:32px;">
@@ -19,6 +43,8 @@ export async function sendPaidOrderEmails(payload: OrderConfirmationPayload) {
         <p style="margin:0 0 14px;color:#d7d2c4;">Plata a fost confirmată și comanda ta a intrat în fluxul nostru de producție.</p>
         <p style="margin:0 0 14px;color:#d7d2c4;">Referință comandă: <strong>${payload.orderReference}</strong></p>
         <p style="margin:0 0 14px;color:#d7d2c4;">Total: <strong>${payload.totalAmount} ${payload.currency}</strong></p>
+        <p style="margin:0 0 14px;color:#d7d2c4;">Livrare: <strong>${payload.shippingMethod}</strong>${typeof payload.shippingCost === "number" ? ` · ${payload.shippingCost} ${payload.currency}` : ""}</p>
+        ${shippingAddress ? `<p style="margin:0 0 14px;color:#d7d2c4;">Adresă livrare: ${shippingAddress}</p>` : ""}
         <p style="margin:0 0 14px;color:#d7d2c4;">Timp de producție: ${payload.leadTime}</p>
         <p style="margin:0 0 14px;color:#d7d2c4;">Poți urmări comanda din pagina de status folosind referința <strong>${payload.orderReference}</strong> și emailul folosit la checkout: <a href="${siteConfig.url}/account/status" style="color:#f2dfaf;">${siteConfig.url}/account/status</a>.</p>
         <div style="margin:20px 0;padding:16px;border-radius:16px;background:#0d0d0d;border:1px solid rgba(255,255,255,0.06);">
@@ -51,6 +77,8 @@ export async function sendPaidOrderEmails(payload: OrderConfirmationPayload) {
         <p style="margin:0 0 14px;color:#d7d2c4;">Client: ${payload.customerName}</p>
         <p style="margin:0 0 14px;color:#d7d2c4;">Email: ${payload.customerEmail}</p>
         <p style="margin:0 0 14px;color:#d7d2c4;">Total: <strong>${payload.totalAmount} ${payload.currency}</strong></p>
+        <p style="margin:0 0 14px;color:#d7d2c4;">Livrare: <strong>${payload.shippingMethod}</strong>${typeof payload.shippingCost === "number" ? ` · ${payload.shippingCost} ${payload.currency}` : ""}</p>
+        ${shippingAddress ? `<p style="margin:0 0 14px;color:#d7d2c4;">Adresă livrare: ${shippingAddress}</p>` : ""}
         <div style="margin:20px 0;padding:16px;border-radius:16px;background:#0d0d0d;border:1px solid rgba(255,255,255,0.06);">
           ${payload.items
             .map(
@@ -70,7 +98,7 @@ export async function sendPaidOrderEmails(payload: OrderConfirmationPayload) {
     </div>
   `;
 
-  await resend.emails.send({
+  const customerEmail = await resend.emails.send({
     from: resendFrom,
     to: [payload.customerEmail],
     replyTo: siteConfig.email,
@@ -78,12 +106,24 @@ export async function sendPaidOrderEmails(payload: OrderConfirmationPayload) {
     html: customerHtml,
   });
 
-  await resend.emails.send({
+  console.log("[order-emails] Customer confirmation email sent.", {
+    orderReference: payload.orderReference,
+    email: payload.customerEmail,
+    id: customerEmail.data?.id,
+  });
+
+  const adminEmail = await resend.emails.send({
     from: resendFrom,
     to: [siteConfig.email],
     replyTo: payload.customerEmail,
     subject: `Comandă nouă plătită – ${payload.orderReference}`,
     html: internalHtml,
+  });
+
+  console.log("[order-emails] Admin notification email sent.", {
+    orderReference: payload.orderReference,
+    email: siteConfig.email,
+    id: adminEmail.data?.id,
   });
 }
 

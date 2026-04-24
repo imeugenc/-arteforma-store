@@ -4,11 +4,16 @@ import { Button } from "@/components/ui/button";
 import { SuccessEffects } from "@/components/checkout/success-effects";
 import { StatusTimeline } from "@/components/orders/status-timeline";
 import {
+  buildOrderConfirmationPayload,
+  formatOrderShippingAddress,
   getCheckoutSessionSnapshot,
+  getOrPersistOrderBySessionId,
   getOrderBySessionId,
   getOrderDisplayReference,
+  getOrderShippingAddress,
   translateOrderStatus,
 } from "@/lib/orders";
+import { sendPaidOrderEmails } from "@/lib/order-emails";
 import { formatPrice } from "@/lib/utils";
 import { siteConfig } from "@/lib/site";
 import { buildMetadata } from "@/lib/seo";
@@ -31,8 +36,18 @@ export default async function SuccessPage({
   }
 
   const persistedOrder = sessionId ? await getOrderBySessionId(sessionId) : null;
+  const recoveredOrder =
+    !persistedOrder && sessionId ? await getOrPersistOrderBySessionId(sessionId) : null;
+
+  if (recoveredOrder?.isNew) {
+    await sendPaidOrderEmails(buildOrderConfirmationPayload({
+      order: recoveredOrder.order,
+      items: recoveredOrder.items,
+    }));
+  }
+
   const orderBundle =
-    persistedOrder ?? (sessionId ? await getCheckoutSessionSnapshot(sessionId) : null);
+    persistedOrder ?? recoveredOrder ?? (sessionId ? await getCheckoutSessionSnapshot(sessionId) : null);
   const hasGiftPackaging =
     orderBundle?.items.some((item) => item.product_name === "Ambalare premium") ?? false;
   const hasPersonalization =
@@ -43,6 +58,8 @@ export default async function SuccessPage({
         item.variant_summary.includes("Personalizare"),
     ) ?? false;
   const freeShippingApplied = orderBundle?.order.shipping_method === "Livrare gratuită România";
+  const shippingAddress = orderBundle ? getOrderShippingAddress(orderBundle.order) : null;
+  const formattedShippingAddress = formatOrderShippingAddress(shippingAddress);
 
   return (
     <div className="mx-auto max-w-5xl px-5 py-20 sm:px-8">
@@ -78,6 +95,13 @@ export default async function SuccessPage({
                 <Row label="Email" value={orderBundle.order.customer_email} />
                 <Row label="Total" value={formatPrice(orderBundle.order.total_amount)} />
                 <Row label="Status" value={translateOrderStatus(orderBundle.order.status)} />
+                <Row label="Metodă livrare" value={orderBundle.order.shipping_method} />
+                {"shipping_cost" in orderBundle.order ? (
+                  <Row label="Cost livrare" value={formatPrice(orderBundle.order.shipping_cost)} />
+                ) : null}
+                {formattedShippingAddress ? (
+                  <Row label="Adresă livrare" value={formattedShippingAddress} />
+                ) : null}
               </div>
             </div>
             <div className="surface-panel rounded-[2rem] p-6">

@@ -1,13 +1,18 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { env } from "@/lib/env";
-import { getOrderDisplayReference, persistStripeOrder } from "@/lib/orders";
+import { buildOrderConfirmationPayload, getOrderDisplayReference, persistStripeOrder } from "@/lib/orders";
 import { sendPaidOrderEmails } from "@/lib/order-emails";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
+  console.log("[stripe-webhook] Direct route hit.", {
+    url: request.url,
+    method: request.method,
+  });
+
   if (!env.STRIPE_SECRET_KEY || !env.STRIPE_WEBHOOK_SECRET) {
     console.error("[stripe-webhook] Missing Stripe configuration.");
     return NextResponse.json(
@@ -64,6 +69,11 @@ export async function POST(request: Request) {
         expand: ["data.price.product"],
       });
 
+      console.log("[stripe-webhook] Line items loaded.", {
+        sessionId: session.id,
+        lineItemsCount: lineItems.data.length,
+      });
+
       const persisted = await persistStripeOrder({
         session,
         lineItems: lineItems.data,
@@ -82,21 +92,20 @@ export async function POST(request: Request) {
       });
 
       if (persisted?.isNew) {
-        await sendPaidOrderEmails({
+        console.log("[stripe-webhook] Sending order emails.", {
+          sessionId: session.id,
           orderReference: getOrderDisplayReference(persisted.order),
-          customerName: persisted.order.customer_name,
           customerEmail: persisted.order.customer_email,
-          totalAmount: persisted.order.total_amount,
-          currency: persisted.order.currency,
-          leadTime: "2–5 zile lucrătoare",
-          shippingMethod: persisted.order.shipping_method,
-          items: persisted.items.map((item) => ({
-            name: item.product_name,
-            quantity: item.quantity,
-            unitPrice: item.unit_price,
-            lineTotal: item.line_total,
-            variantSummary: item.variant_summary,
-          })),
+        });
+
+        await sendPaidOrderEmails(buildOrderConfirmationPayload({
+          order: persisted.order,
+          items: persisted.items,
+        }));
+
+        console.log("[stripe-webhook] Order emails completed.", {
+          sessionId: session.id,
+          orderReference: getOrderDisplayReference(persisted.order),
         });
       }
     }
@@ -110,4 +119,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ ok: false, message }, { status: 500 });
   }
+}
+
+export async function GET() {
+  return NextResponse.json({ ok: true, route: "/api/stripe/webhook" }, { status: 200 });
 }

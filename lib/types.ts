@@ -129,6 +129,17 @@ export type OrderRecord = {
   metadata?: Record<string, unknown> | null;
 };
 
+export type OrderShippingAddress = {
+  name?: string | null;
+  phone?: string | null;
+  line1?: string | null;
+  line2?: string | null;
+  city?: string | null;
+  state?: string | null;
+  postalCode?: string | null;
+  country?: string | null;
+};
+
 export type OrderItemRecord = {
   id: string;
   created_at?: string;
