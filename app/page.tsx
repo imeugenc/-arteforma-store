@@ -14,7 +14,7 @@ import { ProductCard } from "@/components/catalog/product-card";
 
 export const metadata = buildMetadata({
   description:
-    "ArteForma creează în Brașov obiecte printate 3D, din colecție și la comandă, pentru birou, decor, auto, cadouri și spații în care detaliile contează.",
+    "Obiecte printate 3D în România, din colecție sau la comandă. Cadouri, decor, auto/moto și piese custom cu design curat.",
   path: "/",
 });
 

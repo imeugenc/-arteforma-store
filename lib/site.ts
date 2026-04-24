@@ -1,8 +1,8 @@
 export const siteConfig = {
   name: "ArteForma",
-  title: "ArteForma | Obiecte printate 3D realizate la comandă în România",
+  title: "ArteForma | Obiecte 3D personalizate pentru cadouri, birou și decor",
   description:
-    "ArteForma creează în Brașov obiecte printate 3D, din colecție și la comandă, pentru birou, decor și cadouri care merită să rămână la vedere.",
+    "Obiecte printate 3D în România, din colecție sau la comandă. Cadouri, decor, auto/moto și piese custom cu design curat.",
   url: "https://www.arteforma.ro",
   locale: "ro_RO",
   email: "contact@arteforma.ro",
@@ -18,7 +18,7 @@ export const siteConfig = {
   giftPackagingPrice: 30,
   personalizationPrice: 30,
   maxPrintVolume: "20 × 20 × 24 cm",
-  defaultOgImage: "/brand/arteforma-logo-full.png",
+  defaultOgImage: "/brand/arteforma-og.jpg",
   keywords: [
     "decor printat 3D România",
     "cadouri personalizate printate 3D",
