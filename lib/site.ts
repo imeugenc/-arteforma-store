@@ -3,7 +3,7 @@ export const siteConfig = {
   title: "ArteForma | Obiecte printate 3D realizate la comandă în România",
   description:
     "ArteForma creează în Brașov obiecte printate 3D, din colecție și la comandă, pentru birou, decor și cadouri care merită să rămână la vedere.",
-  url: "https://arteforma.ro",
+  url: "https://www.arteforma.ro",
   locale: "ro_RO",
   email: "contact@arteforma.ro",
   city: "Brașov",
