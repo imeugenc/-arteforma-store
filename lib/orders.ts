@@ -35,6 +35,7 @@ export type OrderConfirmationPayload = {
   shippingMethod: string;
   shippingCost?: number;
   shippingAddress?: OrderShippingAddress | null;
+  notes?: string | null;
   items: Array<{
     name: string;
     quantity: number;
@@ -1005,6 +1006,7 @@ export function buildOrderConfirmationPayload({
     shippingMethod: order.shipping_method,
     shippingCost: order.shipping_cost,
     shippingAddress: getOrderShippingAddress(order),
+    notes: order.notes,
     items: items.map((item) => ({
       name: item.product_name,
       quantity: item.quantity,

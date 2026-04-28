@@ -3,6 +3,7 @@ import { env } from "@/lib/env";
 import { products as fallbackProducts } from "@/lib/catalog";
 import { getPrimaryProductMedia } from "@/lib/product-media";
 import { getSupabaseAdminClient, isSupabaseConfigured } from "@/lib/supabase";
+import { formatSizeOptionsForAdmin, normalizeSizeOptions } from "@/lib/size-pricing";
 import { slugify } from "@/lib/utils";
 import type { Product, ProductAdminRecord, ProductCategory, ProductMediaRecord } from "@/lib/types";
 
@@ -129,6 +130,8 @@ function normalizeMediaRow(row: ProductMediaRow): ProductMediaRecord {
 }
 
 function normalizeProductRow(row: ProductRow, media: ProductMediaRecord[]): ProductAdminRecord {
+  const normalizedSizes = normalizeSizeOptions(toStringArray(row.sizes));
+
   return {
     id: row.id,
     slug: row.slug,
@@ -142,7 +145,8 @@ function normalizeProductRow(row: ProductRow, media: ProductMediaRecord[]): Prod
     seo_description: row.seo_description,
     featured: row.featured,
     enabled: row.enabled,
-    sizes: toStringArray(row.sizes),
+    sizes: normalizedSizes.labels,
+    sizePrices: normalizedSizes.priceMap,
     colors: toStringArray(row.colors),
     materials: toStringArray(row.materials),
     customization: toStringArray(row.customization),
@@ -180,6 +184,7 @@ function buildFallbackProduct(record: ProductAdminRecord, base?: Product): Produ
     longDescription: record.long_description,
     story: record.short_description,
     sizes: record.sizes,
+    sizePrices: record.sizePrices,
     colors: record.colors,
     materials: record.materials,
     sizeLabel: "Dimensiune",
@@ -216,6 +221,7 @@ function buildFallbackProduct(record: ProductAdminRecord, base?: Product): Produ
     longDescription: record.long_description,
     price: record.price,
     sizes: record.sizes,
+    sizePrices: record.sizePrices,
     colors: record.colors,
     materials: record.materials,
     customization: record.customization.length ? record.customization : productBase.customization,
@@ -323,7 +329,7 @@ export function getProductFormDefaults(product?: ProductAdminRecord) {
     badge: product.badge ?? "",
     featured: product.featured,
     enabled: product.enabled,
-    sizes: listToText(product.sizes),
+    sizes: formatSizeOptionsForAdmin(product.sizes, product.sizePrices),
     colors: listToText(product.colors),
     materials: listToText(product.materials),
     customization: listToText(product.customization),

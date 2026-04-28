@@ -35,4 +35,5 @@ export const checkoutItemSchema = z.object({
 export const checkoutSchema = z.object({
   items: z.array(checkoutItemSchema).min(1).max(50),
   giftPackaging: z.boolean().optional().default(false),
+  notes: z.string().trim().max(500).optional().or(z.literal("")),
 });

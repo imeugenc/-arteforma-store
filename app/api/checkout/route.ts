@@ -5,6 +5,7 @@ import { env, isProduction } from "@/lib/env";
 import { getCatalogProductBySlug } from "@/lib/admin-catalog";
 import { getShippingQuote } from "@/lib/checkout";
 import { siteConfig } from "@/lib/site";
+import { getSizeAdjustedPrice } from "@/lib/size-pricing";
 
 function isLocalOrigin(origin: string) {
   return origin.includes("localhost") || origin.includes("127.0.0.1");
@@ -48,10 +49,16 @@ async function getValidatedCartItems(items: ReturnType<typeof checkoutSchema.par
         throw new Error(`Ai selectat un material invalid pentru ${product.name}.`);
       }
 
+      const unitPrice = getSizeAdjustedPrice({
+        basePrice: product.price,
+        selectedSize: item.size,
+        sizePrices: product.sizePrices,
+      });
+
       return {
         slug: product.slug,
         name: product.name,
-        unitPrice: product.price,
+        unitPrice,
         quantity: item.quantity,
         size: item.size,
         color: item.color,
@@ -139,6 +146,10 @@ export async function POST(request: Request) {
               product_slug: item.slug,
               product_name: item.name,
               variant_summary: item.variantSummary,
+              selected_size: item.size ?? "",
+              selected_color: item.color ?? "",
+              selected_material: item.material ?? "",
+              personalization_selected: item.personalizationSelected ? "true" : "false",
             },
           },
         },
@@ -202,6 +213,7 @@ export async function POST(request: Request) {
       metadata: {
         channel: "arteforma-web",
         source: "website",
+        notes: parsed.notes ?? "",
         shipping_method: shippingQuote.method,
         shipping_cost: String(shippingCost),
         shipping_notes: shippingQuote.notes.join(" | "),

@@ -7,6 +7,8 @@ import { Product } from "@/lib/types";
 import { trackEvent } from "@/lib/analytics";
 import { AddToCartToast } from "@/components/catalog/add-to-cart-toast";
 import { siteConfig } from "@/lib/site";
+import { formatPrice } from "@/lib/utils";
+import { getSizeAdjustedPrice } from "@/lib/size-pricing";
 
 export function AddToCartForm({ product }: { product: Product }) {
   const { addItem } = useCart();
@@ -16,6 +18,13 @@ export function AddToCartForm({ product }: { product: Product }) {
   const [personalizationSelected, setPersonalizationSelected] = useState(false);
   const [personalization, setPersonalization] = useState("");
   const [toastOpen, setToastOpen] = useState(false);
+  const selectedBasePrice = getSizeAdjustedPrice({
+    basePrice: product.price,
+    selectedSize: size,
+    sizePrices: product.sizePrices,
+  });
+  const selectedTotalPrice =
+    selectedBasePrice + (personalizationSelected ? siteConfig.personalizationPrice : 0);
 
   useEffect(() => {
     if (!toastOpen) {
@@ -85,6 +94,12 @@ export function AddToCartForm({ product }: { product: Product }) {
           <p>Timp de producție: {product.leadTime}.</p>
           <p>Livrare gratuită pentru comenzile peste {siteConfig.freeShippingThreshold} RON.</p>
         </div>
+        <div className="flex items-center justify-between rounded-[1.5rem] border border-[#d7a12a]/18 bg-[#d7a12a]/7 px-4 py-3">
+          <span className="text-sm text-white/62">Preț pentru selecția curentă</span>
+          <span className="text-lg font-semibold text-[#f6d57a]">
+            {formatPrice(selectedTotalPrice)}
+          </span>
+        </div>
         <Button
           className="w-full"
           onClick={() => {
@@ -101,7 +116,7 @@ export function AddToCartForm({ product }: { product: Product }) {
               id: itemId,
               slug: product.slug,
               name: product.name,
-              price: product.price,
+              price: selectedBasePrice,
               quantity: 1,
               size,
               color,
@@ -115,7 +130,7 @@ export function AddToCartForm({ product }: { product: Product }) {
             setToastOpen(true);
             void trackEvent("add_to_cart", {
               slug: product.slug,
-              price: product.price,
+              price: selectedBasePrice,
               size,
               color,
               material,

@@ -105,7 +105,11 @@ export default async function ProductPage({
             </h1>
             <p className="text-sm leading-8 text-white/70 sm:text-[15px]">{product.shortDescription}</p>
             <div className="flex flex-wrap items-end gap-4">
-              <div className="text-3xl font-semibold text-[#f6d57a]">{formatPrice(product.price)}</div>
+              <div className="text-3xl font-semibold text-[#f6d57a]">
+                {product.sizePrices && Object.keys(product.sizePrices).length
+                  ? `De la ${formatPrice(product.price)}`
+                  : formatPrice(product.price)}
+              </div>
               <p className="text-sm uppercase tracking-[0.28em] text-white/32">Realizat la comandă în România</p>
             </div>
           </div>

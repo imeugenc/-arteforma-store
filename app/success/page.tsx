@@ -60,6 +60,8 @@ export default async function SuccessPage({
   const freeShippingApplied = orderBundle?.order.shipping_method === "Livrare gratuită România";
   const shippingAddress = orderBundle ? getOrderShippingAddress(orderBundle.order) : null;
   const formattedShippingAddress = formatOrderShippingAddress(shippingAddress);
+  const orderNotes =
+    orderBundle && "notes" in orderBundle.order ? orderBundle.order.notes : null;
 
   return (
     <div className="mx-auto max-w-5xl px-5 py-20 sm:px-8">
@@ -101,6 +103,9 @@ export default async function SuccessPage({
                 ) : null}
                 {formattedShippingAddress ? (
                   <Row label="Adresă livrare" value={formattedShippingAddress} />
+                ) : null}
+                {orderNotes ? (
+                  <Row label="Mențiuni" value={orderNotes} />
                 ) : null}
               </div>
             </div>

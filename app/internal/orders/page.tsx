@@ -134,6 +134,7 @@ export default async function InternalOrdersPage({
                       <Info label="Stripe session" value={order.stripe_session_id ?? "—"} />
                       <Info label="Livrare" value={`${order.shipping_method} · ${formatPrice(order.shipping_cost)}`} />
                       <Info label="Adresă livrare" value={shippingAddress || "—"} />
+                      <Info label="Mențiuni" value={order.notes || "—"} />
                       <Info label="Arhivată" value={archivedState ? "Da" : "Nu"} />
                     </div>
 

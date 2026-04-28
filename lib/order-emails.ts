@@ -45,6 +45,7 @@ export async function sendPaidOrderEmails(payload: OrderConfirmationPayload) {
         <p style="margin:0 0 14px;color:#d7d2c4;">Total: <strong>${payload.totalAmount} ${payload.currency}</strong></p>
         <p style="margin:0 0 14px;color:#d7d2c4;">Livrare: <strong>${payload.shippingMethod}</strong>${typeof payload.shippingCost === "number" ? ` · ${payload.shippingCost} ${payload.currency}` : ""}</p>
         ${shippingAddress ? `<p style="margin:0 0 14px;color:#d7d2c4;">Adresă livrare: ${shippingAddress}</p>` : ""}
+        ${payload.notes ? `<p style="margin:0 0 14px;color:#d7d2c4;">Mențiuni comandă: ${payload.notes}</p>` : ""}
         <p style="margin:0 0 14px;color:#d7d2c4;">Timp de producție: ${payload.leadTime}</p>
         <p style="margin:0 0 14px;color:#d7d2c4;">Poți urmări comanda din pagina de status folosind referința <strong>${payload.orderReference}</strong> și emailul folosit la checkout: <a href="${siteConfig.url}/account/status" style="color:#f2dfaf;">${siteConfig.url}/account/status</a>.</p>
         <div style="margin:20px 0;padding:16px;border-radius:16px;background:#0d0d0d;border:1px solid rgba(255,255,255,0.06);">
@@ -79,6 +80,7 @@ export async function sendPaidOrderEmails(payload: OrderConfirmationPayload) {
         <p style="margin:0 0 14px;color:#d7d2c4;">Total: <strong>${payload.totalAmount} ${payload.currency}</strong></p>
         <p style="margin:0 0 14px;color:#d7d2c4;">Livrare: <strong>${payload.shippingMethod}</strong>${typeof payload.shippingCost === "number" ? ` · ${payload.shippingCost} ${payload.currency}` : ""}</p>
         ${shippingAddress ? `<p style="margin:0 0 14px;color:#d7d2c4;">Adresă livrare: ${shippingAddress}</p>` : ""}
+        ${payload.notes ? `<p style="margin:0 0 14px;color:#d7d2c4;">Mențiuni comandă: ${payload.notes}</p>` : ""}
         <div style="margin:20px 0;padding:16px;border-radius:16px;background:#0d0d0d;border:1px solid rgba(255,255,255,0.06);">
           ${payload.items
             .map(

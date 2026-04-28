@@ -76,17 +76,44 @@ export default async function InternalProductsPage({
     deleted?: string;
     imported?: string;
     error?: string;
+    q?: string;
+    visibility?: string;
+    featured?: string;
+    category?: ProductCategory;
   }>;
 }) {
-  const { token, saved, deleted, imported, error } = await searchParams;
+  const { token, saved, deleted, imported, error, q, visibility, featured, category } =
+    await searchParams;
   await requireInternalAccess(token, "/internal/products");
 
   const adminAvailable = canUseAdminCatalog();
   const products = adminAvailable ? await getAdminProducts() : null;
+  const normalizedQuery = q?.trim().toLowerCase() ?? "";
+  const filteredProducts = (products ?? []).filter((product) => {
+    const matchesSearch =
+      !normalizedQuery ||
+      [product.name, product.slug, product.category]
+        .join(" ")
+        .toLowerCase()
+        .includes(normalizedQuery);
+    const matchesVisibility =
+      !visibility ||
+      visibility === "all" ||
+      (visibility === "enabled" && product.enabled) ||
+      (visibility === "disabled" && !product.enabled);
+    const matchesFeatured =
+      !featured ||
+      featured === "all" ||
+      (featured === "featured" && product.featured) ||
+      (featured === "not-featured" && !product.featured);
+    const matchesCategory = !category || category === product.category;
+
+    return matchesSearch && matchesVisibility && matchesFeatured && matchesCategory;
+  });
   const productGroups = categoryOptions
     .map((category) => ({
       ...category,
-      products: products?.filter((product) => product.category === category.value) ?? [],
+      products: filteredProducts.filter((product) => product.category === category.value),
     }))
     .filter((group) => group.products.length > 0);
 
@@ -147,13 +174,65 @@ export default async function InternalProductsPage({
             </div>
           </div>
 
+          <form className="surface-panel rounded-[2rem] p-5 lg:p-6">
+            <div className="grid gap-4 lg:grid-cols-[1fr_0.36fr_0.36fr_0.42fr_auto] lg:items-end">
+              <Field label="Caută produs">
+                <input
+                  type="search"
+                  name="q"
+                  defaultValue={q ?? ""}
+                  placeholder="Nume, slug sau categorie"
+                  className="input-field"
+                />
+              </Field>
+              <Field label="Status">
+                <select name="visibility" defaultValue={visibility ?? "all"} className="input-field">
+                  <option value="all">Toate</option>
+                  <option value="enabled">Active</option>
+                  <option value="disabled">Inactive</option>
+                </select>
+              </Field>
+              <Field label="Featured">
+                <select name="featured" defaultValue={featured ?? "all"} className="input-field">
+                  <option value="all">Toate</option>
+                  <option value="featured">Featured</option>
+                  <option value="not-featured">Non-featured</option>
+                </select>
+              </Field>
+              <Field label="Categorie">
+                <select name="category" defaultValue={category ?? ""} className="input-field">
+                  <option value="">Toate</option>
+                  {categoryOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <button
+                type="submit"
+                className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#d7a12a] px-5 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-black"
+              >
+                Filtrează
+              </button>
+            </div>
+            <p className="mt-3 text-xs text-white/42">
+              Se afișează {filteredProducts.length} din {products?.length ?? 0} produse. Produsele noi rămân primele în categoria lor.
+            </p>
+          </form>
+
           {!products?.length ? (
             <div className="surface-panel rounded-[2rem] p-6 text-white/65">
               Tabelul `products` este încă gol. Apasă pe butonul de import de mai sus ca să copiezi catalogul
               actual în Supabase și să poți gestiona apoi imaginile și editările din admin.
             </div>
           ) : (
-            <div className="space-y-8">
+            <div className="space-y-6">
+              {!productGroups.length ? (
+                <div className="surface-panel rounded-[2rem] p-6 text-white/65">
+                  Nu am găsit produse pentru filtrele selectate.
+                </div>
+              ) : null}
               {productGroups.map((group) => (
                 <section key={group.value} className="space-y-4">
                   <div className="flex flex-col gap-2 rounded-[1.6rem] border border-[#d7a12a]/20 bg-[#d7a12a]/8 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
@@ -168,7 +247,7 @@ export default async function InternalProductsPage({
                     </p>
                   </div>
 
-                  <div className="space-y-6">
+                  <div className="space-y-4">
                     {group.products.map((product) => (
                       <ProductAdminCard key={product.id} product={product} />
                     ))}
@@ -185,31 +264,50 @@ export default async function InternalProductsPage({
 
 function ProductAdminCard({ product }: { product: ProductAdminRecord }) {
   const primaryMedia = getPrimaryProductMedia(product.media);
+  const previewMedia = (product.media ?? []).slice(0, 8);
 
   return (
-    <div id={`product-${product.id}`} className="surface-panel rounded-[2rem] p-6 scroll-mt-28">
-      <div className="grid gap-6 xl:grid-cols-[0.3fr_0.7fr]">
-        <div className="space-y-5">
-          <div className="overflow-hidden rounded-[1.6rem] border border-white/8 bg-black/20">
+    <div id={`product-${product.id}`} className="surface-panel rounded-[1.8rem] p-4 scroll-mt-28 lg:p-5">
+      <div className="grid gap-5 xl:grid-cols-[0.24fr_0.76fr]">
+        <div className="space-y-4">
+          <div className="overflow-hidden rounded-[1.3rem] border border-white/8 bg-black/20">
             {primaryMedia?.public_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={primaryMedia.public_url}
                 alt={primaryMedia.alt_text ?? product.name}
-                className="aspect-square h-full w-full object-cover"
+                className="aspect-[4/3] h-full w-full object-cover xl:aspect-square"
               />
             ) : (
-              <div className="flex aspect-square items-center justify-center text-sm text-white/45">
+              <div className="flex aspect-[4/3] items-center justify-center text-sm text-white/45 xl:aspect-square">
                 Fără imagine de copertă
               </div>
             )}
           </div>
+          {previewMedia.length ? (
+            <div className="grid grid-cols-4 gap-2">
+              {previewMedia.map((media) => (
+                <div key={media.id} className="overflow-hidden rounded-xl border border-white/8 bg-black/20">
+                  {media.public_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={media.public_url}
+                      alt={media.alt_text ?? product.name}
+                      className="aspect-square w-full object-cover"
+                    />
+                  ) : (
+                    <div className="aspect-square" />
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : null}
 
-          <div className="rounded-[1.5rem] border border-white/8 bg-black/20 p-5">
+          <div className="rounded-[1.3rem] border border-white/8 bg-black/20 p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#d7a12a]">
               Rezumat
             </p>
-            <div className="mt-4 space-y-3 text-sm text-white/68">
+            <div className="mt-3 grid gap-2 text-sm text-white/68">
               <InfoRow label="Produs" value={product.name} />
               <InfoRow label="Slug" value={product.slug} />
               <InfoRow label="Preț" value={formatPrice(product.price)} />
@@ -307,7 +405,7 @@ function ProductEditor({
       </Field>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Field label="Dimensiuni" hint="Un rând per opțiune. Exemplu: 20 cm standard">
+        <Field label="Dimensiuni" hint="Un rând per opțiune. Poți seta preț fix: A5 = 59, A4 = 89, A3 = 129. Fără preț, se folosește prețul de bază.">
           <textarea name="sizes" defaultValue={defaults.sizes} rows={5} className="textarea-field" />
         </Field>
         <Field label="Culori disponibile" hint="Poți bifa mai multe culori pentru același produs.">
@@ -513,10 +611,10 @@ function ProductMediaSection({
           principală pentru produs.
         </div>
       ) : (
-        <div className="mt-6 grid gap-4">
+        <div className="mt-6 grid gap-3">
           {media.map((item) => (
-            <div key={item.id} className="rounded-[1.5rem] border border-white/8 bg-white/[0.02] p-4">
-              <div className="grid gap-4 lg:grid-cols-[0.26fr_0.74fr]">
+            <div key={item.id} className="rounded-[1.3rem] border border-white/8 bg-white/[0.02] p-3">
+              <div className="grid gap-4 lg:grid-cols-[96px_1fr]">
                 <div className="overflow-hidden rounded-[1.2rem] border border-white/8 bg-black/20">
                   {item.public_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -672,9 +770,9 @@ function CheckboxField({
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[1.2rem] border border-white/6 bg-white/[0.02] px-4 py-3">
+    <div className="rounded-[1rem] border border-white/6 bg-white/[0.02] px-3 py-2">
       <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/34">{label}</p>
-      <p className="mt-2 break-all text-sm text-white/78">{value}</p>
+      <p className="mt-1 break-all text-xs text-white/78">{value}</p>
     </div>
   );
 }

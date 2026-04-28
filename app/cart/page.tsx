@@ -16,7 +16,15 @@ import {
 import { siteConfig } from "@/lib/site";
 
 export default function CartPage() {
-  const { items, updateQuantity, removeItem, giftPackaging, setGiftPackaging } = useCart();
+  const {
+    items,
+    updateQuantity,
+    removeItem,
+    giftPackaging,
+    setGiftPackaging,
+    orderNotes,
+    setOrderNotes,
+  } = useCart();
   const subtotal = getSubtotal(items);
   const personalizationTotal = getPersonalizationTotal(items);
   const shipping = getShipping(items);
@@ -126,6 +134,19 @@ export default function CartPage() {
                 Opțiune disponibilă pentru comenzile care merg direct într-un cadou sau pentru o prezentare mai atentă.
               </span>
             </span>
+          </label>
+          <label className="mt-4 block rounded-[1.5rem] border border-white/8 bg-black/20 p-4">
+            <span className="block text-sm font-medium text-white">Mențiuni pentru comandă</span>
+            <span className="mt-1 block text-sm leading-7 text-white/55">
+              Detalii utile pentru producție, cadou sau livrare. Le vedem înainte să pregătim comanda.
+            </span>
+            <textarea
+              value={orderNotes}
+              onChange={(event) => setOrderNotes(event.target.value.slice(0, 500))}
+              rows={4}
+              placeholder="Exemplu: este pentru cadou, prefer o prezentare discretă, detalii de livrare etc."
+              className="mt-3 w-full rounded-[1.2rem] border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none placeholder:text-white/28 focus:border-[#d7a12a]/40"
+            />
           </label>
           <div className="mt-6 space-y-3 text-sm text-white/65">
             <SummaryRow label="Subtotal" value={formatPrice(subtotal)} />

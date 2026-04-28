@@ -19,6 +19,8 @@ type CartContextValue = {
   clearCart: () => void;
   giftPackaging: boolean;
   setGiftPackaging: (value: boolean) => void;
+  orderNotes: string;
+  setOrderNotes: (value: string) => void;
   itemCount: number;
 };
 
@@ -62,12 +64,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return {
           items: parsed.map(normalizeCartItem),
           giftPackaging: false,
+          orderNotes: "",
         };
       }
 
       return {
         items: (parsed.items ?? []).map(normalizeCartItem),
         giftPackaging: parsed.giftPackaging ?? false,
+        orderNotes: parsed.orderNotes ?? "",
       };
     } catch {
       window.localStorage.removeItem(STORAGE_KEY);
@@ -77,6 +81,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const items = cart.items;
   const giftPackaging = cart.giftPackaging;
+  const orderNotes = cart.orderNotes ?? "";
 
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
@@ -125,8 +130,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = useCallback(() => {
     setCart((current) =>
-      current.items.length || current.giftPackaging
-        ? { items: [], giftPackaging: false }
+      current.items.length || current.giftPackaging || current.orderNotes
+        ? { items: [], giftPackaging: false, orderNotes: "" }
         : current,
     );
   }, []);
@@ -134,6 +139,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const setGiftPackaging = useCallback((value: boolean) => {
     setCart((current) =>
       current.giftPackaging === value ? current : { ...current, giftPackaging: value },
+    );
+  }, []);
+
+  const setOrderNotes = useCallback((value: string) => {
+    setCart((current) =>
+      current.orderNotes === value ? current : { ...current, orderNotes: value },
     );
   }, []);
 
@@ -146,9 +157,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
       clearCart,
       giftPackaging,
       setGiftPackaging,
+      orderNotes,
+      setOrderNotes,
       itemCount: items.reduce((total, item) => total + item.quantity, 0),
     }),
-    [items, addItem, updateQuantity, removeItem, clearCart, giftPackaging, setGiftPackaging],
+    [
+      items,
+      addItem,
+      updateQuantity,
+      removeItem,
+      clearCart,
+      giftPackaging,
+      setGiftPackaging,
+      orderNotes,
+      setOrderNotes,
+    ],
   );
 
   return (

@@ -30,6 +30,7 @@ export type Product = {
   longDescription: string;
   story: string;
   sizes: string[];
+  sizePrices?: Record<string, number>;
   colors: string[];
   materials: string[];
   sizeLabel?: string;
@@ -80,6 +81,7 @@ export type CartItem = {
 export type CartStorage = {
   items: CartItem[];
   giftPackaging: boolean;
+  orderNotes?: string;
 };
 
 export type CustomOrderRecord = {
@@ -187,6 +189,7 @@ export type ProductAdminRecord = {
   featured: boolean;
   enabled: boolean;
   sizes: string[];
+  sizePrices?: Record<string, number>;
   colors: string[];
   materials: string[];
   customization: string[];

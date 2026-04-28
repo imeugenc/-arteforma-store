@@ -18,7 +18,7 @@ import { siteConfig } from "@/lib/site";
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, giftPackaging } = useCart();
+  const { items, giftPackaging, orderNotes, setOrderNotes } = useCart();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const subtotal = getSubtotal(items);
@@ -44,7 +44,7 @@ export default function CheckoutPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ items, giftPackaging }),
+        body: JSON.stringify({ items, giftPackaging, notes: orderNotes }),
       });
 
       const data = (await response.json()) as { url?: string; ok?: boolean; message?: string };
@@ -92,6 +92,19 @@ export default function CheckoutPage() {
           />
           <Row label="Total" value={formatPrice(total)} strong />
         </div>
+        <label className="mt-6 block rounded-[1.5rem] border border-white/8 bg-black/20 p-4">
+          <span className="block text-sm font-medium text-white">Mențiuni pentru comandă</span>
+          <span className="mt-1 block text-sm leading-7 text-white/55">
+            Dacă ai ceva important de transmis, îl salvăm împreună cu comanda.
+          </span>
+          <textarea
+            value={orderNotes}
+            onChange={(event) => setOrderNotes(event.target.value.slice(0, 500))}
+            rows={4}
+            placeholder="Exemplu: detalii pentru cadou, livrare sau preferințe pentru produs"
+            className="mt-3 w-full rounded-[1.2rem] border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none placeholder:text-white/28 focus:border-[#d7a12a]/40"
+          />
+        </label>
         {shippingQuote.notes.length ? (
           <div className="mt-6 rounded-[1.5rem] border border-[#d7a12a]/16 bg-[#d7a12a]/6 p-4 text-sm leading-7 text-white/62">
             {shippingQuote.notes.map((note) => (
